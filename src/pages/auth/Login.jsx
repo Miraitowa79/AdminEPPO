@@ -1,10 +1,50 @@
-import './Auth.scss'
-const Login = () => {
-  return (
-    <>
-      this is a login page
-    </>
-  )
-}
+import React from 'react';
+import { Form, Input, Button } from 'antd';
+import './Auth.scss';
 
-export default Login
+const App = () => {
+  return (
+    <div className="login-container">
+      <div className="login-box">
+        <h2>ĐĂNG NHẬP</h2>
+        <Form
+          name="login_form"
+          initialValues={{ remember: true }}
+          layout="vertical"
+        >
+          <Form.Item
+            label="Tên đăng nhập"
+            name="username"
+            rules={[{ required: true, message: 'Nhập địa chỉ email' }]}
+          >
+            <Input placeholder="Nhập địa chỉ email" />
+          </Form.Item>
+
+          <Form.Item
+            label="Mật khẩu"
+            name="password"
+            rules={[{ required: true, message: 'Nhập mật khẩu' }]}
+          >
+            <Input.Password placeholder="Nhập mật khẩu" />
+          </Form.Item>
+
+          <Form.Item>
+            <a href="/" className="forgot-password">QUÊN MẬT KHẨU?</a>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="login-button">
+              Đăng nhập
+            </Button>
+          </Form.Item>
+
+          <Form.Item>
+            <span>Không có tài khoản ? <a href="/" className="register-account">Tạo ngay</a></span>
+          </Form.Item>
+        </Form>
+      </div>
+    </div>
+  );
+};
+
+export default App;

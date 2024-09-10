@@ -1,0 +1,53 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+  }
+  
+  .login-box h2 {
+    color: #02007B;
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .login-box .ant-form-item-label > label {
+    color: #02007B;
+    font-weight: bold;
+  }
+  
+  .login-box .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .login-box .forgot-password {
+    float: left;
+    color: #02007B;
+  }
+  
+  .login-box .login-button {
+    width: 100%;
+    background: #1e90ff;
+    border: none;
+    color: white;
+    border-radius: 5px;
+  }
+  
+  .login-box .register-account {
+    color: #ffa500;
+  }
+
+  .login-box .issue {
+    color: #7dbae38d;
+  }
+  
