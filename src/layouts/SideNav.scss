@@ -1,0 +1,46 @@
+.role-display {
+  margin: 16px;
+}
+
+.menu-item-header {
+  font-weight: bold;
+  font-size: 14px;
+  color: #000;
+  margin-top: 16px;
+  padding-left: 24px;
+}
+
+.ant-menu-item {
+  margin: 0;
+  padding: 0 24px;
+}
+
+.ant-menu-submenu-title {
+  padding: 0 24px !important;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.icon svg {
+  fill: currentColor;
+}
+
+.ant-menu-submenu .ant-menu-item {
+  padding-left: 48px !important;
+}
+
+/* Style for the aside footer */
+.aside-footer {
+  padding: 16px;
+  text-align: center;
+}

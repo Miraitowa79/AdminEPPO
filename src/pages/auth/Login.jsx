@@ -1,8 +1,21 @@
 import React from 'react';
 import { Form, Input, Button } from 'antd';
+import { Navigate, useNavigate } from "react-router-dom";
 import './Auth.scss';
 
 const App = () => {
+  const navigate = useNavigate()
+  const handleSubmit = ({username, password}) => {
+    if(username == 'admin' && password=='123456'){
+      localStorage.setItem('authUser',JSON.stringify({
+        username: 'uyen',
+        role: 'admin',
+        isLogged: true
+      }))
+      return navigate('/')
+
+    }
+  }
   return (
     <div className="login-container">
       <div className="login-box">
@@ -11,6 +24,7 @@ const App = () => {
           name="login_form"
           initialValues={{ remember: true }}
           layout="vertical"
+          onFinish={handleSubmit}
         >
           <Form.Item
             label="Tên đăng nhập"

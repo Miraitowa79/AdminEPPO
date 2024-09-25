@@ -1,0 +1,25 @@
+.dashboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    background: #fff;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .logo {
+      height: 32px;
+      margin: 16px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .content {
+    padding: 16px;
+    background: #f0f2f5;
+    flex: 1;
+  }
+}
