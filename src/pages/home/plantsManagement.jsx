@@ -1,44 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { Table, Input, Button, Pagination, Space, Select } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
-
+import axios from 'axios';
+import { apiPlant } from '../../api/apiConfig'; 
 const { Option } = Select;
-
-const data = [
-  {
-    key: '1',
-    code: 'PT1232',
-    name: 'Cây kim tiền',
-    price: '5.000.000',
-    description: 'Cây kim tiền...',
-    businessModel: 'Cây bán',
-    status: 'Đang bán',
-    category: 'Cây phong thủy',
-  },
-  {
-    key: '2',
-    code: 'PT2232',
-    name: 'Cây mai 10 cánh',
-    price: '5.000.000',
-    description: 'Cây mai 10 cánh...',
-    businessModel: 'Cây cho thuê',
-    status: 'Đang cho thuê',
-    category: 'Cây cảnh',
-  },
-];
 
 const PlantsMng = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState('');
-
-  const handleSearch = () => {
-    console.log('Search:', searchText);
+  const [data, setData] = useState([]); 
+  const [loading, setLoading] = useState(false); 
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalItems, setTotalItems] = useState(0); 
+  const pageSize = 10;
+  
+  //Get API Plants
+  const fetchData = async (page = 1, search = '') => {
+    setLoading(true); 
+    try {
+      const response = await axios.get(apiPlant.getListPlant, {
+        params: {
+          page: page,
+          size: pageSize,
+          search: search
+        }
+      });
+      const { data: items } = response.data; 
+      setData(items);
+      setTotalItems(response.data.total);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    } finally {
+      setLoading(false); 
+    }
   };
 
+  useEffect(() => {
+    fetchData(currentPage, searchText);
+  }, [currentPage, searchText]);
+
+
+  const handleSearch = () => {
+    setCurrentPage(1); 
+    fetchData(1, searchText); 
+  };
   const handleViewDetails = (record) => {
     console.log('View details:', record);
   };
-
+  const handlePageChange = (page) => {
+    setCurrentPage(page); 
+  };
+ 
   const handleTypeChange = (value) => {
     setSelectedType(value);
   };
@@ -53,16 +65,18 @@ const PlantsMng = () => {
       title: 'STT',
       dataIndex: 'key',
       key: 'key',
+      render: (text, record, index) => (currentPage - 1) * pageSize + index + 1, 
     },
     {
       title: 'Mã cây cảnh',
-      dataIndex: 'code',
-      key: 'code',
+      dataIndex: 'plantId',
+      key: 'plantId',
+  
     },
     {
       title: 'Tên cây',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'plantName',
+      key: 'plantName',
     },
     {
       title: 'Số tiền',
@@ -76,8 +90,8 @@ const PlantsMng = () => {
     },
     {
       title: 'Mô hình kinh doanh',
-      dataIndex: 'businessModel',
-      key: 'businessModel',
+      dataIndex: 'typeEcommerceId',
+      key: 'typeEcommerceId',
     },
     {
       title: 'Trạng Thái',
@@ -124,12 +138,26 @@ const PlantsMng = () => {
           <Option value="Cây cảnh">Cây cảnh</Option>
         </Select>
       </div>
-      <Table columns={columns} dataSource={filteredData} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        rowKey="key"
+        loading={loading}
+      />
+      {/* <Table columns={columns} dataSource={filteredData} pagination={false} /> */}
       <Pagination
         defaultCurrent={1}
         total={100}
+        pageSize={pageSize}
+        onChange={handlePageChange}
         style={{ textAlign: 'center', marginTop: '20px' , justifyContent: 'right'}}
       />
+      {/* <Pagination
+        defaultCurrent={1}
+        total={100}
+        style={{ textAlign: 'center', marginTop: '20px' , justifyContent: 'right'}}
+      /> */}
     </div>
   );
 };
