@@ -3,14 +3,15 @@ import { Form, Input, Button } from 'antd';
 import { Navigate, useNavigate } from "react-router-dom";
 import './Auth.scss';
 
-const App = () => {
+const Login = () => {
   const navigate = useNavigate()
   const handleSubmit = ({username, password}) => {
     if(username == 'admin' && password=='123456'){
       localStorage.setItem('authUser',JSON.stringify({
         username: 'uyen',
         role: 'admin',
-        isLogged: true
+        isLogged: true,
+        userId: 1
       }))
       return navigate('/')
 
@@ -61,4 +62,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Login;

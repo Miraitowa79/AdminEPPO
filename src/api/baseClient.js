@@ -2,11 +2,11 @@
 import axios from "axios";
 
 import { getAuthUser } from "@utils/index";
-import { modalNoti } from "@utils/Notification";
+
 
 let store;
 
-export const BASE_URL = process.env.REACT_APP_BASE_URL_AUTH;
+export const BASE_URL = import.meta.env.VITE_SERVER_URL;
 
 export const injectStore = (_store) =>
 (store = _store);
@@ -15,7 +15,7 @@ export const baseApi = (baseUrl) => {
 
   const baseClient = axios.create({
     baseURL: baseUrl ? baseUrl : BASE_URL,
-    withCredentials: true, 
+    withCredentials: false, 
   });
   
   baseClient.interceptors.response.use((response) => {
