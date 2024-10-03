@@ -13,7 +13,7 @@ export const baseApi = (baseUrl) => {
   const baseClient = axios.create({
     baseURL: baseUrl ? baseUrl : BASE_URL,
     withCredentials: false, 
-    withCredentials: true,
+  //  withCredentials: true,
   });
 
   baseClient.interceptors.response.use(
