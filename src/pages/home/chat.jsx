@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Avatar, List, Input } from 'antd';
 import { UserOutlined, SendOutlined } from '@ant-design/icons';
 import './chat.scss';
+import {getConversationsByUserId, sendMessageByConversationId} from '@src/api';
+import {getAuthUser} from '@src/utils'
 
 const users = {
   staff: [
@@ -21,25 +23,49 @@ const users = {
 };
 
 const Chat = () => {
-  const [selectedUser, setSelectedUser] = useState(users.staff[0]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
   const [menuKey, setMenuKey] = useState('staff');
   const [message, setMessage] = useState('');
+  const [conversations, setConversations] = useState([])
 
   const handleMenuClick = (e) => {
     setMenuKey(e.key);
-    setSelectedUser(users[e.key][0]);
   };
 
-  const handleUserClick = (user) => {
-    setSelectedUser(user);
+  const handleUserClick = (conversationId) => {
+    setSelectedConversation(conversationId);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage =async () => {
     if (message.trim()) {
-      console.log('Sending message:', message);
-      setMessage('');
+      try {
+        await sendMessageByConversationId({
+          conversationId: selectedConversation,
+          userId: getAuthUser().userId,
+          message1: message.trim(),
+          type:'text'
+        })
+        setMessage('')
+        handleGetConversations()
+      } catch (error) {
+        console.log('err', error)
+      }
     }
   };
+ 
+  const handleGetConversations =async () => {
+    try {
+      const res = await getConversationsByUserId(1);
+      setConversations(res)
+    } catch (error) {
+      console.log('err', error)
+    }
+  }
+
+
+  useEffect(() => {
+    handleGetConversations()
+  }, [])
 
   return (
     <div className="chat-container">
@@ -55,16 +81,16 @@ const Chat = () => {
         </Menu>
         <List
           itemLayout="horizontal"
-          dataSource={users[menuKey]}
-          renderItem={(user) => (
+          dataSource={conversations}
+          renderItem={(conversation) => (
             <List.Item
-              onClick={() => handleUserClick(user)}
+              onClick={() => handleUserClick(conversation?.conversationId)}
               style={{ cursor: 'pointer', padding: '10px 20px' }}
-              className={user.id === selectedUser.id ? 'selected-user' : ''}
+              className={conversation.conversationId === selectedConversation ? 'selected-user' : ''}
             >
               <List.Item.Meta
                 avatar={<Avatar icon={<UserOutlined />} />}
-                title={user.name}
+                title={'Uyen Tran'}
               />
             </List.Item>
           )}
@@ -73,66 +99,31 @@ const Chat = () => {
       <div className="chat-main">
         <div className="chat-header">
           <Avatar icon={<UserOutlined />} style={{ marginRight: '10px' }} />
-          {selectedUser.name}
+          {selectedConversation}
         </div>
         <div className="chat-content">
           <div className="chat-window">
-            <div className="message left">
+            {conversations.find(val => {
+              return val.conversationId === selectedConversation
+            })?.messages?.map((message) => {
+                console.log(message?.message1)
+              if(message?.userId === getAuthUser()?.userId){
+                return (
+                  <div className="message right">
+                  <div className="message-content">{message?.message1}</div>
+                    <Avatar icon={<UserOutlined />} />
+                </div>
+                )
+              }else{
+                return (
+                  <div className="message left">
               <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
+              <div className="message-content">{message?.message1}</div>
             </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
-            <div className="message left">
-              <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-            </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
-            <div className="message left">
-              <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-            </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
-            <div className="message left">
-              <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-            </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
-            <div className="message left">
-              <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-            </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
-            <div className="message left">
-              <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-            </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
-            <div className="message left">
-              <Avatar icon={<UserOutlined />} />
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-            </div>
-            <div className="message right">
-              <div className="message-content">Tôi muốn nghỉ việc</div>
-              <Avatar icon={<UserOutlined />} />
-            </div>
+                )
+              }
+            }).reverse()}
+           
           </div>
         </div>
         <div className="chat-input">

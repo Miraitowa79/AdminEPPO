@@ -15,6 +15,9 @@ import Dashboard from "@pages/home/dashboard.jsx";
 import AccountManagement from "@pages/home/accountManagement.jsx";
 import ContractManagement from "@pages/home/contractManagement.jsx";
 import PlantstManagement from "@pages/home/plantsManagement.jsx";
+import Profile from "@pages/home/profile.jsx";
+// import AccountDetails from "@pages/home/accountManagement.jsx";
+// import Verify from '@pages/auth/Login.jsx'
 
 const authRoutes = {
   path: "/auth",
@@ -137,6 +140,42 @@ const plantsManagement = {
   ],
 };
 
+const profile = {
+  path: "/profile",
+  element: <MainLayout />,
+  guard: <AuthRoute />,
+  children: [
+    {
+      path: "",
+      element: <Profile />,
+    }
+  ],
+};
+
+// const accountDetails = {
+//   path: "/account",
+//   element: <MainLayout />,
+//   guard: <AuthRoute />,
+//   children: [
+//     {
+//       path: "detail",
+//       element: <AccountDetails />,
+//     }
+//   ],
+// };
+
+// const verify = {
+//   path: "/auth",
+//   element: <LayoutAuth />,
+//   guard: <UnauthRoute />,
+//   children: [
+//     {
+//       path: "verify",
+//       element: <Verify />,
+//     },
+//   ],
+// };
+
 const notfoundRoute = {
   path: "*",
   element: <></>,
@@ -148,7 +187,9 @@ const notfoundRoute = {
   ],
 };
 
-const routes = [authRoutes, notfoundRoute, homeRoutes,adminRoutes, staffRoutes, managerRoutes, chatMessage, dashboard, accountManagement, contractManagement, plantsManagement];
+const routes = [authRoutes, notfoundRoute, homeRoutes,adminRoutes, staffRoutes, managerRoutes, chatMessage, dashboard, accountManagement, contractManagement, plantsManagement,
+  profile
+];
 
 const Routes = () => {
   return (
