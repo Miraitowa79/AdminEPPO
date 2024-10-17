@@ -1,20 +1,25 @@
 import React from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, notification } from 'antd';
 import { Navigate, useNavigate } from "react-router-dom";
+import { login } from '@src/api/login'
+import {getAuthUser} from '@utils'
+
 import './Auth.scss';
 
 const Login = () => {
   const navigate = useNavigate()
-  const handleSubmit = ({username, password}) => {
-    if(username == 'admin' && password=='123456'){
-      localStorage.setItem('authUser',JSON.stringify({
-        username: 'uyen',
-        role: 'admin',
-        isLogged: true,
-        userId: 1
-      }))
+  
+  const handleSubmit =async ({usernameOrEmail, password}) => {
+    try {
+      const res = await login({usernameOrEmail, password});
+      localStorage.setItem('authUser',JSON.stringify(res))
       return navigate('/')
-
+    } catch (error) {
+      notification.error({
+        duration: 5,
+        message: 'Có lỗi xảy ra',
+        description: 'Email/Tên đăng nhập hoặc mật khẩu không đúng!'
+      })
     }
   }
   return (
@@ -28,11 +33,11 @@ const Login = () => {
           onFinish={handleSubmit}
         >
           <Form.Item
-            label="Tên đăng nhập"
-            name="username"
-            rules={[{ required: true, message: 'Nhập địa chỉ email' }]}
+            label="Email hoặc Tên đăng nhập"
+            name="usernameOrEmail"
+            rules={[{ required: true, message: 'Nhập email hoặc tên đăng nhập' }]}
           >
-            <Input placeholder="Nhập địa chỉ email" />
+            <Input placeholder="Nhập email hoặc tên đăng nhập" />
           </Form.Item>
 
           <Form.Item
@@ -43,9 +48,9 @@ const Login = () => {
             <Input.Password placeholder="Nhập mật khẩu" />
           </Form.Item>
 
-          <Form.Item>
+          {/* <Form.Item>
             <a href="/" className="forgot-password">QUÊN MẬT KHẨU?</a>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button type="primary" htmlType="submit" className="login-button">
@@ -53,9 +58,9 @@ const Login = () => {
             </Button>
           </Form.Item>
 
-          <Form.Item>
+          {/* <Form.Item>
             <span>Không có tài khoản ? <a href="/" className="register-account">Tạo ngay</a></span>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </div>
     </div>

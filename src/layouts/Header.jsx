@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Button, Avatar, Badge, Dropdown, Menu } from "antd";
+import {useNavigate} from 'react-router-dom'
 import { BellOutlined, MailOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -42,6 +43,7 @@ function Header({
   handleSidenavType,
   handleFixedNavbar,
 }) {
+  const navigation = useNavigate()
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
 
@@ -53,8 +55,10 @@ function Header({
   return (
     <Row gutter={[24, 0]} style={{ padding: '10px 20px' }}>
       <Col span={12} md={6}>
-        <div className="brand" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={logo} alt="Logo" style={{ marginRight: 10 }} />
+        <div onClick={() => {
+          navigation('/')
+        }} className="brand hover-point" style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={logo}  alt="Logo" style={{ marginRight: 10 }} />
           <span style={{ fontSize: 18, color: '#5457FB' }}>EPPO</span>
         </div>
       </Col>

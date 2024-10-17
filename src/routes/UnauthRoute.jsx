@@ -4,7 +4,7 @@ import { getAuthUser } from '@utils'
 
 const UnauthRoute = () => {
   const auth = getAuthUser();
-  if (!auth?.isLogged) {
+  if (!auth?.token) {
     return <Outlet />;
   }
   return <Navigate to={'/'} />;

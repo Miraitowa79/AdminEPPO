@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { apiContract } from '../../api/apiConfig'; 
+import { getContracts } from '../../api/contractManagement';
 
 const ContractMng = () => {
   const [data, setData] = useState([]); 
@@ -13,34 +15,66 @@ const ContractMng = () => {
   const pageSize = 10; 
 
     //Get API Contracts
+  // const fetchData = async (page = 1, search = '') => {
+  //   setLoading(true); 
+  //   try {
+  //     const response = await axios.get(apiContract.getListContract, {
+  //       params: {
+  //         page: page,
+  //         size: pageSize,
+  //         search: search
+  //       }
+  //     });
+  //     const { data: items, total } = response.data; 
+  //     setData(items.map((item, index) => ({
+  //       ...item,
+  //       key: item.contractId, 
+  //       userId: item.user.userName, 
+  //       totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Format amount in VND
+  //       creationContractDate: item.creationContractDate.split('T')[0], 
+  //       endContractDate: item.endContractDate.split('T')[0], 
+  //       status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn', 
+  //     })));
+  //     setTotalItems(response.data.total);
+
+  //   } catch (error) {
+  //     console.error('Failed to fetch data:', error);
+  //   } finally {
+  //     setLoading(false); 
+  //   }
+  // };
+
+  const navigate = useNavigate();
+
   const fetchData = async (page = 1, search = '') => {
-    setLoading(true); 
+    setLoading(true);
     try {
-      const response = await axios.get(apiContract.getListContract, {
-        params: {
-          page: page,
-          size: pageSize,
-          search: search
-        }
-      });
-      const { data: items, total } = response.data; 
+      const response = await getContracts({ page, size: pageSize, search });
+      const { data: items } = response;
+
       setData(items.map((item, index) => ({
         ...item,
-        key: item.contractId, 
-        userId: item.user.userName, 
-        totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }), // Format amount in VND
-        creationContractDate: item.creationContractDate.split('T')[0], 
-        endContractDate: item.endContractDate.split('T')[0], 
-        status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn', 
+        key: item.contractId,
+        userId: item.user.userName,
+        totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+        creationContractDate: item.creationContractDate.split('T')[0],
+        endContractDate: item.endContractDate.split('T')[0],
+        status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn',
       })));
-      setTotalItems(response.data.total);
 
+      if (items.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + items.length);
+      } else {
+        setTotalItems((page + 1) * pageSize);
+      }
+      
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData(currentPage, searchText);
   }, [currentPage, searchText]);
@@ -50,7 +84,7 @@ const ContractMng = () => {
     fetchData(1, searchText); 
   };
   const handleViewDetails = (record) => {
-    console.log('View details:', record);
+    navigate(`/staff/contract/${record.contractId}`);
   };
   const handlePageChange = (page) => {
     setCurrentPage(page); 
@@ -128,10 +162,11 @@ const ContractMng = () => {
         loading={loading}
       />
        <Pagination
-        defaultCurrent={1}
-        total={100}
+        current={currentPage}
+        total={totalItems}
         pageSize={pageSize}
         onChange={handlePageChange}
+        showSizeChanger={false}
         style={{ textAlign: 'center', marginTop: '20px' , justifyContent: 'right'}}
       />
       {/* <Table columns={columns} dataSource={data} pagination={false} /> */}

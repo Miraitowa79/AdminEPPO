@@ -16,8 +16,9 @@ import AccountManagement from "@pages/home/accountManagement.jsx";
 import ContractManagement from "@pages/home/contractManagement.jsx";
 import PlantstManagement from "@pages/home/plantsManagement.jsx";
 import Profile from "@pages/home/profile.jsx";
-// import AccountDetails from "@pages/home/accountManagement.jsx";
-// import Verify from '@pages/auth/Login.jsx'
+import AccountDetails from "@pages/home/accountDetails.jsx";
+import Verify from '@pages/auth/verifyAccount.jsx'
+import ContractId from "@pages/home/contractId.jsx";
 
 const authRoutes = {
   path: "/auth",
@@ -27,6 +28,10 @@ const authRoutes = {
     {
       path: "login",
       element: <Login />,
+    },
+    {
+      path: "verify",
+      element: <Verify />,
     },
   ],
 };
@@ -40,18 +45,13 @@ const homeRoutes = {
       path: "/",
       element: <Dashboard />,
     },
-  
-  ],
-};
-
-const staffRoutes = {
-  path: "/staff",
-  element: <MainLayout />,
-  guard: <StaffRoute />,
-  children: [
     {
-      path: "products-management",
-      element: <>this is a staff page</>,
+      path: "profile",
+      element: <Profile/>
+    },
+    {
+      path: "/dashboard",
+      element: <Dashboard />
     }
   ],
 };
@@ -62,8 +62,33 @@ const adminRoutes = {
   guard: <AdminRoute />,
   children: [
     {
-      path: "users-management",
-      element: <>this is a admin page</>,
+      path: "account",
+      element: <AccountManagement/>,
+    },
+    {
+      path: 'account/:id',
+      element: <AccountDetails />
+    }
+  ],
+};
+
+const staffRoutes = {
+  path: "/staff",
+  element: <MainLayout />,
+  guard: <StaffRoute />,
+  children: [
+    {
+      path: "contract",
+      element: <ContractManagement/>,
+      guard: <StaffRoute />
+    },
+    {
+      path: 'contract/:id',
+      element:  <ContractId />
+    },
+    {
+      path: 'chat',
+      element:  <ChatMessage />
     }
   ],
 };
@@ -74,107 +99,15 @@ const managerRoutes = {
   guard: <ManagerRoute />,
   children: [
     {
-      path: "auction-management",
-      element: <>this is a manager page</>,
-    }
+      path: "products/plants",
+      element:  <PlantstManagement />,
+    },
+    // {
+    //   path: "plants",
+    //   element: <PlantstManagement />,
+    // }
   ],
 };
-
-const chatMessage = {
-  path: "/chat",
-  element: <MainLayout />,
-  guard: <AuthRoute />,
-  children: [
-    {
-      path: "support",
-      element: <ChatMessage />,
-    }
-  ],
-};
-
-const dashboard = {
-  path: "/dashboard",
-  element: <MainLayout />,
-  guard: <AuthRoute />,
-  children: [
-    {
-      path: "",
-      element: <Dashboard />,
-    }
-  ],
-};
-
-const accountManagement = {
-  path: "/account",
-  element: <MainLayout />,
-  guard: <AuthRoute />,
-  children: [
-    {
-      path: "",
-      element: <AccountManagement />,
-    }
-  ],
-};
-
-const contractManagement = {
-  path: "/contract",
-  element: <MainLayout />,
-  guard: <AuthRoute />,
-  children: [
-    {
-      path: "",
-      element: <ContractManagement />,
-    }
-  ],
-};
-
-const plantsManagement = {
-  path: "/product",
-  element: <MainLayout />,
-  guard: <AuthRoute />,
-  children: [
-    {
-      path: "plants",
-      element: <PlantstManagement />,
-    }
-  ],
-};
-
-const profile = {
-  path: "/profile",
-  element: <MainLayout />,
-  guard: <AuthRoute />,
-  children: [
-    {
-      path: "",
-      element: <Profile />,
-    }
-  ],
-};
-
-// const accountDetails = {
-//   path: "/account",
-//   element: <MainLayout />,
-//   guard: <AuthRoute />,
-//   children: [
-//     {
-//       path: "detail",
-//       element: <AccountDetails />,
-//     }
-//   ],
-// };
-
-// const verify = {
-//   path: "/auth",
-//   element: <LayoutAuth />,
-//   guard: <UnauthRoute />,
-//   children: [
-//     {
-//       path: "verify",
-//       element: <Verify />,
-//     },
-//   ],
-// };
 
 const notfoundRoute = {
   path: "*",
@@ -187,9 +120,7 @@ const notfoundRoute = {
   ],
 };
 
-const routes = [authRoutes, notfoundRoute, homeRoutes,adminRoutes, staffRoutes, managerRoutes, chatMessage, dashboard, accountManagement, contractManagement, plantsManagement,
-  profile
-];
+const routes = [authRoutes, notfoundRoute, homeRoutes,adminRoutes, staffRoutes, managerRoutes];
 
 const Routes = () => {
   return (

@@ -2,51 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Avatar, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import avatar from "../../assets/images/team-2.jpg";
-import axios from 'axios';
-import { apiAccount } from '../../api/apiConfig'; 
+import { useNavigate } from 'react-router-dom';
+import { getAccounts } from '../../api/accountManagement';
 
-const accountMng = () => {
-  const [data, setData] = useState([]); 
-  const [loading, setLoading] = useState(false); 
-  const [searchText, setSearchText] = useState(''); 
-  const [currentPage, setCurrentPage] = useState(1); 
-  const [totalItems, setTotalItems] = useState(0); 
-  const pageSize = 10; 
+const AccountMng = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 5;
 
-  //Get API Accounts
   const fetchData = async (page = 1, search = '') => {
-    setLoading(true); 
+    setLoading(true);
     try {
-      const response = await axios.get(apiAccount.getListAccount, {
-        params: {
-          page: page,
-          size: pageSize,
-          search: search
-        }
-      });
-      const { data: items } = response.data; 
+      const response = await getAccounts({ page, size: pageSize, search });
+      const { data: items} = response;
       setData(items);
-      setTotalItems(response.data.total);
+      
+      if (items.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + items.length);
+      } else {
+        setTotalItems((page + 1) * pageSize);
+      }
+
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
- 
   useEffect(() => {
     fetchData(currentPage, searchText);
   }, [currentPage, searchText]);
 
   const handleSearch = () => {
-    setCurrentPage(1); 
-    fetchData(1, searchText); 
+    setCurrentPage(1);
+    fetchData(1, searchText);
   };
 
-
   const handleViewDetails = (record) => {
-    console.log('View details:', record);
+    navigate(`/admin/account/${record.userId}`);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const columns = [
@@ -54,13 +56,13 @@ const accountMng = () => {
       title: 'STT',
       dataIndex: 'key',
       key: 'key',
-      render: (text, record, index) => (currentPage - 1) * pageSize + index + 1, 
+      render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Avata',
+      title: 'Avatar',
       dataIndex: 'imageUrl',
       key: 'imageUrl',
-      render: (imageUrl) => <Avatar src={imageUrl ? imageUrl : avatar} />, 
+      render: (imageUrl) => <Avatar src={imageUrl ? imageUrl : avatar} />,
     },
     {
       title: 'Họ Và Tên',
@@ -107,14 +109,9 @@ const accountMng = () => {
     },
   ];
 
-  
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
   return (
     <div style={{ padding: '20px' }}>
-          <Input
+      <Input
         placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
         suffix={
           <SearchOutlined
@@ -127,30 +124,23 @@ const accountMng = () => {
         onPressEnter={handleSearch}
         style={{ marginBottom: '20px', width: '50%' }}
       />
-       {/* <Table columns={columns} dataSource={data} pagination={false} /> */}
-       <Table
+      <Table
         columns={columns}
         dataSource={data}
         pagination={false}
         rowKey="userId"
         loading={loading}
       />
-      {/* <Pagination
+      <Pagination
         current={currentPage}
         total={totalItems}
         pageSize={pageSize}
         onChange={handlePageChange}
-        style={{ textAlign: 'center', marginTop: '20px' }}
-      /> */}
-      <Pagination
-        defaultCurrent={1}
-        total={100}
-        pageSize={pageSize}
-        onChange={handlePageChange}
-        style={{ textAlign: 'center', marginTop: '20px' , justifyContent: 'right'}}
+        showSizeChanger={false}
+        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right'}}
       />
     </div>
   );
 };
 
-export default accountMng;
+export default AccountMng;

@@ -66,6 +66,11 @@ body {
 .layout-dashboard .ant-layout-sider.sider-primary .brand {
   font-weight: 600;
 }
+
+.hover-point:hover{
+  cursor: pointer;
+}
+
 .layout-dashboard .ant-layout-sider.sider-primary .brand span {
   vertical-align: middle;
   margin-left: 3px;
