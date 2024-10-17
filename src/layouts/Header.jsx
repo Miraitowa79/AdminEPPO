@@ -19,6 +19,8 @@ const notifications = [
   { title: "Notification 3", message: "Có 5 hợp đồng thuê xe đang chờ duyệt" },
   { title: "Notification 4", message: "Có 5 hợp đồng thuê xe đang chờ duyệt" },
   { title: "Notification 5", message: "Có 5 hợp đồng thuê xe đang chờ duyệt" },
+  { title: "Notification 4", message: "Có 5 hợp đồng thuê xe đang chờ duyệt" },
+  { title: "Notification 5", message: "Có 5 hợp đồng thuê xe đang chờ duyệt" },
 ];
 
 const menu = (
