@@ -66,7 +66,7 @@ const adminRoutes = {
       element: <AccountManagement/>,
     },
     {
-      path: 'account/:id',
+      path: 'account/:userId',
       element: <AccountDetails />
     }
   ],

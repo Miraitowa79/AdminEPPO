@@ -152,7 +152,8 @@ function SideNav({ color }) {
                     if (option.submenu) {
                         return (
                             <SubMenu
-                                key={`submenu-${index}`}
+                                // key={`submenu-${index}`}
+                                key={option.path}
                                 title={
                                     <span>
                                         <span className="icon" style={option?.styleIcon || {}}>

@@ -3,35 +3,57 @@ import { Table, Input, Button, Pagination, Space, Select } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { apiPlant } from '../../api/apiConfig'; 
+import { getPlants, getPlantDetails } from '../../api/plantsManagement';
+import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
 
 const PlantsMng = () => {
+  const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [data, setData] = useState([]); 
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
-  const pageSize = 10;
+  const pageSize = 5;
   
   //Get API Plants
+  // const fetchData = async (page = 1, search = '') => {
+  //   setLoading(true); 
+  //   try {
+  //     const response = await axios.get(apiPlant.getListPlant, {
+  //       params: {
+  //         page: page,
+  //         size: pageSize,
+  //         search: search
+  //       }
+  //     });
+  //     const { data: items } = response.data; 
+  //     setData(items);
+  //     setTotalItems(response.data.total);
+  //   } catch (error) {
+  //     console.error('Failed to fetch data:', error);
+  //   } finally {
+  //     setLoading(false); 
+  //   }
+  // };
+
   const fetchData = async (page = 1, search = '') => {
-    setLoading(true); 
+    setLoading(true);
     try {
-      const response = await axios.get(apiPlant.getListPlant, {
-        params: {
-          page: page,
-          size: pageSize,
-          search: search
-        }
-      });
-      const { data: items } = response.data; 
+      const response = await getPlants({ pageIndex: page, pageSize, search });
+      const items = response;
       setData(items);
-      setTotalItems(response.data.total);
+      
+      if (items.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + items.length);
+      } else {
+        setTotalItems((page + 1) * pageSize);
+      }
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -44,9 +66,16 @@ const PlantsMng = () => {
     setCurrentPage(1); 
     fetchData(1, searchText); 
   };
-  const handleViewDetails = (record) => {
-    console.log('View details:', record);
+  
+  const handleViewDetails = async (record) => {
+    try {
+      const details = await getPlantDetails(record.plantId);
+      console.log('Plant details:', details);
+    } catch (error) {
+      console.error('Failed to fetch plant details:', error);
+    }
   };
+
   const handlePageChange = (page) => {
     setCurrentPage(page); 
   };
@@ -55,10 +84,10 @@ const PlantsMng = () => {
     setSelectedType(value);
   };
 
-  const filteredData = data.filter(item => 
-    (item.code.includes(searchText) || item.name.includes(searchText)) &&
-    (selectedType === '' || item.category === selectedType)
-  );
+  // const filteredData = data.filter(item => 
+  //   (item.code.includes(searchText) || item.name.includes(searchText)) &&
+  //   (selectedType === '' || item.category === selectedType)
+  // );
 
   const columns = [
     {
@@ -142,15 +171,16 @@ const PlantsMng = () => {
         columns={columns}
         dataSource={data}
         pagination={false}
-        rowKey="key"
+        rowKey="plantId"
         loading={loading}
       />
       {/* <Table columns={columns} dataSource={filteredData} pagination={false} /> */}
       <Pagination
-        defaultCurrent={1}
-        total={100}
+        current={currentPage}
+        total={totalItems}
         pageSize={pageSize}
         onChange={handlePageChange}
+        showSizeChanger={false}
         style={{ textAlign: 'center', marginTop: '20px' , justifyContent: 'right'}}
       />
       {/* <Pagination

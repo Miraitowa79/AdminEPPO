@@ -1,15 +1,16 @@
 import { baseApi } from './baseClient';
 
-export const getAccounts = ({ page = 1, size = 5, search = '' }) => {
+export const getPlants = ({ pageIndex = 1, pageSize = 10, search = '' }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { data } = await baseApi().get('/GetList/Users', {
+            const { data } = await baseApi().get('/Plant', {
                 params: {
-                    page,
-                    size,
+                    pageIndex,
+                    pageSize,
                     search
                 }
             });
+            console.log('data: ', data);
             return resolve(data);
         } catch (error) {
             console.log('Error fetching accounts:', error);
@@ -18,11 +19,10 @@ export const getAccounts = ({ page = 1, size = 5, search = '' }) => {
     });
 };
 
-export const getAccountDetails = (id) => {
+export const getPlantDetails = (plantId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            console.log('id:', id);
-            const { data } = await baseApi().get(`/GetUser/Users/Id?id=${id}`);
+            const { data } = await baseApi().get(`/Plant/${plantId}`);
             return resolve(data);
         } catch (error) {
             console.log('Error fetching account details:', error);
