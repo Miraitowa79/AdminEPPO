@@ -12,7 +12,8 @@ const Login = () => {
   const handleSubmit =async ({usernameOrEmail, password}) => {
     try {
       const res = await login({usernameOrEmail, password});
-      localStorage.setItem('authUser',JSON.stringify(res))
+      localStorage.setItem('authUser',JSON.stringify(res));
+      localStorage.setItem('authToken', res.token);
       return navigate('/')
     } catch (error) {
       notification.error({

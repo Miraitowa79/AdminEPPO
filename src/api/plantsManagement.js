@@ -19,10 +19,11 @@ export const getPlants = ({ pageIndex = 1, pageSize = 10, search = '' }) => {
     });
 };
 
-export const getPlantDetails = (plantId) => {
+export const getPlantDetails = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { data } = await baseApi().get(`/Plant/${plantId}`);
+            console.log('id:', id);
+            const { data } = await baseApi().get(`/Plant/${id}`);
             return resolve(data);
         } catch (error) {
             console.log('Error fetching account details:', error);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Form, Input, Button, Select, DatePicker, Typography, Card, Spin, message } from 'antd';
+import { Form, Input, Button, Select, DatePicker, Typography, Card, Spin, message, Avatar } from 'antd';
 import { getAccountDetails } from '../../api/accountManagement';
+import avatar from "../../assets/images/team-2.jpg";
 import moment from 'moment';
 
 const { Title } = Typography;
@@ -43,7 +44,10 @@ const AccountDetails = () => {
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <Button type="primary" shape="round">Mã ID: {data.userId}</Button>
         </div>
-        <Form layout="vertical">
+        <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} labelAlign="left">
+          <Form.Item label="Hình ảnh">
+            <Avatar style={{ width: '100px', height: '100px', backgroundColor: '#f0f0f0', borderRadius: '50%' }} src={avatar}/>
+          </Form.Item>
           <Form.Item label="Tên tài khoản:">
             <Input value={data.userName || ''} readOnly />
           </Form.Item>

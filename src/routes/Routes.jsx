@@ -19,6 +19,14 @@ import Profile from "@pages/home/profile.jsx";
 import AccountDetails from "@pages/home/accountDetails.jsx";
 import Verify from '@pages/auth/verifyAccount.jsx'
 import ContractId from "@pages/home/contractId.jsx";
+import AdminAndManagerRoute from "./AdminAndManager.jsx";
+import ManagerAndStaffRoutes from "./ManagerAndStaff.jsx";
+import CreateAccount from "@pages/home/createAccount.jsx";
+import PlantDetails from "@pages/home/plantDetails.jsx";
+import FeedbackMng from "@pages/home/feedbackManagement.jsx";
+import FeedbackDetails from "@pages/home/feedbackDetails.jsx";
+import AuctionMng from "@pages/home/auctionManagement.jsx";
+import AuctionDetails from "@pages/home/auctionDetails.jsx";
 
 const authRoutes = {
   path: "/auth",
@@ -62,13 +70,9 @@ const adminRoutes = {
   guard: <AdminRoute />,
   children: [
     {
-      path: "account",
-      element: <AccountManagement/>,
+      path: "list/users/create-account",
+      element: <CreateAccount/>,
     },
-    {
-      path: 'account/:userId',
-      element: <AccountDetails />
-    }
   ],
 };
 
@@ -77,19 +81,15 @@ const staffRoutes = {
   element: <MainLayout />,
   guard: <StaffRoute />,
   children: [
-    {
-      path: "contract",
-      element: <ContractManagement/>,
-      guard: <StaffRoute />
-    },
-    {
-      path: 'contract/:id',
-      element:  <ContractId />
-    },
-    {
-      path: 'chat',
-      element:  <ChatMessage />
-    }
+    // {
+    //   path: "contract",
+    //   element: <ContractManagement/>,
+    //   guard: <StaffRoute />
+    // },
+    // {
+    //   path: 'contract/:id',
+    //   element:  <ContractId />
+    // },
   ],
 };
 
@@ -102,10 +102,62 @@ const managerRoutes = {
       path: "products/plants",
       element:  <PlantstManagement />,
     },
-    // {
-    //   path: "plants",
-    //   element: <PlantstManagement />,
-    // }
+    {
+      path: "products/plants/:id",
+      element:  <PlantDetails />,
+    },
+  ],
+};
+
+const adminAndManagerRoutes = {
+  path: "/list",
+  element: <MainLayout />,
+  guard: <AdminAndManagerRoute />,
+  children: [
+    {
+      path: "users",
+      element: <AccountManagement/>,
+    },
+    {
+      path: 'users/:userId',
+      element: <AccountDetails />
+    },
+  ],
+};
+
+const managerAndStaffRoutes = {
+  path: "/management",
+  element: <MainLayout />,
+  guard: <ManagerAndStaffRoutes />,
+  children: [
+    {
+      path: "chat",
+      element: <ChatMessage/>,
+    },
+    {
+      path: "contract",
+      element: <ContractManagement/>
+    },
+    {
+      path: 'contract/:id',
+      element:  <ContractId />
+    },
+    {
+      path: 'feedback',
+      element: <FeedbackMng />
+    },
+    {
+      path: 'feedback/:id',
+      element: <FeedbackDetails />
+    },
+    {
+      path: 'auction',
+      element: <AuctionMng />
+    },
+    {
+      path: 'auction/:id',
+      element: <AuctionDetails />
+    }
   ],
 };
 
@@ -120,7 +172,7 @@ const notfoundRoute = {
   ],
 };
 
-const routes = [authRoutes, notfoundRoute, homeRoutes,adminRoutes, staffRoutes, managerRoutes];
+const routes = [authRoutes, notfoundRoute, homeRoutes,adminRoutes, staffRoutes, managerRoutes, adminAndManagerRoutes, managerAndStaffRoutes];
 
 const Routes = () => {
   return (

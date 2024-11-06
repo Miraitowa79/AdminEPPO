@@ -16,27 +16,6 @@ const PlantsMng = () => {
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
   const pageSize = 5;
-  
-  //Get API Plants
-  // const fetchData = async (page = 1, search = '') => {
-  //   setLoading(true); 
-  //   try {
-  //     const response = await axios.get(apiPlant.getListPlant, {
-  //       params: {
-  //         page: page,
-  //         size: pageSize,
-  //         search: search
-  //       }
-  //     });
-  //     const { data: items } = response.data; 
-  //     setData(items);
-  //     setTotalItems(response.data.total);
-  //   } catch (error) {
-  //     console.error('Failed to fetch data:', error);
-  //   } finally {
-  //     setLoading(false); 
-  //   }
-  // };
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
@@ -67,13 +46,8 @@ const PlantsMng = () => {
     fetchData(1, searchText); 
   };
   
-  const handleViewDetails = async (record) => {
-    try {
-      const details = await getPlantDetails(record.plantId);
-      console.log('Plant details:', details);
-    } catch (error) {
-      console.error('Failed to fetch plant details:', error);
-    }
+  const handleViewDetails = (record) => {
+    navigate(`/manager/products/plants/${record.plantId}`);
   };
 
   const handlePageChange = (page) => {

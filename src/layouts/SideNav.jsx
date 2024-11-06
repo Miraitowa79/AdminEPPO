@@ -30,7 +30,7 @@ function SideNav({ color }) {
     const sideBarOption = {
         1: [
             {
-                path: '/admin/account',
+                path: '/list/users',
                 name: 'Tài khoản',
                 styleIcon: {
                     background: page === "account" ? color : "",
@@ -45,26 +45,62 @@ function SideNav({ color }) {
         ],
         2:[
             {
-                // path:'/manager/products',
+                path: '/list/users',
+                name: 'Tài khoản',
+                styleIcon: {
+                    background: page === "account" ? color : "",
+                },
+                icon: <UserOutlined />
+            },
+            {
+                path:'/management/contract',
+                name:'Hợp đồng',
+                icon:  <FileTextOutlined />
+            },
+            {
                 name:'Sản phẩm',
                 icon:  <FolderOpenOutlined />,
                 submenu: [
                     { path: '/manager/products/plants', name: 'Cây cảnh' },
                     { path: '/manager/products/tools', name: 'Dụng cụ' },
-                    // { path: '/manager/products/add', name: 'Thêm sản phẩm' }
                 ]
-            }
+            },
+            {
+                path:'/management/auction',
+                name: 'Đấu giá',
+                icon: <FolderOpenOutlined />
+            },
+            {
+                path:'/management/chat',
+                name: 'Chat',
+                icon: <MessageOutlined />
+            },
+            {
+                path:'/management/feedback',
+                name: 'Đánh giá',
+                icon: <CommentOutlined />
+            },
         ],
         3:[
             {
-                path:'/staff/contract',
+                path:'/management/contract',
                 name:'Hợp đồng',
                 icon:  <FileTextOutlined />
             },
             {
-                path:'/staff/chat',
+                path:'/management/auction',
+                name: 'Đấu giá',
+                icon: <FolderOpenOutlined />
+            },
+            {
+                path:'/management/chat',
                 name: 'Chat',
                 icon: <MessageOutlined />
+            },
+            {
+                path:'/management/feedback',
+                name: 'Đánh giá',
+                icon: <CommentOutlined />
             }
         ]
     }

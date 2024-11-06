@@ -6,7 +6,7 @@ import { getAuthUser, isTokenExpired } from '@utils'
 const roles = [2,3]
 const ManagerAndStaffRoute = () => {
   const auth = getAuthUser();
-  if (auth?.isLogged && roles.includes(auth?.roleId)) {
+  if (auth?.token && roles.includes(Number(auth?.roleId))) {
     if(!isTokenExpired(auth?.token)){
         return <Outlet />;
       }else{

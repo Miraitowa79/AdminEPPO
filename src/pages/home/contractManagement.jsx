@@ -12,7 +12,8 @@ const ContractMng = () => {
   const [searchText, setSearchText] = useState(''); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
-  const pageSize = 10; 
+  const [hasMore, setHasMore] = useState(true);
+  const pageSize = 1; 
 
     //Get API Contracts
   // const fetchData = async (page = 1, search = '') => {
@@ -63,10 +64,12 @@ const ContractMng = () => {
       })));
 
       if (items.length < pageSize) {
-        setTotalItems((page - 1) * pageSize + items.length);
-      } else {
-        setTotalItems((page + 1) * pageSize);
-      }
+         setHasMore(false);
+         setTotalItems((page - 1) * pageSize + items.length);
+       } else {
+         setHasMore(true);
+         setTotalItems(page * pageSize);
+       }
       
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -84,7 +87,7 @@ const ContractMng = () => {
     fetchData(1, searchText); 
   };
   const handleViewDetails = (record) => {
-    navigate(`/staff/contract/${record.contractId}`);
+    navigate(`/management/contract/${record.contractId}`);
   };
   const handlePageChange = (page) => {
     setCurrentPage(page); 

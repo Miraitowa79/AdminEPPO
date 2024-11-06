@@ -66,11 +66,11 @@ function Header({
       </Col>
       <Col span={12} md={18} style={{ textAlign: 'right' }}>
         <ButtonContainer>
-          <Button type="link">
+          {/* <Button type="link">
             <Badge count={5}>
               <MailOutlined style={{ fontSize: '20px' }} />
             </Badge>
-          </Button>
+          </Button> */}
           <Dropdown overlay={menu} trigger={['click']}>
             <Button type="link">
               <Badge >
