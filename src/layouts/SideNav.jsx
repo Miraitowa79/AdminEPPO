@@ -66,7 +66,7 @@ function SideNav({ color }) {
                 ]
             },
             {
-                path:'/management/auction',
+                path:'/manager/auction',
                 name: 'Đấu giá',
                 icon: <FolderOpenOutlined />
             },
@@ -88,7 +88,7 @@ function SideNav({ color }) {
                 icon:  <FileTextOutlined />
             },
             {
-                path:'/management/auction',
+                path:'/staff/auction',
                 name: 'Đấu giá',
                 icon: <FolderOpenOutlined />
             },

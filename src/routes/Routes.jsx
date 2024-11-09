@@ -27,6 +27,9 @@ import FeedbackMng from "@pages/home/feedbackManagement.jsx";
 import FeedbackDetails from "@pages/home/feedbackDetails.jsx";
 import AuctionMng from "@pages/home/auctionManagement.jsx";
 import AuctionDetails from "@pages/home/auctionDetails.jsx";
+import AuctionCreate from "@pages/home/auctionCreate.jsx";
+import AuctionMnger from "@pages/home/auctionMnger.jsx";
+import AuctionMngerDetails from "@pages/home/auctionMngerDetails.jsx";
 
 const authRoutes = {
   path: "/auth",
@@ -81,6 +84,19 @@ const staffRoutes = {
   element: <MainLayout />,
   guard: <StaffRoute />,
   children: [
+    {
+      path: 'auction',
+      element: <AuctionMng />
+    },
+    {
+      path: 'auction/:id',
+      element: <AuctionDetails />
+    },
+    {
+      path: 'auction/create',
+      element: <AuctionCreate />,
+      guard: <StaffRoute />
+    }
     // {
     //   path: "contract",
     //   element: <ContractManagement/>,
@@ -106,6 +122,14 @@ const managerRoutes = {
       path: "products/plants/:id",
       element:  <PlantDetails />,
     },
+    {
+      path: 'auction',
+      element: <AuctionMnger />
+    },
+    {
+      path: 'auction/:id',
+      element: <AuctionMngerDetails />
+    }
   ],
 };
 
@@ -149,14 +173,6 @@ const managerAndStaffRoutes = {
     {
       path: 'feedback/:id',
       element: <FeedbackDetails />
-    },
-    {
-      path: 'auction',
-      element: <AuctionMng />
-    },
-    {
-      path: 'auction/:id',
-      element: <AuctionDetails />
     }
   ],
 };

@@ -29,3 +29,15 @@ export const getAuctionDetails = (id) => {
     }
   });
 };
+
+export const createAuctionRoom = (roomData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await baseApi().post('/GetList/Rooms/Create/Room', roomData);
+      return resolve(response.data);
+    } catch (error) {
+      console.log('Error creating auction room:', error);
+      return reject(error);
+    }
+  });
+};

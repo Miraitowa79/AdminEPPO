@@ -43,11 +43,7 @@ const AuctionMng = () => {
   };
 
   const handleViewDetails = (record) => {
-    navigate(`/staff/auction/${record.roomId}`);
-  };
-
-  const handleCreateRoom = () => {
-    navigate('/staff/auction/create');
+    navigate(`/manager/auction/${record.roomId}`);
   };
 
   const handlePageChange = (page) => {
@@ -119,9 +115,6 @@ const AuctionMng = () => {
           onPressEnter={handleSearch}
           style={{ width: '50%' }}
         />
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateRoom}>
-          Create Room
-        </Button>
       </div>
       <Table
         columns={columns}
