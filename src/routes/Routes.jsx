@@ -30,6 +30,8 @@ import AuctionDetails from "@pages/home/auctionDetails.jsx";
 import AuctionCreate from "@pages/home/auctionCreate.jsx";
 import AuctionMnger from "@pages/home/auctionMnger.jsx";
 import AuctionMngerDetails from "@pages/home/auctionMngerDetails.jsx";
+import OrdersMng from "@pages/home/orderMngStaff.jsx";
+import OrderDetails from "@pages/home/orderDetailStaff.jsx";
 
 const authRoutes = {
   path: "/auth",
@@ -96,16 +98,15 @@ const staffRoutes = {
       path: 'auction/create',
       element: <AuctionCreate />,
       guard: <StaffRoute />
+    },
+    {
+      path: "orders",
+      element: <OrdersMng/>
+    },
+    {
+      path: 'orders/:id',
+      element:  <OrderDetails />
     }
-    // {
-    //   path: "contract",
-    //   element: <ContractManagement/>,
-    //   guard: <StaffRoute />
-    // },
-    // {
-    //   path: 'contract/:id',
-    //   element:  <ContractId />
-    // },
   ],
 };
 

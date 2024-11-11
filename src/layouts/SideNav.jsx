@@ -88,6 +88,11 @@ function SideNav({ color }) {
                 icon:  <FileTextOutlined />
             },
             {
+                path:'/staff/orders',
+                name: 'Đơn hàng',
+                icon: <FileTextOutlined />
+            },
+            {
                 path:'/staff/auction',
                 name: 'Đấu giá',
                 icon: <FolderOpenOutlined />
