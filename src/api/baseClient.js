@@ -11,7 +11,6 @@ export const injectStore = (_store) => (store = _store);
 export const baseApi = (baseUrl) => {
   const baseClient = axios.create({
     baseURL: baseUrl ? baseUrl : BASE_URL,
-
     withCredentials: false,
   });
 
