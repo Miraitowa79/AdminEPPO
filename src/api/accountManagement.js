@@ -1,6 +1,6 @@
 import { baseApi } from './baseClient';
 
-export const getAccounts = ({ page = 1, size = 5, search = '' }) => {
+export const getAccounts = ({ page = 1, size = 100, search = '' }) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { data } = await baseApi().get('/GetList/Users', {

@@ -10,7 +10,6 @@ export const getOrders = ({ pageIndex = 1, pageSize = 10, search = '' }) => {
                     search
                 }
             });
-            console.log('data: ', data);
             return resolve(data);
         } catch (error) {
             console.log('Error fetching orders:', error);
@@ -22,11 +21,22 @@ export const getOrders = ({ pageIndex = 1, pageSize = 10, search = '' }) => {
 export const getOrderDetails = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            console.log('id:', id);
             const { data } = await baseApi().get(`/Order/${id}`);
             return resolve(data);
         } catch (error) {
             console.log('Error fetching order details:', error);
+            return reject(error);
+        }
+    });
+};
+
+export const updateOrderDetails = (updatedOrderData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { data } = await baseApi().put('/Order', updatedOrderData);
+            return resolve(data);
+        } catch (error) {
+            console.log('Error updating order details:', error);
             return reject(error);
         }
     });

@@ -17,9 +17,9 @@ const AuctionMng = () => {
     setLoading(true);
     try {
       const response = await getAuctions({ page, size: pageSize, search });
-      const { data: items } = response;
+      const items = response.data;
       setData(items);
-      
+
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
@@ -65,6 +65,18 @@ const AuctionMng = () => {
       title: 'Plant Name',
       dataIndex: ['plant', 'plantName'],
       key: 'plantName',
+    },
+    {
+      title: 'Registration Open Date',
+      dataIndex: 'registrationOpenDate',
+      key: 'registrationOpenDate',
+      render: (date) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Registration End Date',
+      dataIndex: 'registrationEndDate',
+      key: 'registrationEndDate',
+      render: (date) => new Date(date).toLocaleDateString(),
     },
     {
       title: 'Creation Date',
