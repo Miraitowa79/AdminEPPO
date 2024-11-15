@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, Typography, Card, Spin, message, Avatar, Upload } from 'antd';
-import { getPlantDetails } from '../../api/plantsManagement';
+import { getPlantDetails } from '../../../api/plantsManagement';
 import moment from 'moment';
 import { UploadOutlined } from '@ant-design/icons';
 

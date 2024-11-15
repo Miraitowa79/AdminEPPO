@@ -2,8 +2,8 @@ import React, { useState ,useEffect} from 'react';
 import { Table, Input, Button, Pagination, Space, Select } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { apiPlant } from '../../api/apiConfig'; 
-import { getPlants, getPlantDetails } from '../../api/plantsManagement';
+import { apiPlant } from '../../../api/apiConfig'; 
+import { getPlants, getPlantDetails } from '../../../api/plantsManagement';
 import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
 

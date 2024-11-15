@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Pagination, message } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { getAuctions } from '../../api/auctionManagement';
+import { getAuctions } from '../../../api/auctionManagement';
 
 const AuctionMng = () => {
   const navigate = useNavigate();

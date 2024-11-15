@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Typography, Card, Spin, message } from 'antd';
-import { getAuctionDetails } from '../../api/auctionManagement';
+import { getAuctionDetails } from '../../../api/auctionManagement';
 
 const { Title } = Typography;
 

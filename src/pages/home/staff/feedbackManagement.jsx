@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, Space } from 'antd';
+import { Table, Input, Avatar, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
-import { getOrders } from '../../api/orderManagement';
 import { useNavigate } from 'react-router-dom';
+import { getFeedbacks } from '../../../api/feedbackManagement';
 
-const OrdersMng = () => {
+const FeedbackMng = () => {
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState('');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const pageSize = 5;
@@ -16,10 +16,9 @@ const OrdersMng = () => {
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
-      const response = await getOrders({ pageIndex: page, pageSize, search });
-      const items = response;
+      const response = await getFeedbacks({ page, size: pageSize, search });
+      const { data: items } = response;
       setData(items);
-
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
@@ -42,7 +41,7 @@ const OrdersMng = () => {
   };
 
   const handleViewDetails = (record) => {
-    navigate(`/staff/orders/${record.orderId}`);
+    navigate(`/staff/feedback/${record.feedbackId}`);
   };
 
   const handlePageChange = (page) => {
@@ -57,32 +56,40 @@ const OrdersMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Mã đơn hàng',
-      dataIndex: 'orderId',
-      key: 'orderId',
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
     },
     {
-      title: 'Mô tả',
+      title: 'Description',
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: 'Tổng giá',
-      dataIndex: 'totalPrice',
-      key: 'totalPrice',
-    },
-    {
-      title: 'Trạng thái thanh toán',
-      dataIndex: 'paymentStatus',
-      key: 'paymentStatus',
-    },
-    {
-      title: 'Ngày tạo',
+      title: 'Creation Date',
       dataIndex: 'creationDate',
       key: 'creationDate',
+      render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: '',
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        switch (status) {
+          case 1:
+            return 'Active';
+          case 2:
+            return 'Pending';
+          case 3:
+            return 'Resolved';
+          default:
+            return 'Unknown';
+        }
+      },
+    },
+    {
+      title: 'View Details',
       key: 'action',
       render: (text, record) => (
         <Button
@@ -96,9 +103,9 @@ const OrdersMng = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <Input
-          placeholder="Tìm kiếm theo mã đơn hàng/ mô tả"
+          placeholder="Search by title or description"
           suffix={
             <SearchOutlined
               onClick={handleSearch}
@@ -115,7 +122,7 @@ const OrdersMng = () => {
         columns={columns}
         dataSource={data}
         pagination={false}
-        rowKey="orderId"
+        rowKey="feedbackId"
         loading={loading}
       />
       <Pagination
@@ -130,4 +137,4 @@ const OrdersMng = () => {
   );
 };
 
-export default OrdersMng;
+export default FeedbackMng;

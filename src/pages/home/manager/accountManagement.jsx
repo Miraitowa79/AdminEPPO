@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Avatar, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import avatar from "../../assets/images/team-2.jpg";
+import avatar from "../../../assets/images/team-2.jpg";
 import { useNavigate } from 'react-router-dom';
-import { getAccounts } from '../../api/accountManagement';
+import { getAccounts } from '../../../api/accountManagement';
 
 const AccountMng = () => {
   const navigate = useNavigate();

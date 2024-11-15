@@ -12,26 +12,30 @@ import MainLayout from "@layouts/MainLayout.jsx";
 import PageNotFound from "@pages/system/PageNotFound.jsx";
 import ChatMessage from "@pages/home/chat.jsx";
 import Dashboard from "@pages/home/dashboard.jsx";
-import AccountManagement from "@pages/home/accountManagement.jsx";
-import ContractManagement from "@pages/home/contractManagement.jsx";
-import PlantstManagement from "@pages/home/plantsManagement.jsx";
+import AccountManagement from "@pages/home/manager/accountManagement.jsx";
+import ContractManagement from "@pages/home/staff/contractManagement.jsx";
+import PlantstManagement from "@pages/home/manager/plantsManagement.jsx";
 import Profile from "@pages/home/profile.jsx";
-import AccountDetails from "@pages/home/accountDetails.jsx";
+import AccountDetails from "@pages/home/manager/accountDetails.jsx";
 import Verify from '@pages/auth/verifyAccount.jsx'
-import ContractId from "@pages/home/contractId.jsx";
+import ContractId from "@pages/home/staff/contractId.jsx";
 import AdminAndManagerRoute from "./AdminAndManager.jsx";
 import ManagerAndStaffRoutes from "./ManagerAndStaff.jsx";
-import CreateAccount from "@pages/home/createAccount.jsx";
-import PlantDetails from "@pages/home/plantDetails.jsx";
-import FeedbackMng from "@pages/home/feedbackManagement.jsx";
-import FeedbackDetails from "@pages/home/feedbackDetails.jsx";
-import AuctionMng from "@pages/home/auctionManagement.jsx";
-import AuctionDetails from "@pages/home/auctionDetails.jsx";
-import AuctionCreate from "@pages/home/auctionCreate.jsx";
-import AuctionMnger from "@pages/home/auctionMnger.jsx";
-import AuctionMngerDetails from "@pages/home/auctionMngerDetails.jsx";
-import OrdersMng from "@pages/home/orderMngStaff.jsx";
-import OrderDetails from "@pages/home/orderDetailStaff.jsx";
+import CreateAccount from "@pages/home/manager/createAccount.jsx";
+import PlantDetails from "@pages/home/manager/plantDetails.jsx";
+import FeedbackMng from "@pages/home/staff/feedbackManagement.jsx";
+import FeedbackDetails from "@pages/home/staff/feedbackDetails.jsx";
+import AuctionMng from "@pages/home/staff/auctionManagement.jsx";
+import AuctionDetails from "@pages/home/staff/auctionDetails.jsx";
+import AuctionCreate from "@pages/home/staff/auctionCreate.jsx";
+import AuctionMnger from "@pages/home/manager/auctionMnger.jsx";
+import AuctionMngerDetails from "@pages/home/manager/auctionMngerDetails.jsx";
+import OrdersMng from "@pages/home/staff/orderMngStaff.jsx";
+import OrderDetails from "@pages/home/staff/orderDetailStaff.jsx";
+import FeedbackListMnger from "@pages/home/manager/feedbackList.jsx";
+import FeedbackDetailsMnger from "@pages/home/manager/feedbackDetailsMnger.jsx";
+import ContractList from "@pages/home/manager/contractList.jsx";
+import ContractDetails from "@pages/home/manager/contractDetails.jsx";
 
 const authRoutes = {
   path: "/auth",
@@ -106,6 +110,22 @@ const staffRoutes = {
     {
       path: 'orders/:id',
       element:  <OrderDetails />
+    },
+    {
+      path: 'feedback',
+      element: <FeedbackMng />
+    },
+    {
+      path: 'feedback/:id',
+      element: <FeedbackDetails />
+    },
+    {
+      path: "contract",
+      element: <ContractManagement/>
+    },
+    {
+      path: 'contract/:id',
+      element:  <ContractId />
     }
   ],
 };
@@ -130,6 +150,22 @@ const managerRoutes = {
     {
       path: 'auction/:id',
       element: <AuctionMngerDetails />
+    },
+    {
+      path: 'feedback',
+      element: <FeedbackListMnger />
+    },
+    {
+      path: 'feedback/:id',
+      element: <FeedbackDetailsMnger />
+    },
+    {
+      path: "contract",
+      element: <ContractList/>
+    },
+    {
+      path: 'contract/:id',
+      element:  <ContractDetails />
     }
   ],
 };
@@ -158,22 +194,6 @@ const managerAndStaffRoutes = {
     {
       path: "chat",
       element: <ChatMessage/>,
-    },
-    {
-      path: "contract",
-      element: <ContractManagement/>
-    },
-    {
-      path: 'contract/:id',
-      element:  <ContractId />
-    },
-    {
-      path: 'feedback',
-      element: <FeedbackMng />
-    },
-    {
-      path: 'feedback/:id',
-      element: <FeedbackDetails />
     }
   ],
 };

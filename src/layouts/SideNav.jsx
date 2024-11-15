@@ -53,7 +53,7 @@ function SideNav({ color }) {
                 icon: <UserOutlined />
             },
             {
-                path:'/management/contract',
+                path:'/manager/contract',
                 name:'Hợp đồng',
                 icon:  <FileTextOutlined />
             },
@@ -76,14 +76,14 @@ function SideNav({ color }) {
                 icon: <MessageOutlined />
             },
             {
-                path:'/management/feedback',
+                path:'/manager/feedback',
                 name: 'Đánh giá',
                 icon: <CommentOutlined />
             },
         ],
         3:[
             {
-                path:'/management/contract',
+                path:'/staff/contract',
                 name:'Hợp đồng',
                 icon:  <FileTextOutlined />
             },
@@ -103,7 +103,7 @@ function SideNav({ color }) {
                 icon: <MessageOutlined />
             },
             {
-                path:'/management/feedback',
+                path:'/staff/feedback',
                 name: 'Đánh giá',
                 icon: <CommentOutlined />
             }
