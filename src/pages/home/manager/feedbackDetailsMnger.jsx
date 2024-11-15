@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Typography, Card, Spin, message, Avatar } from 'antd';
-import { getFeedbackDetails } from '../../api/feedbackManagement';
+import { getFeedbackDetails } from '../../../api/feedbackManagement';
 
 const { Title } = Typography;
 

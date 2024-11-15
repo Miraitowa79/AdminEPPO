@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Pagination, Space, message } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
-import { getOrders } from '../../api/orderManagement';
-import { getAccounts } from '../../api/accountManagement';
+import { getOrders } from '../../../api/orderManagement';
+import { getAccounts } from '../../../api/accountManagement';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import './ordersMng.scss';

@@ -3,8 +3,8 @@ import { Table, Input, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { apiContract } from '../../api/apiConfig'; 
-import { getContracts } from '../../api/contractManagement';
+import { apiContract } from '../../../api/apiConfig'; 
+import { getContracts } from '../../../api/contractManagement';
 
 const ContractMng = () => {
   const [data, setData] = useState([]); 
@@ -87,7 +87,7 @@ const ContractMng = () => {
     fetchData(1, searchText); 
   };
   const handleViewDetails = (record) => {
-    navigate(`/management/contract/${record.contractId}`);
+    navigate(`/manager/contract/${record.contractId}`);
   };
   const handlePageChange = (page) => {
     setCurrentPage(page); 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Avatar, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { getFeedbacks } from '../../api/feedbackManagement';
+import { getFeedbacks } from '../../../api/feedbackManagement';
 
 const FeedbackMng = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const FeedbackMng = () => {
   };
 
   const handleViewDetails = (record) => {
-    navigate(`/management/feedback/${record.feedbackId}`);
+    navigate(`/manager/feedback/${record.feedbackId}`);
   };
 
   const handlePageChange = (page) => {

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, message } from 'antd';
+import { Table, Input, Avatar, Button, Pagination } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import avatar from "../../../assets/images/team-2.jpg";
 import { useNavigate } from 'react-router-dom';
-import { getAuctions } from '../../api/auctionManagement';
+import { getAccounts } from '../../../api/accountManagement';
 
-const AuctionMng = () => {
+const AccountMng = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,18 +17,18 @@ const AuctionMng = () => {
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
-      const response = await getAuctions({ page, size: pageSize, search });
-      const items = response.data;
+      const response = await getAccounts({ page, size: pageSize, search });
+      const { data: items} = response;
       setData(items);
-
+      
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
-        setTotalItems(page * pageSize);
+        setTotalItems((page + 1) * pageSize);
       }
+
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      message.error('Failed to fetch data');
     } finally {
       setLoading(false);
     }
@@ -43,15 +44,15 @@ const AuctionMng = () => {
   };
 
   const handleViewDetails = (record) => {
-    navigate(`/staff/auction/${record.roomId}`);
-  };
-
-  const handleCreateRoom = () => {
-    navigate('/staff/auction/create');
+    navigate(`/list/users/${record.userId}`);
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleAddAccount = () => {
+    navigate('/admin/list/users/create-account'); // Chuyển hướng đến trang tạo tài khoản
   };
 
   const columns = [
@@ -62,48 +63,45 @@ const AuctionMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Plant Name',
-      dataIndex: ['plant', 'plantName'],
-      key: 'plantName',
+      title: 'Avatar',
+      dataIndex: 'imageUrl',
+      key: 'imageUrl',
+      render: (imageUrl) => <Avatar src={imageUrl ? imageUrl : avatar} />,
     },
     {
-      title: 'Registration Open Date',
-      dataIndex: 'registrationOpenDate',
-      key: 'registrationOpenDate',
-      render: (date) => new Date(date).toLocaleDateString(),
+      title: 'Họ Và Tên',
+      dataIndex: 'fullName',
+      key: 'fullName',
     },
     {
-      title: 'Registration End Date',
-      dataIndex: 'registrationEndDate',
-      key: 'registrationEndDate',
-      render: (date) => new Date(date).toLocaleDateString(),
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
     },
     {
-      title: 'Creation Date',
-      dataIndex: 'creationDate',
-      key: 'creationDate',
-      render: (date) => new Date(date).toLocaleDateString(),
+      title: 'Số Điện Thoại',
+      dataIndex: 'phoneNumber',
+      key: 'phoneNumber',
     },
     {
-      title: 'Active Date',
-      dataIndex: 'activeDate',
-      key: 'activeDate',
-      render: (date) => new Date(date).toLocaleDateString(),
-    },
-    {
-      title: 'End Date',
-      dataIndex: 'endDate',
-      key: 'endDate',
-      render: (date) => new Date(date).toLocaleDateString(),
-    },
-    {
-      title: 'Status',
+      title: 'Trạng Thái',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (status === 1 ? 'Active' : 'Inactive'),
+      render: (status) => {
+        switch (status) {
+          case 1:
+            return 'Đang hoạt động';
+          case 2:
+            return 'Hoạt động hạn chế';
+          case 3:
+            return 'Ngừng hoạt động';
+          default:
+            return 'Không rõ';
+        }
+      },
     },
     {
-      title: 'View Details',
+      title: 'Xem chi tiết',
       key: 'action',
       render: (text, record) => (
         <Button
@@ -119,7 +117,7 @@ const AuctionMng = () => {
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <Input
-          placeholder="Search by plant name"
+          placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
           suffix={
             <SearchOutlined
               onClick={handleSearch}
@@ -131,15 +129,20 @@ const AuctionMng = () => {
           onPressEnter={handleSearch}
           style={{ width: '50%' }}
         />
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateRoom}>
-          Create Room
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAddAccount}
+          style={{ marginLeft: '10px' }}
+        >
+          Thêm Tài Khoản
         </Button>
       </div>
       <Table
         columns={columns}
         dataSource={data}
         pagination={false}
-        rowKey="roomId"
+        rowKey="userId"
         loading={loading}
       />
       <Pagination
@@ -148,10 +151,10 @@ const AuctionMng = () => {
         pageSize={pageSize}
         onChange={handlePageChange}
         showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
+        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right'}}
       />
     </div>
   );
 };
 
-export default AuctionMng;
+export default AccountMng;

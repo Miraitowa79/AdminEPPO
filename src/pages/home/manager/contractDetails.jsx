@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, DatePicker, Typography, Card, Spin, message } from 'antd';
-import { getContractDetails } from '../../api/contractManagement';
+import { getContractDetails } from '../../../api/contractManagement';
 import moment from 'moment';
 
 const { Title } = Typography;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, Typography, Card, Spin, message } from 'antd';
-import { getOrderDetails, updateOrderDetails } from '../../api/orderManagement';
-import { getAccountDetails } from '../../api/accountManagement';
+import { getOrderDetails, updateOrderDetails } from '../../../api/orderManagement';
+import { getAccountDetails } from '../../../api/accountManagement';
 import moment from 'moment';
 import './orderDetailStaff.scss';
 
