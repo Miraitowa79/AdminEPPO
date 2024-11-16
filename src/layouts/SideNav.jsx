@@ -58,11 +58,12 @@ function SideNav({ color }) {
                 icon:  <FileTextOutlined />
             },
             {
-                name:'Sản phẩm',
+                name:'Cây cảnh',
                 icon:  <FolderOpenOutlined />,
                 submenu: [
-                    { path: '/manager/products/plants', name: 'Cây cảnh' },
-                    { path: '/manager/products/tools', name: 'Dụng cụ' },
+                    { path: '/manager/products/plants/sales', name: 'Cây bán' },
+                    { path: '/manager/products/plants/renting', name: 'Cây thuê' },
+                    { path: '/manager/products/plants/auction', name: 'Cây đấu giá' },
                 ]
             },
             {

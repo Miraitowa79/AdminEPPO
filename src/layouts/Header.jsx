@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import { BellOutlined, MailOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import logo from "../assets/images/logo/Vector.png";
+import logo from "../assets/images/Icon/EPPO.jpg";
 import avatar from "../assets/images/team-2.jpg";
 
 const ButtonContainer = styled.div`
@@ -60,8 +60,8 @@ function Header({
         <div onClick={() => {
           navigation('/')
         }} className="brand hover-point" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={logo}  alt="Logo" style={{ marginRight: 10 }} />
-          <span style={{ fontSize: 18, color: '#5457FB' }}>EPPO</span>
+          <img src={logo}  width={58} alt="Logo" style={{ marginRight: 10 }} />
+          <span style={{ fontSize: 18, color: '#5457FB' }}>Quản lí hệ thống EPPO</span>
         </div>
       </Col>
       <Col span={12} md={18} style={{ textAlign: 'right' }}>

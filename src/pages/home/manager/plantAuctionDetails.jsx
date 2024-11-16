@@ -7,12 +7,13 @@ import { UploadOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
-const PlantDetails = () => {
+const PlantAuctionDetails = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
+  const [extraForm] = Form.useForm();
 
   useEffect(() => {
     const fetchPlantDetails = async (id) => {
@@ -54,9 +55,11 @@ const PlantDetails = () => {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-      <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT CÂY CẢNH</Title>
-      <Card>
+    <div style={{ display: 'flex', gap: '20px', padding: '20px', maxWidth: '1200px', margin: 'auto' }}>
+      {/* Form chính bên trái */}
+      <div style={{ flex: 4}}>
+        <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT CÂY CẢNH</Title>
+      <  Card>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <Button type="primary" shape="round">Mã cây: {data.plantId}</Button>
         </div>
@@ -107,6 +110,13 @@ const PlantDetails = () => {
           <Form.Item label="Giá bán:" name="finalPrice">
             <Input readOnly={!editMode} />
           </Form.Item>
+          <Form.Item label="Ngày đấu giá:" name="rentalStartDate">
+            <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
+          </Form.Item>
+          <Form.Item label="Ngày kết thúc đấu giá:" name="rentalEndDate">
+            <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
+          </Form.Item>
+
 
           <Form.Item label="Ngày tạo:" name="creationDate">
             <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
@@ -116,28 +126,10 @@ const PlantDetails = () => {
             <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
           </Form.Item>
 
-          <Form.Item label="Chủ nhà vườn (chủ cây):" name="modificationBy">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-
-          <Form.Item label="Loại cây:" name="categoryId">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-
-          <Form.Item label="Loại mô hình kinh doanh" name="typeEcommerceId">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-
-          <Form.Item label="Đã duyệt:" name="isActive">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-
           <Form.Item label="Trạng thái:" name="status">
             <Input readOnly={!editMode} />
           </Form.Item>
 
-
-     
           <Form.Item style={{ textAlign: 'center' }}>
             {editMode ? (
               <>
@@ -150,9 +142,66 @@ const PlantDetails = () => {
           </Form.Item>
         </Form>
       </Card>
+      </div>
+
+      {/* Form bổ sung bên phải */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div>
+        <Title level={4} style={{ textAlign: 'center' }}>Thông tin bổ sung</Title>
+        <Card>
+          <Form
+            form={extraForm}
+            layout="vertical"
+            onFinish={(values) => {
+              console.log('Extra Form Values:', values);
+              message.success('Extra form submitted');
+            }}
+          >
+          <Form.Item label="Chủ nhà vườn (chủ cây):" name="modificationBy">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          <Form.Item label="Loại mô hình kinh doanh" name="typeEcommerceId">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          <Form.Item label="Loại cây:" name="categoryId">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          <Form.Item label="Đã duyệt:" name="isActive">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          </Form>
+        </Card>
+      </div>
+      <div>
+
+        <Title level={4} style={{ textAlign: 'center' }}>Thông tin bổ sung</Title>
+        <Card>
+          <Form
+            form={extraForm}
+            layout="vertical"
+            onFinish={(values) => {
+              console.log('Extra Form Values:', values);
+              message.success('Extra form submitted');
+            }}
+          >
+          <Form.Item label="Chủ nhà vườn (chủ cây):" name="modificationBy">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          <Form.Item label="Loại mô hình kinh doanh" name="typeEcommerceId">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          <Form.Item label="Loại cây:" name="categoryId">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          <Form.Item label="Đã duyệt:" name="isActive">
+            <Input readOnly={!editMode} />
+          </Form.Item>
+          </Form>
+        </Card>
+      </div>
+      </div>
     </div>
-    
   );
 };
 
-export default PlantDetails;
+export default PlantAuctionDetails;
