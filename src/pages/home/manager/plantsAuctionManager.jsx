@@ -3,12 +3,12 @@ import { Table, Input, Button, Pagination, Space, Select, Avatar } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { apiPlant } from '../../../api/apiConfig'; 
-import { getListPlantSale, getPlantDetails } from '../../../api/plantsManagement';
+import { getListPlantAuction, getPlantDetails } from '../../../api/plantsManagement';
 import { useNavigate } from 'react-router-dom';
 import avatar from "../../../assets/images/team-2.jpg";
 const { Option } = Select;
 
-const PlantsMng = () => {
+const PlantsAuction = () => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState('');
@@ -21,7 +21,7 @@ const PlantsMng = () => {
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
-      const response = await getListPlantSale({ pageIndex: page, pageSize, search });
+      const response = await getListPlantAuction({ pageIndex: page, pageSize, search });
       const items = response;
       setData(items.data);
       
@@ -48,7 +48,7 @@ const PlantsMng = () => {
   };
   
   const handleViewDetails = (record) => {
-    navigate(`/manager/products/plants/sale/${record.plantId}`);
+    navigate(`/manager/products/plants/auction/${record.plantId}`);
   };
 
   const handlePageChange = (page) => {
@@ -72,11 +72,11 @@ const PlantsMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1, 
     },
     {
-      title: 'Hình ảnh',
-      dataIndex: 'mainImage',
-      key: 'mainImage',
-      render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
-    },
+        title: 'Hình ảnh',
+        dataIndex: 'mainImage',
+        key: 'mainImage',
+        render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
+      },
     {
       title: 'Mã cây cảnh',
       dataIndex: 'plantId',
@@ -100,20 +100,20 @@ const PlantsMng = () => {
       ellipsis: true,
     },
     {
-      title: 'Mô hình kinh doanh',
-      dataIndex: 'typeEcommerceId',
-      key: 'typeEcommerceId',
-    },
-    {
-        title: 'Loại Cây',
-        dataIndex: 'categoryId',
-        key: 'categoryId',
+        title: 'Mô hình kinh doanh',
+        dataIndex: 'typeEcommerceId',
+        key: 'typeEcommerceId',
       },
-    {
-        title: 'Chủ cây',
-        dataIndex: 'modificationBy',
-        key: 'modificationBy',
-      },
+      {
+          title: 'Loại Cây',
+          dataIndex: 'categoryId',
+          key: 'categoryId',
+        },
+      {
+          title: 'Chủ cây',
+          dataIndex: 'modificationBy',
+          key: 'modificationBy',
+        },
     {
       title: 'Trạng Thái',
       dataIndex: 'status',
@@ -184,4 +184,4 @@ const PlantsMng = () => {
   );
 };
 
-export default PlantsMng;
+export default PlantsAuction;

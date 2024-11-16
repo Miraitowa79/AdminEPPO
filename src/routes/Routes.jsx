@@ -37,6 +37,18 @@ import FeedbackDetailsMnger from "@pages/home/manager/feedbackDetailsMnger.jsx";
 import ContractList from "@pages/home/manager/contractList.jsx";
 import ContractDetails from "@pages/home/manager/contractDetails.jsx";
 
+
+
+/* Manager list manager of the function */
+import PlantsRenting from "../pages/home/manager/plantsRentingManager.jsx";
+import PlantsAuction from "../pages/home/manager/plantsAuctionManager.jsx";
+import PlantRentingDetails from "../pages/home/manager/plantRentingDetails.jsx";
+import PlantAuctionDetails from './../pages/home/manager/plantAuctionDetails.jsx';
+import PlantSaleDetails from './../pages/home/manager/plantSaleDetails.jsx';
+
+
+
+
 const authRoutes = {
   path: "/auth",
   element: <LayoutAuth />,
@@ -136,12 +148,32 @@ const managerRoutes = {
   guard: <ManagerRoute />,
   children: [
     {
-      path: "products/plants",
+      path: "products/plants/sales",
       element:  <PlantstManagement />,
+    },
+    {
+      path: "products/plants/renting",
+      element:  <PlantsRenting />,
+    },
+    {
+      path: "products/plants/auction",
+      element:  <PlantsAuction />,
     },
     {
       path: "products/plants/:id",
       element:  <PlantDetails />,
+    },
+    {
+      path: "products/plants/sale/:id",
+      element:  <PlantSaleDetails/>,
+    },
+    {
+      path: "products/plants/renting/:id",
+      element:  <PlantRentingDetails />,
+    },
+    {
+      path: "products/plants/auction/:id",
+      element:  <PlantAuctionDetails />,
     },
     {
       path: 'auction',

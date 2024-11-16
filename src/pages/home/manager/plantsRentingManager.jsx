@@ -3,16 +3,18 @@ import { Table, Input, Button, Pagination, Space, Select, Avatar } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { apiPlant } from '../../../api/apiConfig'; 
-import { getListPlantSale, getPlantDetails } from '../../../api/plantsManagement';
+import { getListPlantRenting, getPlantDetails } from '../../../api/plantsManagement';
 import { useNavigate } from 'react-router-dom';
 import avatar from "../../../assets/images/team-2.jpg";
+
 const { Option } = Select;
 
-const PlantsMng = () => {
+const PlantsRenting = () => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [data, setData] = useState([]); 
+
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
@@ -21,10 +23,10 @@ const PlantsMng = () => {
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
-      const response = await getListPlantSale({ pageIndex: page, pageSize, search });
+      const response = await getListPlantRenting({ pageIndex: page, pageSize, search });
       const items = response;
       setData(items.data);
-      
+      console.log("date plant renting:",items)
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
@@ -48,7 +50,7 @@ const PlantsMng = () => {
   };
   
   const handleViewDetails = (record) => {
-    navigate(`/manager/products/plants/sale/${record.plantId}`);
+    navigate(`/manager/products/plants/renting/${record.plantId}`);
   };
 
   const handlePageChange = (page) => {
@@ -72,11 +74,11 @@ const PlantsMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1, 
     },
     {
-      title: 'Hình ảnh',
-      dataIndex: 'mainImage',
-      key: 'mainImage',
-      render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
-    },
+        title: 'Hình ảnh',
+        dataIndex: 'mainImage',
+        key: 'mainImage',
+        render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
+      },
     {
       title: 'Mã cây cảnh',
       dataIndex: 'plantId',
@@ -184,4 +186,4 @@ const PlantsMng = () => {
   );
 };
 
-export default PlantsMng;
+export default PlantsRenting;
