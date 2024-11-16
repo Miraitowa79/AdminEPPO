@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, Select, DatePicker, Typography, Card, Spin, message, Avatar } from 'antd';
 import { getAccountDetails } from '../../../api/accountManagement';
+import { getWalletDetail } from '../../../api/walletAPI';
 import avatar from "../../../assets/images/team-2.jpg";
 import moment from 'moment';
 
