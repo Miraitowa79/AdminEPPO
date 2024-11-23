@@ -26,7 +26,13 @@ const AccountMng = () => {
       const { data: items } = response;
 
       setData(items);
-      setTotalItems(response.total || items.length); // Adjusted totalItems logic
+
+      if (items.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + items.length);
+      } else {
+        setTotalItems((page + 1) * pageSize);
+      }
+      // setTotalItems(response.total || items.length); // Adjusted totalItems logic
     } catch (error) {
       console.error('Failed to fetch data:', error.response?.data || error.message);
     } finally {
