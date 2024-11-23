@@ -55,6 +55,21 @@ export const getAccountsStatus = ({
   });
 };
 
+export const updateAccountDetails = (userId, updatedData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await baseApi().put(
+        `/GetUser/Users/UpdateAccount/ChangeStatus/Id?userId=${userId}`,
+        { status: updatedData.status }
+      );
+      return resolve(response.data);
+    } catch (error) {
+      console.log("Error updating auction room:", error);
+      return reject(error);
+    }
+  });
+};
+
 // Hàm để cập nhật thông tin tài khoản (nếu cần)
 // export const updateAccount = (userId, accountData) => {
 //     return new Promise(async (resolve, reject) => {

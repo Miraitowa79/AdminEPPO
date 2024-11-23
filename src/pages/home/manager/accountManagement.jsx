@@ -95,21 +95,43 @@ const AccountMng = () => {
       key: 'phoneNumber',
     },
     {
+      title: 'Ngày Tạo',
+      dataIndex: 'creationDate',
+      key: 'creationDate',
+      render: (date) => {
+        const formattedDate = new Date(date).toLocaleDateString('vi-VN');  // Định dạng theo chuẩn Việt Nam
+        return formattedDate;
+      },
+    },
+    {
       title: 'Trạng Thái',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
+        let statusText = '';
+        let statusColor = '';
+    
         switch (status) {
           case 1:
-            return 'Đang hoạt động';
+            statusText = 'Đang hoạt động';
+            statusColor = 'green';  // Màu xanh cho "Đang hoạt động"
+            break;
           case 2:
-            return 'Hoạt động hạn chế';
-          case 3:
-            return 'Ngừng hoạt động';
+            statusText = 'Ngừng hoạt động';
+            statusColor = 'red';  // Màu đỏ cho "Ngừng hoạt động"
+            break;
           default:
-            return 'Không rõ';
+            statusText = 'Không rõ';
+            statusColor = 'gray';  // Màu xám cho "Không rõ"
+            break;
         }
-      },
+    
+        return (
+          <span style={{ color: statusColor }}>
+            {statusText}
+          </span>
+        );
+      },    
     },
     {
       title: 'Xem chi tiết',
