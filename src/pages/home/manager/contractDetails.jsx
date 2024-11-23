@@ -144,6 +144,7 @@ const ContractDetails = () => {
     </div>
 
 
+
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
   <div style={{ flex: 1, padding: '20px' }}>
     <Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY CHO THUÊ</Title>
@@ -211,6 +212,7 @@ const ContractDetails = () => {
     </Card>
   </div>
 </div>
+
 
   </div>
   );
