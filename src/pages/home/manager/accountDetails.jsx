@@ -230,21 +230,22 @@ const AccountDetails = () => {
             </Form.Item>
 
              {/* New Section for Address */}
-        <Form.Item label="Danh sách địa chỉ: ">
-        <div>
-          {data.addresses && data.addresses.length > 0 ? (
-            data.addresses.map((address, index) => (
-              <div key={index} style={{ marginBottom: '10px' }}>
-                <span>* Địa chỉ {index + 1}: {address.description}</span>
+             <Form.Item label="Danh sách địa chỉ: ">
+              <div>
+                {data.addresses && data.addresses.length > 0 ? (
+                  data.addresses
+                    .filter(address => address.status === 1 || address.status === 2)  // Filter by status 1 or 2
+                    .map((address, index) => (
+                      <div key={index} style={{ marginBottom: '10px' }}>
+                        <span>* Địa chỉ {index + 1}: {address.description}</span>
+                      </div>
+                    ))
+                ) : (
+                  <span>Không có thông tin</span>
+                )}
               </div>
-            ))
-          ) : (
-            <span>Không có thông tin</span>
-          )}
-        </div>
+            </Form.Item>
 
-
-      </Form.Item>
 
 
           </Form>
