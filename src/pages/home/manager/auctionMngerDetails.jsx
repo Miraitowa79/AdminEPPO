@@ -423,9 +423,6 @@ const AuctionDetails = () => {
     </div>
   );
 };
-
-export default AuctionDetails;
-
 const styles = {
   label: {
     padding: '10px',
@@ -439,3 +436,7 @@ const styles = {
     borderBottom: '1px solid #ddd',
   },
 };
+
+export default AuctionDetails;
+
+
