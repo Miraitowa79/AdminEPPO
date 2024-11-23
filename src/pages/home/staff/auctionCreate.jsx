@@ -101,7 +101,7 @@ const CreateAuctionRoom = () => {
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item name="modificationBy" label="Modified By" rules={[{ required: true, message: 'Please select a modifier' }]}>
+            {/* <Form.Item name="modificationBy" label="Modified By" rules={[{ required: true, message: 'Please select a modifier' }]}>
               <Select placeholder="Select a modifier">
                 {accounts.map(account => (
                   <Option key={account.id} value={account.id}>
@@ -109,12 +109,12 @@ const CreateAuctionRoom = () => {
                   </Option>
                 ))}
               </Select>
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày mở đăng ký' }]}>
-              <DatePicker format="YYYY-MM-DD" placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày'/>
             </Form.Item>
             <Form.Item name="registrationEndDate" label="Ngày đóng đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày đóng đăng ký' }]}>
-              <DatePicker format="YYYY-MM-DD" placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày'/>
             </Form.Item>
             <Form.Item name="registrationFee" label="Phí đăng ký tham gia">
               <Input type="number" placeholder='Phí đăng ký = 5% * giá cây' readOnly />
@@ -126,10 +126,10 @@ const CreateAuctionRoom = () => {
               <DatePicker format="YYYY-MM-DD" />
             </Form.Item> */}
             <Form.Item name="activeDate" label="Ngày hoạt động" rules={[{ required: true, message: 'Hãy chọn ngày đấu giá hoạt động' }]}>
-              <DatePicker format="YYYY-MM-DD" placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày'/>
             </Form.Item>
             <Form.Item name="endDate" label="Ngày két thúc" rules={[{ required: true, message: 'Hãy chọn ngày kết thúc đấu giá' }]}>
-              <DatePicker format="YYYY-MM-DD" placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày'/>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
               <Button type="primary" htmlType="submit" style={{ width: 'calc(50% - 10px)', marginRight: '20px' }}>

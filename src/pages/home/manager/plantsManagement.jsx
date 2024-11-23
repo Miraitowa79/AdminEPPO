@@ -109,11 +109,31 @@ const PlantsMng = () => {
         dataIndex: 'categoryId',
         key: 'categoryId',
       },
+    // {
+    //     title: 'Chủ cây',
+    //     dataIndex: 'modificationBy',
+    //     key: 'modificationBy',
+    //   },
     {
-        title: 'Chủ cây',
-        dataIndex: 'modificationBy',
-        key: 'modificationBy',
-      },
+      title: 'Trạng Thái',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      render: (isActive) => {
+        switch (isActive) {
+          case 1:
+            return 'Chờ xác nhận';
+          case 2:
+            return 'Đang hoạt động';
+          case 3:
+            return 'Đấu giá thành công';
+          case 4:
+            return 'Đấu giá thất bại';
+          case 5:
+            return 'Đã hủy';
+          default:
+            return 'Không xác định';
+        }}
+    },
     {
       title: 'Trạng Thái',
       dataIndex: 'status',
