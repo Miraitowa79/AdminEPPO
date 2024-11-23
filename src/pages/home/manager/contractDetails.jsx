@@ -81,9 +81,8 @@ const ContractDetails = () => {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-         {/* Form chính bên trái */}
-         <div style={{ flex: 4}}>
+    <div style={{ padding: '20px', maxWidth: '1800px', margin: 'auto', display: 'flex', gap: '20px' }}>
+    <div style={{ flex: 2 }}>
       <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT HỢP ĐỒNG</Title>
       <Card>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -100,10 +99,10 @@ const ContractDetails = () => {
             <Input readOnly={!editMode} />
           </Form.Item>
           <Form.Item label="Ngày tạo hợp đồng:" name="creationContractDate" className={editMode ? 'blurred-field' : ''}>
-            <DatePicker value={moment(contract?.creationContractDate).format('YYYY-MM-DD')} disabled />
+            <DatePicker showTime value={moment(contract?.creationContractDate).format('YYYY-MM-DD')} disabled />
           </Form.Item>
           <Form.Item label="Ngày kết thúc hợp đồng:" name="endContractDate">
-            <DatePicker value={moment(contract?.endContractDate).format('YYYY-MM-DD')} disabled={!editMode} />
+            <DatePicker showTime value={moment(contract?.endContractDate).format('YYYY-MM-DD')} disabled={!editMode} />
           </Form.Item>
           <Form.Item label="Tổng số tiền (VND):" name="totalAmount">
             <Input readOnly={!editMode} />
@@ -142,8 +141,44 @@ const ContractDetails = () => {
         </Form>
       </Card>
     </div>
+
+
+    <div style={{ flex: 1, padding: '20px' }}>
+        <Title level={4} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
+    
+        <Card>
+          {/* Plant Information Table */}
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr>
+                <td style={styles.label}><strong>Mã cây:</strong></td>
+                <td style={styles.value}></td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Tên cây:</strong></td>
+                <td style={styles.value}></td>
+              </tr>
+              {/* Other plant details */}
+            </tbody>
+          </table>
+        </Card>
+      </div>
   </div>
   );
 };
 
 export default ContractDetails;
+
+const styles = {
+  label: {
+    padding: '10px',
+    textAlign: 'left',
+    backgroundColor: '#f5f5f5',
+    borderBottom: '1px solid #ddd',
+  },
+  value: {
+    padding: '10px',
+    textAlign: 'left',
+    borderBottom: '1px solid #ddd',
+  },
+};

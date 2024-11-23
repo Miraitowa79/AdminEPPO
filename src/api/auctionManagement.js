@@ -18,14 +18,20 @@ export const getAuctions = ({ page = 1, size = 2000, search = "" }) => {
   });
 };
 
-export const getAuctionStatus = ({ page = 1, size = 2000, search = "" }) => {
+export const getAuctionStatus = ({
+  page = 1,
+  size = 100,
+  search = "",
+  status = "",
+}) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { data } = await baseApi().get("/GetList/Rooms", {
+      const { data } = await baseApi().get("/GetList/Rooms/Status", {
         params: {
           page,
           size,
           search,
+          status,
         },
       });
       return resolve(data);

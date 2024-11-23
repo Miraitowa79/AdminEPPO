@@ -86,11 +86,10 @@ const AuctionDetails = () => {
         modificationDate: new Date().toISOString(),
       };
       await updateAuctionRoom(id, updatedData);
-      message.success('Auction room updated successfully');
+      message.success('Cập nhật thành công !');
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating auction room:', error);
-      message.error('Error updating auction room');
+      console.error('Failed to fetch data:', error.response?.data || error.message);
     }
   };
 

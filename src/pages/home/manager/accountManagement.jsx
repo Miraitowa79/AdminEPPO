@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Avatar, Button, Pagination, Select } from 'antd';
+import { Table, Input, Avatar, Button, Pagination, Select, Tag } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import avatar from "../../../assets/images/team-2.jpg";
 import { useNavigate } from 'react-router-dom';
@@ -109,29 +109,25 @@ const AccountMng = () => {
       key: 'status',
       render: (status) => {
         let statusText = '';
-        let statusColor = '';
-    
+        let color = '';
+  
         switch (status) {
           case 1:
             statusText = 'Đang hoạt động';
-            statusColor = 'green';  // Màu xanh cho "Đang hoạt động"
+            color = 'green';  // Màu xanh cho "Đang hoạt động"
             break;
           case 2:
             statusText = 'Ngừng hoạt động';
-            statusColor = 'red';  // Màu đỏ cho "Ngừng hoạt động"
+            color = 'red';    // Màu đỏ cho "Ngừng hoạt động"
             break;
           default:
             statusText = 'Không rõ';
-            statusColor = 'gray';  // Màu xám cho "Không rõ"
+            color = 'gray';   // Màu xám cho "Không rõ"
             break;
         }
-    
-        return (
-          <span style={{ color: statusColor }}>
-            {statusText}
-          </span>
-        );
-      },    
+  
+        return <Tag color={color}>{statusText}</Tag>;
+      },
     },
     {
       title: 'Xem chi tiết',

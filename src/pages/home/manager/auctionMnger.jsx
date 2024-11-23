@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, message, Select } from 'antd';
+import { Table, Input, Button, Pagination, message, Select, Tag } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { getAuctions } from '../../../api/auctionManagement';
+import { getAuctions, getAuctionStatus } from '../../../api/auctionManagement';
 
 const AuctionMng = () => {
   const navigate = useNavigate();
@@ -14,21 +14,22 @@ const AuctionMng = () => {
   const pageSize = 10;
   const [selectedType, setSelectedType] = useState('');
 
-  const fetchData = async (page = 1, search = '') => {
+  const fetchData = async (page = 1, search = '', status = '') => {
     setLoading(true);
     try {
-      const response = await getAuctions({ page, size: pageSize, search });
+      const response = status 
+      ? await getAuctionStatus({ page, size: pageSize, search,status })
+      : await getAuctions({ page, size: pageSize, search });
       const items = response.data;
       setData(items);
 
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
-        setTotalItems(page * pageSize);
+        setTotalItems((page + 1) * pageSize);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
-      message.error('Failed to fetch data');
+      console.error('Failed to fetch data:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
@@ -98,24 +99,42 @@ const AuctionMng = () => {
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Trạng thái   đấu giá',
+      title: 'Trạng thái đấu giá',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
+        let statusText = '';
+        let color = '';
+  
+        // Xử lý màu sắc và văn bản theo giá trị trạng thái
         switch (status) {
           case 1:
-            return 'Chờ xác nhận';
+            statusText = 'Chờ xác nhận';
+            color = 'yellow';  // Màu vàng cho trạng thái 1
+            break;
           case 2:
-            return 'Đang hoạt động';
+            statusText = 'Đang hoạt động';
+            color = 'blue';    // Màu xanh dương cho trạng thái 2
+            break;
           case 3:
-            return 'Đấu giá thành công';
+            statusText = 'Đấu giá thành công';
+            color = 'green';   // Màu xanh lá cho trạng thái 3
+            break;
           case 4:
-            return 'Đấu giá thất bại';
+            statusText = 'Đấu giá thất bại';
+            color = 'red';     // Màu đỏ cho trạng thái 4
+            break;
           case 5:
-            return 'Đã hủy';
+            statusText = 'Đã hủy';
+            color = 'gray';    // Màu xám cho trạng thái 5
+            break;
           default:
-            return 'Không xác định';
+            statusText = 'Không xác định';
+            color = 'black';   // Màu đen cho trạng thái không xác định
         }
+  
+        // Trả về Tag với màu sắc và văn bản trạng thái
+        return <Tag color={color}>{statusText}</Tag>;
       },
     },
     {
