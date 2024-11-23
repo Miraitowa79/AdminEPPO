@@ -12,6 +12,7 @@ const AuctionMng = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const pageSize = 10;
+  const [selectedType, setSelectedType] = useState('');
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
@@ -34,12 +35,17 @@ const AuctionMng = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText]);
+    fetchData(currentPage, searchText,selectedType);
+  }, [currentPage, searchText, selectedType]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchData(1, searchText);
+    fetchData(1, searchText,selectedType);
+  };
+
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    setCurrentPage(1);
   };
 
   const handleViewDetails = (record) => {
@@ -143,16 +149,16 @@ const AuctionMng = () => {
         />
           <Select
           placeholder="Chọn loại cây"
-          // value={selectedType}
-          // onChange={handleTypeChange}
+          value={selectedType}
+          onChange={handleTypeChange}
           style={{ width: '200px', marginLeft: 'auto' }}
         >
           <Option value="">Tất cả</Option>
-          <Option value="Cây phong thủy">Chờ xác nhận</Option>
-          <Option value="Cây phong thủy">Đang hoạt động</Option>
-          <Option value="Cây phong thủy">Đấu giá thành công</Option>
-          <Option value="Cây phong thủy">Đấu giá thất bại</Option>
-          <Option value="Cây phong thủy">Đã hủy</Option>
+          <Option value="1">Chờ xác nhận</Option>
+          <Option value="2">Đang hoạt động</Option>
+          <Option value="3">Đấu giá thành công</Option>
+          <Option value="4">Đấu giá thất bại</Option>
+          <Option value="5">Đã hủy</Option>
         </Select>
       </div>
       <Table
