@@ -145,7 +145,7 @@ const OrderDetails = () => {
               <Input value={orderData.paymentStatus} readOnly />
             )}
           </Form.Item>
-          <Form.Item label="Trạng thái đơn hàng" >
+          <Form.Item label="Trạng thái đơn hàng" name="status">
             {editMode ? (
               <Select defaultValue={orderData.status} style={{ width: '100%' }}>
                 <Option value={1}>Chờ xác nhận</Option>
