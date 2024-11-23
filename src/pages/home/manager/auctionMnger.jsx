@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, message } from 'antd';
+import { Table, Input, Button, Pagination, message, Select } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getAuctions } from '../../../api/auctionManagement';
@@ -11,15 +11,15 @@ const AuctionMng = () => {
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 5;
+  const pageSize = 10;
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
       const response = await getAuctions({ page, size: pageSize, search });
-      const { data: items } = response;
+      const items = response.data;
       setData(items);
-      
+
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
@@ -58,36 +58,62 @@ const AuctionMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Plant Name',
+      title: 'Mã phòng',
+      dataIndex: 'roomId',
+      key: 'roomId',
+    },
+    {
+      title: 'Tên cây',
       dataIndex: ['plant', 'plantName'],
       key: 'plantName',
     },
     {
-      title: 'Creation Date',
+      title: 'Phí đăng ký',
+      dataIndex: 'registrationFee',
+      key: 'registrationFee',
+      render: (fee) => fee.toLocaleString(),
+    },
+    {
+      title: 'Ngày tạo',
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Active Date',
+      title: 'Ngày bắt đầu',
       dataIndex: 'activeDate',
       key: 'activeDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'End Date',
+      title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Status',
+      title: 'Trạng thái   đấu giá',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (status === 1 ? 'Active' : 'Inactive'),
+      render: (status) => {
+        switch (status) {
+          case 1:
+            return 'Chờ xác nhận';
+          case 2:
+            return 'Đang hoạt động';
+          case 3:
+            return 'Đấu giá thành công';
+          case 4:
+            return 'Đấu giá thất bại';
+          case 5:
+            return 'Đã hủy';
+          default:
+            return 'Không xác định';
+        }
+      },
     },
     {
-      title: 'View Details',
+      title: 'Xem',
       key: 'action',
       render: (text, record) => (
         <Button
@@ -115,6 +141,19 @@ const AuctionMng = () => {
           onPressEnter={handleSearch}
           style={{ width: '50%' }}
         />
+          <Select
+          placeholder="Chọn loại cây"
+          // value={selectedType}
+          // onChange={handleTypeChange}
+          style={{ width: '200px', marginLeft: 'auto' }}
+        >
+          <Option value="">Tất cả</Option>
+          <Option value="Cây phong thủy">Chờ xác nhận</Option>
+          <Option value="Cây phong thủy">Đang hoạt động</Option>
+          <Option value="Cây phong thủy">Đấu giá thành công</Option>
+          <Option value="Cây phong thủy">Đấu giá thất bại</Option>
+          <Option value="Cây phong thủy">Đã hủy</Option>
+        </Select>
       </div>
       <Table
         columns={columns}

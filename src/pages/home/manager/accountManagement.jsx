@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Avatar, Button, Pagination } from 'antd';
+import { Table, Input, Avatar, Button, Pagination, Select } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import avatar from "../../../assets/images/team-2.jpg";
 import { useNavigate } from 'react-router-dom';
-import { getAccounts } from '../../../api/accountManagement';
+import { getAccounts, getAccountsStatus } from '../../../api/accountManagement';
 
 const AccountMng = () => {
   const navigate = useNavigate();
@@ -12,35 +12,35 @@ const AccountMng = () => {
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 5;
+  const [selectedType, setSelectedType] = useState('');
+  const pageSize = 10;
+  const { Option } = Select;
 
-  const fetchData = async (page = 1, search = '') => {
+  const fetchData = async (page = 1, search = '', roleId = '') => {
     setLoading(true);
     try {
-      const response = await getAccounts({ page, size: pageSize, search });
-      const { data: items} = response;
-      setData(items);
-      
-      if (items.length < pageSize) {
-        setTotalItems((page - 1) * pageSize + items.length);
-      } else {
-        setTotalItems((page + 1) * pageSize);
-      }
+      const response = roleId
+        ? await getAccountsStatus({ page, size: pageSize, search, roleId }) // Corrected roleId mapping
+        : await getAccounts({ page, size: pageSize, search });
 
+      const { data: items } = response;
+
+      setData(items);
+      setTotalItems(response.total || items.length); // Adjusted totalItems logic
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Failed to fetch data:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText]);
+    fetchData(currentPage, searchText, selectedType);
+  }, [currentPage, searchText, selectedType]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchData(1, searchText);
+    fetchData(1, searchText, selectedType);
   };
 
   const handleViewDetails = (record) => {
@@ -51,8 +51,13 @@ const AccountMng = () => {
     setCurrentPage(page);
   };
 
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    setCurrentPage(1);
+  };
+
   const handleAddAccount = () => {
-    navigate('/admin/list/users/create-account'); // Chuyển hướng đến trang tạo tài khoản
+    navigate('/admin/list/users/create-account');
   };
 
   const columns = [
@@ -66,7 +71,7 @@ const AccountMng = () => {
       title: 'Avatar',
       dataIndex: 'imageUrl',
       key: 'imageUrl',
-      render: (imageUrl) => <Avatar src={imageUrl ? imageUrl : avatar} />,
+      render: (imageUrl) => <Avatar src={imageUrl || avatar} />,
     },
     {
       title: 'Họ Và Tên',
@@ -138,6 +143,21 @@ const AccountMng = () => {
           Thêm Tài Khoản
         </Button>
       </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <Select
+          placeholder="Chọn loại tài khoản"
+          value={selectedType}
+          onChange={handleTypeChange}
+          style={{ width: "200px", marginLeft: "auto" }}
+        >
+          <Option value="">Tất cả</Option>
+          <Option value="3">Nhân viên</Option>
+          <Option value="5">Khách hàng</Option>
+          <Option value="4">Người bán</Option>
+        </Select>
+      </div>
+
       <Table
         columns={columns}
         dataSource={data}
@@ -151,7 +171,7 @@ const AccountMng = () => {
         pageSize={pageSize}
         onChange={handlePageChange}
         showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right'}}
+        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
       />
     </div>
   );
