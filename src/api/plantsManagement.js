@@ -1,6 +1,6 @@
 import { baseApi } from "./baseClient";
 
-export const getPlants = ({ pageIndex = 1, pageSize = 10, search = "" }) => {
+export const getPlants = ({ pageIndex = 1, pageSize = 1000, search = "" }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get("/Plant", {
@@ -22,7 +22,8 @@ export const getPlants = ({ pageIndex = 1, pageSize = 10, search = "" }) => {
 /* Get list plant for function sale plant */
 export const getListPlantSale = ({
   pageIndex = 1,
-  pageSize = 10,
+  pageSize = 1000,
+
   search = "",
 }) => {
   return new Promise(async (resolve, reject) => {
@@ -48,7 +49,8 @@ export const getListPlantSale = ({
 /* Get list plant for function renting plant */
 export const getListPlantRenting = ({
   pageIndex = 1,
-  pageSize = 10,
+  pageSize = 1000,
+
   search = "",
 }) => {
   return new Promise(async (resolve, reject) => {
@@ -75,7 +77,7 @@ export const getListPlantRenting = ({
 /* Get list plant for function auction plant */
 export const getListPlantAuction = ({
   pageIndex = 1,
-  pageSize = 10,
+  pageSize = 1000,
   search = "",
 }) => {
   return new Promise(async (resolve, reject) => {

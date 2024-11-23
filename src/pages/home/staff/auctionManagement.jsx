@@ -11,7 +11,7 @@ const AuctionMng = () => {
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 5;
+  const pageSize = 10;
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
@@ -62,48 +62,96 @@ const AuctionMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Plant Name',
+      title: 'Mã phòng',
+      dataIndex: 'roomId',
+      key: 'roomId',
+    },
+    // {
+    //   title: 'Plant ID',
+    //   dataIndex: 'plantId',
+    //   key: 'plantId',
+    // },
+    {
+      title: 'Tên cây',
       dataIndex: ['plant', 'plantName'],
       key: 'plantName',
     },
+    // {
+    //   title: 'Registration Open Date',
+    //   dataIndex: 'registrationOpenDate',
+    //   key: 'registrationOpenDate',
+    //   render: (date) => new Date(date).toLocaleDateString(),
+    // },
+    // {
+    //   title: 'Registration End Date',
+    //   dataIndex: 'registrationEndDate',
+    //   key: 'registrationEndDate',
+    //   render: (date) => new Date(date).toLocaleDateString(),
+    // },
     {
-      title: 'Registration Open Date',
-      dataIndex: 'registrationOpenDate',
-      key: 'registrationOpenDate',
-      render: (date) => new Date(date).toLocaleDateString(),
+      title: 'Phí đăng ký',
+      dataIndex: 'registrationFee',
+      key: 'registrationFee',
+      render: (fee) => fee.toLocaleString(),
     },
+    // {
+    //   title: 'Price Step',
+    //   dataIndex: 'priceStep',
+    //   key: 'priceStep',
+    //   render: (step) => step.toLocaleString(),
+    // },
     {
-      title: 'Registration End Date',
-      dataIndex: 'registrationEndDate',
-      key: 'registrationEndDate',
-      render: (date) => new Date(date).toLocaleDateString(),
-    },
-    {
-      title: 'Creation Date',
+      title: 'Ngày tạo',
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Active Date',
+      title: 'Ngày bắt đầu',
       dataIndex: 'activeDate',
       key: 'activeDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'End Date',
+      title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
+    // {
+    //   title: 'Modification Date',
+    //   dataIndex: 'modificationDate',
+    //   key: 'modificationDate',
+    //   render: (date) => new Date(date).toLocaleDateString(),
+    // },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (status === 1 ? 'Active' : 'Inactive'),
+      title: 'Modification By',
+      dataIndex: 'modificationBy',
+      key: 'modificationBy',
     },
     {
-      title: 'View Details',
+      title: 'Trạng thái cuộc đấu giá',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        switch (status) {
+          case 1:
+            return 'Chờ xác nhận';
+          case 2:
+            return 'Đang hoạt động';
+          case 3:
+            return 'Đấu giá thành công';
+          case 4:
+            return 'Đấu giá thất bại';
+          case 5:
+            return 'Đã hủy';
+          default:
+            return 'Không xác định';
+        }
+      },
+    },
+    {
+      title: 'Xem',
       key: 'action',
       render: (text, record) => (
         <Button
@@ -132,7 +180,7 @@ const AuctionMng = () => {
           style={{ width: '50%' }}
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateRoom}>
-          Create Room
+          Tạo phòng đấu giá
         </Button>
       </div>
       <Table

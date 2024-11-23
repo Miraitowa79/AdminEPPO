@@ -1,6 +1,6 @@
 import { baseApi } from './baseClient';
 
-export const getOrders = ({ pageIndex = 1, pageSize = 10, search = '' }) => {
+export const getOrders = ({ pageIndex = 1, pageSize = 5000, search = '' }) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { data } = await baseApi().get('/Order', {

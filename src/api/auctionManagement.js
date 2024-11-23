@@ -1,6 +1,6 @@
 import { baseApi } from './baseClient';
 
-export const getAuctions = ({ page = 1, size = 5, search = '' }) => {
+export const getAuctions = ({ page = 1, size = 2000, search = '' }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get('/GetList/Rooms', {
@@ -21,7 +21,7 @@ export const getAuctions = ({ page = 1, size = 5, search = '' }) => {
 export const getAuctionDetails = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { data } = await baseApi().get(`/GetList/Rooms/Id?id=${id}`);
+      const { data } = await baseApi().get(`/GetList/Rooms/Id?roomId=${id}`);
       return resolve(data);
     } catch (error) {
       console.log('Error fetching auction details:', error);
@@ -37,6 +37,18 @@ export const createAuctionRoom = (roomData) => {
       return resolve(response.data);
     } catch (error) {
       console.log('Error creating auction room:', error);
+      return reject(error);
+    }
+  });
+};
+
+export const updateAuctionRoom = (roomId, updatedData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await baseApi().put(`/GetList/Rooms/Update/Room/Id?id=${roomId}`, updatedData);
+      return resolve(response.data);
+    } catch (error) {
+      console.log('Error updating auction room:', error);
       return reject(error);
     }
   });

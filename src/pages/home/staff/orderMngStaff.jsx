@@ -3,6 +3,7 @@ import { Table, Input, Button, Pagination, Space, message } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { getOrders } from '../../../api/orderManagement';
 import { getAccounts } from '../../../api/accountManagement';
+import { getTypeEcommerce } from '../../../api/typeEcommerceApi';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import './ordersMng.scss';
@@ -12,10 +13,11 @@ const OrdersMng = () => {
   const [searchText, setSearchText] = useState('');
   const [data, setData] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [typeEcommerce, setTypeEcommerce] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 5;
+  const pageSize = 10;
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -29,21 +31,38 @@ const OrdersMng = () => {
       }
     };
 
+    const fetchTypeEcommerce = async () => {
+      try {
+        const response = await getTypeEcommerce({});
+        setTypeEcommerce(response.data);
+      } catch (error) {
+        console.error('Error fetching typeEcommerce:', error);
+        message.error('Error fetching typeEcommerce');
+      }
+    };
+
     fetchAccounts();
+    fetchTypeEcommerce();
   }, []);
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
       const response = await getOrders({ pageIndex: page, pageSize, search });
-      const orders = response.data; // Giả định response có dạng { data: [...] }
+      const orders = response.data;
 
-      const ordersWithUserDetails = orders.map(order => {
+      const ordersWithDetails = orders.map(order => {
         const user = accounts.find(account => account.userId === order.userId);
-        return { ...order, userName: user ? user.userName : 'N/A' };
+        const ecommerceType = typeEcommerce.find(type => type.typeEcommerceId === order.typeEcommerceId);
+        return { 
+          ...order, 
+          userName: user ? user.userName : 'N/A',
+          typeEcommerceTitle: ecommerceType ? ecommerceType.title : 'N/A',
+          statusText: getStatusText(order.status)
+        };
       });
 
-      setData(ordersWithUserDetails);
+      setData(ordersWithDetails);
       
       if (orders.length < pageSize) {
         setTotalItems((page - 1) * pageSize + orders.length);
@@ -59,7 +78,7 @@ const OrdersMng = () => {
 
   useEffect(() => {
     fetchData(currentPage, searchText);
-  }, [currentPage, searchText, accounts]);
+  }, [currentPage, searchText, accounts, typeEcommerce]);
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -72,6 +91,23 @@ const OrdersMng = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 1:
+        return 'Chờ xác nhận';
+      case 2:
+        return 'Đang chuẩn bị hàng';
+      case 3:
+        return 'Đang giao';
+      case 4:
+        return 'Đã giao';
+      case 5:
+        return 'Đã hủy';
+      default:
+        return 'Không xác định';
+    }
   };
 
   const columns = [
@@ -87,7 +123,7 @@ const OrdersMng = () => {
       key: 'orderId',
     },
     {
-      title: 'Người dùng',
+      title: 'Khách hàng',
       dataIndex: 'userName',
       key: 'userName',
       className: 'wrap-text',
@@ -98,25 +134,35 @@ const OrdersMng = () => {
       key: 'deliveryAddress',
       className: 'wrap-text',
     },
-    {
-      title: 'Tổng giá',
-      dataIndex: 'totalPrice',
-      key: 'totalPrice',
-    },
-    {
-      title: 'Phí giao hàng',
-      dataIndex: 'deliveryFee',
-      key: 'deliveryFee',
-    },
+    // {
+    //   title: 'Tổng giá',
+    //   dataIndex: 'totalPrice',
+    //   key: 'totalPrice',
+    // },
+    // {
+    //   title: 'Phí giao hàng',
+    //   dataIndex: 'deliveryFee',
+    //   key: 'deliveryFee',
+    // },
     {
       title: 'Giá cuối cùng',
       dataIndex: 'finalPrice',
       key: 'finalPrice',
     },
     {
+      title: 'Hình thức',
+      dataIndex: 'typeEcommerceTitle',
+      key: 'typeEcommerceTitle',
+    },
+    {
       title: 'Trạng thái thanh toán',
       dataIndex: 'paymentStatus',
       key: 'paymentStatus',
+    },
+    {
+      title: 'Trạng thái đơn hàng',
+      dataIndex: 'statusText',
+      key: 'statusText',
     },
     {
       title: 'Ngày tạo',
@@ -125,7 +171,7 @@ const OrdersMng = () => {
       render: (text) => moment(text).format('YYYY-MM-DD'),
     },
     {
-      title: '',
+      title: 'Xem',
       key: 'action',
       render: (text, record) => (
         <Button

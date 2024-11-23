@@ -36,6 +36,19 @@ import FeedbackListMnger from "@pages/home/manager/feedbackList.jsx";
 import FeedbackDetailsMnger from "@pages/home/manager/feedbackDetailsMnger.jsx";
 import ContractList from "@pages/home/manager/contractList.jsx";
 import ContractDetails from "@pages/home/manager/contractDetails.jsx";
+import ContractCreate from "@pages/home/staff/contractCreate.jsx";
+
+
+
+// /* Manager list manager of the function */
+// import PlantsRenting from "../pages/home/manager/plantsRentingManager.jsx";
+// import PlantsAuction from "../pages/home/manager/plantsAuctionManager.jsx";
+// import PlantRentingDetails from "../pages/home/manager/plantRentingDetails.jsx";
+// import PlantAuctionDetails from './../pages/home/manager/plantAuctionDetails.jsx';
+// import PlantSaleDetails from './../pages/home/manager/plantSaleDetails.jsx';
+
+
+
 
 
 
@@ -138,6 +151,10 @@ const staffRoutes = {
     {
       path: 'contract/:id',
       element:  <ContractId />
+    },
+    {
+      path: 'contract/create',
+      element:  <ContractCreate />
     }
   ],
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination } from 'antd';
+import { Table, Input, Button, Pagination, Select } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,6 +13,7 @@ const ContractMng = () => {
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
   const [hasMore, setHasMore] = useState(true);
+  const [selectedType, setSelectedType] = useState('');
   const pageSize = 1; 
 
     //Get API Contracts
@@ -92,7 +93,10 @@ const ContractMng = () => {
   const handlePageChange = (page) => {
     setCurrentPage(page); 
   };
-
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+  };
+  
   const columns = [
     {
       title: 'STT',
@@ -144,19 +148,33 @@ const ContractMng = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <Input
-        placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
-        suffix={
-          <SearchOutlined
-            onClick={handleSearch}
-            style={{ cursor: 'pointer' }}
-          />
-        }
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        onPressEnter={handleSearch}
-        style={{ marginBottom: '20px', width: '50%' }}
-      />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <Input
+          placeholder="Tìm kiếm theo mã sản phẩm/ tên sản phẩm"
+          suffix={
+            <SearchOutlined
+              onClick={handleSearch}
+              style={{ cursor: 'pointer' }}
+            />
+          }
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onPressEnter={handleSearch}
+          style={{ width: '50%' }}
+        />
+        <Select
+          placeholder="Chọn loại cây"
+          value={selectedType}
+          onChange={handleTypeChange}
+          style={{ width: '200px', marginLeft: 'auto' }}
+        >
+          <Option value="">Tất cả</Option>
+          <Option value="Hợp đồng chưa ký">Hợp đồng chưa ký</Option>
+          <Option value="Hợp đồng đã ký">Hợp đồng đã ký </Option>
+          <Option value="Hợp đồng hét hạn">Hợp đồng hết hạn</Option>
+          <Option value="Hợp đồng đã hủy">Hợp đồng đã hủy</Option>  
+        </Select>
+      </div>
         <Table
         columns={columns}
         dataSource={data}

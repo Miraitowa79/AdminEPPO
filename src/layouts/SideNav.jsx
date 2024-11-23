@@ -53,9 +53,9 @@ function SideNav({ color }) {
                 icon: <UserOutlined />
             },
             {
-                path:'/manager/contract',
-                name:'Hợp đồng',
-                icon:  <FileTextOutlined />
+                path:'/manager/auction',
+                name: 'Đấu giá',
+                icon: <FolderOpenOutlined />
             },
             {
                 name:'Cây cảnh',
@@ -67,19 +67,19 @@ function SideNav({ color }) {
                 ]
             },
             {
-                path:'/manager/auction',
-                name: 'Đấu giá',
-                icon: <FolderOpenOutlined />
-            },
-            {
-                path:'/management/chat',
-                name: 'Chat',
-                icon: <MessageOutlined />
+                path:'/manager/contract',
+                name:'Hợp đồng',
+                icon:  <FileTextOutlined />
             },
             {
                 path:'/manager/feedback',
                 name: 'Đánh giá',
                 icon: <CommentOutlined />
+            },
+            {
+                path:'/management/chat',
+                name: 'Chat',
+                icon: <MessageOutlined />
             },
         ],
         3:[
