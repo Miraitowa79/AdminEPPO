@@ -4,27 +4,48 @@ import { Form, Input, Typography, Card, Spin, message, Button, DatePicker, Selec
 import moment from 'moment';
 import { getAuctionDetails, updateAuctionRoom } from '../../../api/auctionManagement';
 import { getAccounts } from '../../../api/accountManagement';
-
+import { getAccountDetails } from '../../../api/accountManagement';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const AuctionDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // lấy id từ URL params
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
-  const [accounts, setAccounts] = useState([]);
+  const [udata, setUdata] = useState({}); // sửa usetData thành setUdata
+  const [accounts, setAccounts] = useState([]); // Tạo state cho tài khoản
   const [form] = Form.useForm();
   const [isEditing, setIsEditing] = useState(false);
-  const [prevStatus, setPrevStatus] = useState(1); // Mặc định trạng thái đầu tiên là 1
+  const [prevStatus, setPrevStatus] = useState(1);
   const [activeDate, setActiveDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-
-  const [status, setStatus] = useState(1); 
-
+  const [status, setStatus] = useState(1);
+  const [account, setAccount] = useState(null);
   const handleStatusChange = (value) => {
     setStatus(value);
   };
+
+
+  useEffect(() => {
+    const fetchAccountDetails = async (modificationById) => {
+      try {
+        const response = await getAccountDetails(modificationById);
+        setUdata(response.data); // Cập nhật state udata với dữ liệu trả về từ API
+        console.log('API Response:', response);
+        console.log('Account data:', response.data);
+      } catch (error) {
+        console.error('Error fetching account details:', error);
+        message.error('Lỗi khi tải thông tin tài khoản');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (data?.room?.modificationBy) {
+      fetchAccountDetails(data.room.modificationBy);
+    }
+  }, [data?.room?.modificationBy]);
 
   useEffect(() => {
     const fetchAuctionDetails = async (id) => {
@@ -41,6 +62,10 @@ const AuctionDetails = () => {
           status: data.room.status,
           modificationBy: data.room.modificationBy,
         });
+
+        const accountDetails = await getAccountDetails(data.room.modificationBy);
+        setAccount(accountDetails);
+
       } catch (error) {
         console.error('Error fetching auction details:', error);
         message.error('Error fetching auction details');
@@ -98,11 +123,10 @@ const AuctionDetails = () => {
         modificationDate: new Date().toISOString(),
       };
       await updateAuctionRoom(id, updatedData);
-      message.success('Auction room updated successfully');
+      message.success('Cập nhật thành công !');
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating auction room:', error);
-      message.error('Error updating auction room');
+      console.error('Failed to fetch data:', error.response?.data || error.message);
     }
   };
 
@@ -149,137 +173,171 @@ const AuctionDetails = () => {
         <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT CUỘC ĐẤU GIÁ</Title>
         <Card>
           <Form form={form} layout="horizontal" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
-            <Form.Item label="Id Phòng đấu giá" className="blurred-field">
+            <Form.Item label="Id Phòng đấu giá" className="blurred-field"> 
               <Input value={data.room.roomId || ''} readOnly />
             </Form.Item>
-            <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD"  disabled={!isEditing} readOnly/>
-            </Form.Item>
-            <Form.Item name="registrationEndDate" label="Ngày đóng đăng ký" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} readOnly/>
-            </Form.Item>
-            {/* <Form.Item name="registrationFee" label="Phí đăng ký">
-              <Input value={data.room.registrationFee || ''} readOnly />
-            </Form.Item> */}
 
-            <Form.Item name="registrationFee" label="Phí đăng ký" rules={[{ required: true, message: 'Please enter a registration fee' }]}>
+            <Form.Item label="Người tạo phòng" className="blurred-field">
+            <Input value={udata?.fullName || 'Không có thông tin'} readOnly />
+          </Form.Item>
+
+
+
+
+
+            <Form.Item
+            name="registrationOpenDate"
+            label="Ngày mở đăng ký"
+            rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
+          >
+            <DatePicker
+              showTime
+              disabled={!isEditing}
+              readOnly
+              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+            />
+          </Form.Item>
+          <Form.Item
+            name="registrationEndDate"
+            label="Ngày đóng đăng ký"
+            rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
+          >
+            <DatePicker
+              showTime
+              disabled={!isEditing}
+              readOnly
+              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+            />
+          </Form.Item>
+            <Form.Item
+              name="registrationFee"
+              label="Phí đăng ký"
+              rules={[
+                { required: true, message: 'Vui lòng nhập phí đăng ký' },
+                () => ({
+                  validator(_, value) {
+                    if (!value || (Number(value) > 0 && !isNaN(value))) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Phí đăng ký phải là số dương'));
+                  },
+                }),
+              ]}
+            >
               <Input
-                disabled={!isEditing || status != 1} // Vô hiệu hóa khi trạng thái là "Đấu giá thành công"
+                type="number" // Chỉ cho phép nhập số
+                inputMode="decimal" // Đảm bảo giao diện số trên các thiết bị hỗ trợ
+                min="1" // Ngăn giá trị âm
+                step="any" // Hỗ trợ số thập phân nếu cần
+                disabled={!isEditing || status !== 1}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (Number(value) < 0 || isNaN(Number(value))) {
+                    e.target.value = ''; // Xóa giá trị không hợp lệ
+                  }
+                }}
+                placeholder="Chỉ nhập số dương"
               />
             </Form.Item>
 
-
-            <Form.Item name="priceStep" label="Mức đấu giá" rules={[{ required: true, message: 'Please enter a price step' }]}>
-              <Input   disabled={!isEditing || status != 1}/>
-            </Form.Item>
-            <Form.Item label="Ngày tạo cuộc đấu giá" className="blurred-field">
-              <Input value={new Date(data.room.creationDate).toLocaleDateString() || ''} readOnly />
-            </Form.Item>
-            <Form.Item name="activeDate" label="Thời gian diễn ra" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} readOnly/>
-            </Form.Item>
-            <Form.Item name="endDate" label="Thời gian kết thúc" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} readOnly/>
-            </Form.Item>
-            
-            <Form.Item label="Thời gian chơi (Giây)">
-            <Input value={calculateDuration()} readOnly />
+            <Form.Item
+            name="priceStep"
+            label="Bước đấu giá"
+            rules={[
+              { required: true, message: 'Vui lòng nhập bước đấu giá' },
+              () => ({
+                validator(_, value) {
+                  if (!value || (Number(value) > 0 && !isNaN(value))) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Bước đấu giá phải là số dương'));
+                },
+              }),
+            ]}
+          >
+            <Input
+              type="number" // Chỉ cho phép nhập số
+              inputMode="decimal" // Bàn phím số thập phân cho các thiết bị di động
+              min="1" // Không cho phép nhập giá trị âm
+              step="any" // Hỗ trợ số thập phân nếu cần
+              disabled={!isEditing || status !== 1}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (Number(value) < 0 || isNaN(Number(value))) {
+                  e.target.value = ''; // Xóa giá trị không hợp lệ
+                }
+              }}
+              placeholder="Chỉ nhập số dương"
+            />
+          </Form.Item>
+        
+          <Form.Item
+            name="activeDate"
+            label="Thời gian diễn ra"
+            rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
+          >
+            <DatePicker
+              showTime
+              disabled={!isEditing}
+              readOnly
+              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+            />
           </Form.Item>
 
+          <Form.Item
+          name="endDate"
+          label="Thời gian kết thúc"
+          rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
+        >
+          <DatePicker
+            showTime
+            disabled={!isEditing}
+            readOnly
+            disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+          />
+        </Form.Item>
+
+            
+            {/* <Form.Item label="Thời gian chơi (Giây) ">
+            <Input value={calculateDuration()} readOnly />
+          </Form.Item> */}
+          <Form.Item label="Ngày tạo cuộc đấu giá" className="blurred-field">
+              <Input value={new Date(data.room.creationDate).toLocaleDateString() || ''} readOnly />
+            </Form.Item>
             <Form.Item label="Thời gian sửa đổi lần cuối" className="blurred-field">
               <Input value={new Date(data.room.modificationDate).toLocaleDateString() || ''} readOnly />
             </Form.Item>
-            {/* <Form.Item name="modificationBy" label="Modification By" rules={[{ required: true, message: 'Please select a user' }]}>
-              <Select placeholder="Select a modifier" disabled={!isEditing}>
-                {accounts.map(account => (
-                  <Option key={account.id} value={account.id}>
-                    {account.user Name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item> */}
-            {/* <Form.Item name="status" label="Trạng thái cuộc đấu giá" rules={[{ required: true, message: 'Please select a status' }]}>
-              <Select placeholder="Select status" disabled={!isEditing}>
-                <Option value={1}>Chờ xác nhận</Option>
-                <Option value={2}>Đang hoạt động</Option>
-                <Option value={3}>Đấu giá thành công</Option>
-                <Option value={4}>Đấu giá thất bại</Option>
-                <Option value={5}>Đã hủy</Option>
-              </Select>
-            </Form.Item> */}
+
 
             <Form.Item
             name="status"
             label="Trạng thái cuộc đấu giá"
             rules={[{ required: true, message: "Please select a status" }]}
           >
-            <Select
-              value={status}
-              placeholder="Select status"
-              disabled={!isEditing}
-              onChange={handleStatusChange}
+          <Select
+          value={status}
+          placeholder="Select status"
+          disabled={!isEditing}
+          onChange={handleStatusChange}
+        >
+          {/* Hiển thị các tùy chọn dựa trên trạng thái hiện tại */}
+          {[
+            { value: 1, label: "Chờ xác nhận" },
+            { value: 2, label: "Đang hoạt động" },
+            { value: 3, label: "Đấu giá thành công" },
+            { value: 4, label: "Đấu giá thất bại" },
+            { value: 5, label: "Đã hủy" },
+          ].map((option) => (
+            <Option 
+              key={option.value} 
+              value={option.value} 
+              disabled={option.value < status} // Không cho phép quay lại trạng thái trước đó
             >
-              {/* Hiển thị các giá trị tùy thuộc vào trạng thái hiện tại */}
-              {status === 1 && (
-                    <>
-                      <Option value={1} disabled>Chờ xác nhận</Option>
-                      <Option value={2}>Đang hoạt động</Option>
-                      <Option value={3}>Đấu giá thành công</Option>
-                      <Option value={4}>Đấu giá thất bại</Option>
-                      <Option value={5}>Đã hủy</Option>
-                    </>
-                  )}
-
-                  {/* Trạng thái 2 */}
-                  {status === 2 && (
-                    <>
-                      <Option value={1} disabled>Chờ xác nhận</Option>
-                      <Option value={2} disabled>Đang hoạt động</Option>
-                      <Option value={3}>Đấu giá thành công</Option>
-                      <Option value={4}>Đấu giá thất bại</Option>
-                      <Option value={5}>Đã hủy</Option>
-                    </>
-                  )}
-
-                  {/* Trạng thái 3 */}
-                  {status === 3 && (
-                    <>
-                      <Option value={1} disabled>Chờ xác nhận</Option>
-                      <Option value={2} disabled>Đang hoạt động</Option>
-                      <Option value={3} disabled>Đấu giá thành công</Option>
-                      <Option value={4}>Đấu giá thất bại</Option>
-                      <Option value={5}>Đã hủy</Option>
-                    </>
-                  )}
-
-                  {/* Trạng thái 4 */}
-                  {status === 4 && (
-                    <>
-                      <Option value={1} disabled>Chờ xác nhận</Option>
-                      <Option value={2} disabled>Đang hoạt động</Option>
-                      <Option value={3} disabled>Đấu giá thành công</Option>
-                      <Option value={4} disabled>Đấu giá thất bại</Option>
-                      <Option value={5}>Đã hủy</Option>
-                    </>
-                  )}
-
-                  {/* Trạng thái 5 */}
-                  {status === 5 && (
-                    <>
-                      <Option value={1} disabled>Chờ xác nhận</Option>
-                      <Option value={2} disabled>Đang hoạt động</Option>
-                      <Option value={3} disabled>Đấu giá thành công</Option>
-                      <Option value={4} disabled>Đấu giá thất bại</Option>
-                      <Option value={5} disabled>Đã hủy</Option>
-                    </>
-                  )}
-            </Select>
+              {option.label}
+            </Option>
+          ))}
+        </Select>
           </Form.Item>
-
-
-            
-
-
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               {isEditing ? (
                 <>
@@ -299,59 +357,85 @@ const AuctionDetails = () => {
           </Form>
         </Card>
       </div>
-      <div style={{ flex: 1 }}>
-        <Title level={3} style={{ textAlign: 'center' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
+      <div style={{ flex: 1, padding: '20px' }}>
+        <Title level={4} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
         <Card>
-          <Form layout="horizontal" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
-          <Form.Item label="Mã cây">
-              <Input value={data.room.plant.plantId || ''} readOnly />
-            </Form.Item>
-            <Form.Item label="Tên cây">
-              <Input value={data.room.plant.plantName || ''} readOnly />
-            </Form.Item>
-            <Form.Item label="Tiêu đề">
-              <Input value={data.room.plant.title || ''} readOnly />
-            </Form.Item>
-            <Form.Item label="Mô tả">
-              <Input.TextArea value={data.room.plant.description || ''} readOnly />
-            </Form.Item>
-            <Form.Item label="Hình ảnh: ">
-              <a href={data.room.plant.mainImage} target="_blank" rel="noopener noreferrer">
-                Xem ảnh
-              </a>
-            </Form.Item>
-            <Form.Item label="Giá">
-              <Input value={data.room.plant.finalPrice || ''} readOnly />
-            </Form.Item>
-            {/* <Form.Item label="Loại cây">
-              <Input value={data.room.plant.categoryId || ''} readOnly />
-            </Form.Item> */}
-                <Form.Item label="Hình thức">
-                <Input 
-                  value={
-                    data.room.plant.typeEcommerceId === 1
-                      ? 'Cây bán'
-                      : data.room.plant.typeEcommerceId === 2
-                      ? 'Cây thuê'
-                      : data.room.plant.typeEcommerceId === 3
-                      ? 'Cây đấu giá'
-                      : ''
-                  }
-                  readOnly
-                />
-              </Form.Item>
-
-            <Form.Item label="Trạng thái hoạt động">
-              <Input value={data.room.plant.isActive === true ? 'Có thể đặt mua / thuê / mang vào đấu giá.' : 'Không thể thuê, mua, đấu giá.'} readOnly />
-            </Form.Item>
-            <Form.Item label="Ngày tạo cây">
-              <Input value={new Date(data.room.plant.creationDate).toLocaleDateString() || ''} readOnly />
-            </Form.Item>
-          </Form>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr>
+                <td style={styles.label}><strong>Mã cây:</strong></td>
+                <td style={styles.value}>{data.room.plant.plantId || ''}</td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Tên cây:</strong></td>
+                <td style={styles.value}>{data.room.plant.plantName || ''}</td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Tiêu đề:</strong></td>
+                <td style={styles.value}>{data.room.plant.title || ''}</td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Mô tả:</strong></td>
+                <td style={styles.value}>{data.room.plant.description || ''}</td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Hình ảnh:</strong></td>
+                <td style={styles.value}>
+                  <a href={data.room.plant.mainImage} target="_blank" rel="noopener noreferrer">
+                    Xem ảnh
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Giá:</strong></td>
+                <td style={styles.value}>{data.room.plant.finalPrice || ''}</td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Hình thức:</strong></td>
+                <td style={styles.value}>
+                  {data.room.plant.typeEcommerceId === 1
+                    ? 'Cây bán'
+                    : data.room.plant.typeEcommerceId === 2
+                    ? 'Cây thuê'
+                    : data.room.plant.typeEcommerceId === 3
+                    ? 'Cây đấu giá'
+                    : ''}
+                </td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Trạng thái hoạt động:</strong></td>
+                <td style={styles.value}>
+                  {data.room.plant.isActive
+                    ? 'Có thể đặt mua / thuê / mang vào đấu giá.'
+                    : 'Không thể thuê, mua, đấu giá.'}
+                </td>
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Ngày tạo cây:</strong></td>
+                <td style={styles.value}>{new Date(data.room.plant.creationDate).toLocaleDateString() || ''}</td>
+              </tr>
+            </tbody>
+          </table>
         </Card>
-      </div>  
+      </div>
+
+
     </div>
   );
 };
 
 export default AuctionDetails;
+
+const styles = {
+  label: {
+    padding: '10px',
+    textAlign: 'left',
+    backgroundColor: '#f5f5f5',
+    borderBottom: '1px solid #ddd',
+  },
+  value: {
+    padding: '10px',
+    textAlign: 'left',
+    borderBottom: '1px solid #ddd',
+  },
+};

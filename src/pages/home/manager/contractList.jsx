@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, Select } from 'antd';
+import { Table, Input, Button, Pagination, Select, Tag } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { apiContract } from '../../../api/apiConfig'; 
-import { getContracts } from '../../../api/contractManagement';
+import { getContracts, getContractStatus } from '../../../api/contractManagement';
 
 
 const ContractMng = () => {
@@ -19,10 +19,10 @@ const ContractMng = () => {
   const navigate = useNavigate();
 
 // fetch get data
-  const fetchData = async (page = 1, search = '') => {
+  const fetchData = async (page = 1, search = '', status = '') => {
     setLoading(true);
     try {
-      const response = await getContracts({ page, size: pageSize, search });
+      const response = status  ?  await getContractStatus({ page, size: pageSize, search , status}) : await getContracts({ page, size: pageSize, search });
       const { data: items } = response;
 
       setData(items.map((item, index) => ({
@@ -50,13 +50,13 @@ const ContractMng = () => {
   };
   // user Effect
   useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText]);
+    fetchData(currentPage, searchText, selectedType);
+  }, [currentPage, searchText, selectedType]);
 
   // Search value
   const handleSearch = () => {
     setCurrentPage(1); 
-    fetchData(1, searchText); 
+    fetchData(1, searchText, selectedType); 
   };
 
   // Detail Contract
@@ -68,6 +68,7 @@ const ContractMng = () => {
   };
   const handleTypeChange = (value) => {
     setSelectedType(value);
+    setCurrentPage(1);
   };
   
   const columns = [
@@ -91,11 +92,6 @@ const ContractMng = () => {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
     },
-    // {
-    //   title: 'Chủ hợp đồng',
-    //   dataIndex: 'userId',
-    //   key: 'userId',
-    // },
     {
       title: 'Mã đơn hàng',
       dataIndex: 'contractNumber',
@@ -120,6 +116,13 @@ const ContractMng = () => {
       title: 'Trạng Thái',
       dataIndex: 'status',
       key: 'status',
+      render: (text) => {
+        let color = 'gray'; // Mặc định màu xám
+        if (text === 'Đang hoạt động') color = 'green';
+        else if (text === 'Hết hạn') color = 'red';
+    
+        return <Tag color={color}>{text}</Tag>;
+      },
     },
     {
       title: 'Xem chi tiết',
@@ -150,13 +153,6 @@ const ContractMng = () => {
           onPressEnter={handleSearch}
           style={{ width: '50%' }}
         />
-        <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => navigate('/staff/contract/create')}
-      >
-        Tạo hợp đồng mới
-      </Button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <Select
@@ -166,12 +162,12 @@ const ContractMng = () => {
           style={{ width: '200px', marginLeft: 'auto' }}
         >
           <Option value="">Tất cả</Option>
-          <Option value="Hợp đồng chưa ký">Hợp đồng chưa ký</Option>
-          <Option value="Hợp đồng đã ký">Hợp đồng đã ký </Option>
-          <Option value="Hợp đồng hét hạn">Hợp đồng hết hạn</Option>
-          <Option value="Hợp đồng đã hủy">Hợp đồng đã hủy</Option>  
+              <Option value={1}>Đang hoạt động</Option>
+              <Option value={2}>Hết hạn hợp đồng</Option>
+              <Option value={0}>Bị hủy</Option>
         </Select>
       </div>
+      
       <Table
         columns={columns}
         dataSource={data}
