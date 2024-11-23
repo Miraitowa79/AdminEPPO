@@ -15,21 +15,14 @@ const AccountDetails = () => {
   const [data, setData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [form] = Form.useForm();
-D
-  const [accounts, setAccount] = useState({});
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   useEffect(() => {
     const fetchAccountDetails = async (id) => {
       try {
         const response = await getAccountDetails(id);
         setData(response.data);
-
         console.log('data:', response.data);
-
-
       } catch (error) {
         console.error('Error fetching account details:', error);
         message.error('Lỗi khi tải thông tin tài khoản');
@@ -47,68 +40,28 @@ D
     return <Spin tip="Loading..." style={{ display: 'block', margin: 'auto' }} />;
   }
 
-<<<<<<< HEAD
   const handleUpdate = async () => {
     try {
-      const values = await form.validateFields();
-      console.log('Updated values:', values);
-      message.success('Thông tin tài khoản đã được cập nhật');
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating account:', error);
-      message.error('Lỗi khi cập nhật tài khoản');
-    }
-  };
-
-  const handleCancelEdit = () => {
-    form.resetFields();
-    setIsEditing(false);
-  };
-
-  const handleFinish = async (updatedData) => {
-    try {
-      const updatedAccount = {
-        ...accounts,
-        ...updatedData,
-
-      };
-      await updateAccountDetails(id, updatedAccount);
-      setAccount(updatedAccount);
-      setIsEditing(false);
-      message.success('Cập nhật hợp đồng thành công!');
-    } catch (error) {
-      message.error('Error updating contract details');
-    }
-  };
-
-
-  // Handle account update
-  const handleUpdate = async () => {
-     
-      
-      try {
       setIsSubmitting(true);
       const values = await form.validateFields();  // Validate form
       const updatedAccount = { ...data, ...values };  // Merge old data with updated values
 
       // Call API to update account
-      const response = await updateAccountDetails(userId, updatedAccount);
+      await updateAccountDetails(userId, updatedAccount);
       setData(updatedAccount);  
       message.success('Thông tin tài khoản đã được cập nhật');
       setIsEditing(false);
-      } catch (error) {
-        message.error('Lỗi khi tải thông tin tài khoản');
-      } finally {
-        setLoading(false);
-      }
-
+    } catch (error) {
+      message.error('Lỗi khi cập nhật tài khoản');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancelEdit = () => {
     form.resetFields();  // Reset the form
     setIsEditing(false);  // Disable editing
   };
-
 
   return (
     <div style={{ display: 'flex', gap: '20px', padding: '20px', maxWidth: '1200px', margin: 'auto' }}>
@@ -125,11 +78,6 @@ D
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 18 }}
             labelAlign="left"
-
-            onFinish={handleFinish}
-
-            onFinish={handleUpdate}  // Submit form on finish
-
             initialValues={data}
           >
             <Form.Item label="Hình ảnh">
@@ -194,54 +142,12 @@ D
                   ? 'Nhân viên'
                   : data.roleId === 4
                   ? 'Chủ sở hữu cây'
-<<<<<<< HEAD
                   : data.roleId === 5
                   ? 'Khách hàng'
                   : 'Không xác định'}
               </span>
             </Form.Item>
 
-
-          <Form.Item label="Trạng thái tài khoản">
-          {isEditing ? (
-            <Select value={data.status} onChange={(value) => setData({ ...data, status: value })}>
-              <Option value={1}>Đang hoạt động</Option>
-              <Option value={2}>Ngừng hoạt động</Option>
-            </Select>
-          ) : (
-            <Input
-              value={
-                data.status === 1
-                  ? 'Đang hoạt động'
-                  : data.status === 2
-                  ? 'Hết hạn hợp đồng'
-                  : 'Bị hủy'
-              }
-              readOnly
-            />
-          )}
-        </Form.Item>
-
-
-
-            <Form.Item style={{ textAlign: 'center' }}>
-            {isEditing ? (
-              <>
-                <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelEdit}>Hủy</Button>
-                <Button type="primary" onClick={handleUpdate} style={{ marginRight: '10px' }}>
-                    Lưu
-                  </Button>
-              </>
-            ) : (
-              <Button type="primary" onClick={() => setIsEditing(true)} style={{ width: '90px' }}>
-              Chỉnh sửa
-            </Button>
-            )}
-          </Form.Item>
-
-                  : 'Không xác định'}
-              </span>
-            </Form.Item>
             <Form.Item label="Trạng thái tài khoản">
               {isEditing ? (
                 <Select value={data.status} onChange={(value) => setData({ ...data, status: value })}>
@@ -261,11 +167,12 @@ D
                 />
               )}
             </Form.Item>
+
             <Form.Item style={{ textAlign: 'center' }}>
               {isEditing ? (
                 <>
                   <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelEdit}>Hủy</Button>
-                  <Button type="primary" htmlType="submit" style={{ marginRight: '10px' }}>
+                  <Button type="primary" onClick={handleUpdate} style={{ marginRight: '10px' }} loading={isSubmitting}>
                     Lưu
                   </Button>
                 </>
@@ -275,7 +182,6 @@ D
                 </Button>
               )}
             </Form.Item>
-
           </Form>
         </Card>
       </div>
@@ -322,22 +228,8 @@ D
                   : 'Không xác định'}
               </span>
             </Form.Item>
-          </Form>
-        </Card>
-      </div>
 
-            <Form.Item label="Số dư ví (USD)">
-              <span>
-                {data.wallet?.numberBalanceUSD
-                  ? new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                      maximumFractionDigits: 0,
-                    }).format(data.wallet.numberBalanceUSD)
-                  : 'Không có thông tin'}
-              </span>
-            </Form.Item>
-        {/* New Section for Address */}
+             {/* New Section for Address */}
         <Form.Item label="Danh sách địa chỉ: ">
         <div>
           {data.addresses && data.addresses.length > 0 ? (
@@ -354,10 +246,10 @@ D
 
       </Form.Item>
 
-        </Form>
+
+          </Form>
         </Card>
       </div>
-
     </div>
   );
 };
