@@ -23,6 +23,7 @@ const ContractDetails = () => {
         const { data: contractData } = await getContractDetails(id);
         setContract(contractData);
 
+        console.log("Log",contractData.contractDetails);
         if (contractData.userId) {
           const { data: userData } = await getAccountDetails(contractData.userId);
           setUser(userData);
@@ -33,7 +34,7 @@ const ContractDetails = () => {
           creationContractDate: moment(contractData.creationContractDate),
           endContractDate: moment(contractData.endContractDate),
         });
-        console.log(contractData)
+        console.log("Data",contractData)
       } catch (error) {
         console.error('Error fetching details:', error);
         message.error('Error fetching details');
@@ -143,26 +144,74 @@ const ContractDetails = () => {
     </div>
 
 
-    <div style={{ flex: 1, padding: '20px' }}>
-        <Title level={4} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
-    
-        <Card>
-          {/* Plant Information Table */}
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <tbody>
-              <tr>
-                <td style={styles.label}><strong>Mã cây:</strong></td>
-                <td style={styles.value}></td>
-              </tr>
-              <tr>
-                <td style={styles.label}><strong>Tên cây:</strong></td>
-                <td style={styles.value}></td>
-              </tr>
-              {/* Other plant details */}
-            </tbody>
-          </table>
-        </Card>
-      </div>
+    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+  <div style={{ flex: 1, padding: '20px' }}>
+    <Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY CHO THUÊ</Title>
+    <Card>
+      {/* Plant Information Table */}
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <tbody>
+          <tr>
+            <td style={styles.label}><strong>Mã cây:</strong></td>
+            <td style={styles.value}>{contract.contractNumber}</td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+
+          {/* Other plant details */}
+        </tbody>
+      </table>
+    </Card>
+  </div>
+
+  <div style={{ flex: 1, padding: '20px' }}>
+    <Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
+    <Card>
+      {/* Plant Information Table */}
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <tbody>
+          <tr>
+            <td style={styles.label}><strong>Mã cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+          <tr>
+            <td style={styles.label}><strong>Tên cây:</strong></td>
+            <td style={styles.value}></td>
+          </tr>
+
+          {/* Other plant details */}
+        </tbody>
+      </table>
+    </Card>
+  </div>
+</div>
+
   </div>
   );
 };
