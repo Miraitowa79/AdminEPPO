@@ -169,6 +169,7 @@ const AuctionDetails = () => {
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               {isEditing ? (
                 <>
+                 <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelEdit}>Hủy</Button>
                   <Button type="primary" onClick={handleUpdate} style={{ marginRight: '10px' }}>
                     Cập nhật
                   </Button>

@@ -22,6 +22,7 @@ const AuctionDetails = () => {
   const [endDate, setEndDate] = useState(null);
   const [status, setStatus] = useState(1);
   const [account, setAccount] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleStatusChange = (value) => {
     setStatus(value);
   };
@@ -109,6 +110,7 @@ const AuctionDetails = () => {
 
   const handleUpdate = async () => {
     try {
+      setIsSubmitting(true);
       const values = await form.validateFields();
       const updatedData = {
         ...data.room,
@@ -127,6 +129,8 @@ const AuctionDetails = () => {
       setIsEditing(false);
     } catch (error) {
       console.error('Failed to fetch data:', error.response?.data || error.message);
+    }finally{
+      setIsSubmitting(false);
     }
   };
 
@@ -341,17 +345,18 @@ const AuctionDetails = () => {
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               {isEditing ? (
                 <>
-                  <Button type="primary" onClick={handleUpdate} style={{ marginRight: '10px' }}>
+                  <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelEdit}>Hủy</Button>
+                  <Button type="primary" onClick={handleUpdate} loading={isSubmitting} style={{ marginRight: '10px' }}>
                     Cập nhật
                   </Button>
-                  <Button onClick={handleCancelEdit}>
+                  {/* <Button onClick={handleCancelEdit}>
                     Hủy
-                  </Button>
+                  </Button> */}
                 </>
               ) : (
-                <Button type="primary" onClick={toggleEdit} style={{ width: '100%' }}>
-                  Chỉnh sửa
-                </Button>
+                <Button type="primary" onClick={() => setIsEditing(true)} style={{ width: '90px' }}>
+                Chỉnh sửa
+              </Button>
               )}
             </Form.Item>
           </Form>
