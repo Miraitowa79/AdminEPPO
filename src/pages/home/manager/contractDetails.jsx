@@ -65,7 +65,7 @@ const ContractDetails = () => {
         ...contract,
         ...updatedData,
         endContractDate: updatedData.endContractDate.format('YYYY-MM-DD'),
-        endContractDate: updatedData.endContractDate.format('YYYY-MM-DD'),
+        // endContractDate: updatedData.endContractDate.format('YYYY-MM-DD'),
       };
       await updateContractDetails(id, updatedContract);
       setContract(updatedContract);
@@ -259,17 +259,12 @@ const styles = {
     borderCollapse: 'collapse',
     margin: '10px 0',
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    margin: '10px 0',
-  },
   label: {
     padding: '10px',
     textAlign: 'left',
     borderBottom: '1px solid #ddd',
     width: '150px',
-    width: '150px',
+
   },
   value: {
     padding: '10px',
@@ -280,10 +275,7 @@ const styles = {
     width: '100px',
     height: 'auto',
   },
-  image: {
-    width: '100px',
-    height: 'auto',
-  },
+
 };
 
 export default ContractDetails;
