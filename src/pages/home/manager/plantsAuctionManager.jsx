@@ -3,7 +3,7 @@ import { Table, Input, Button, Pagination, Space, Select, Avatar } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { apiPlant } from '../../../api/apiConfig'; 
-import { getListPlantAuction, getPlantDetails } from '../../../api/plantsManagement';
+import { getListPlantAuction,getAllCategories, getPlantDetails } from '../../../api/plantsManagement';
 import { useNavigate } from 'react-router-dom';
 import avatar from "../../../assets/images/team-2.jpg";
 const { Option } = Select;
@@ -17,7 +17,8 @@ const PlantsAuction = () => {
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
   const pageSize = 5;
-
+  const [categories, setCategories] = useState([]);
+  
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
@@ -59,6 +60,19 @@ const PlantsAuction = () => {
     setSelectedType(value);
   };
 
+  useEffect(() => {
+    const getCategories = async () => {
+      const fetchedCategories = await getAllCategories();
+      setCategories(fetchedCategories);
+      console.log("Category:", fetchedCategories);
+    };
+
+    getCategories();
+  }, []);
+  const dataWithCategoryTitle = data.map((item) => ({
+    ...item,
+    categoryTitle: categories.find((category) => category.categoryId === item.categoryId)?.title || "Không xác định",
+  }));
   // const filteredData = data.filter(item => 
   //   (item.code.includes(searchText) || item.name.includes(searchText)) &&
   //   (selectedType === '' || item.category === selectedType)
@@ -108,6 +122,7 @@ const PlantsAuction = () => {
           title: 'Loại Cây',
           dataIndex: 'categoryId',
           key: 'categoryId',
+         
         },
       {
           title: 'Chủ cây',
@@ -130,6 +145,7 @@ const PlantsAuction = () => {
         />
       ),
     },
+    
   ];
 
   return (

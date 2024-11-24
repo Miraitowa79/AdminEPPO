@@ -24,8 +24,9 @@ const ContractMng = () => {
     try {
       const response = status  ?  await getContractStatus({ page, size: pageSize, search , status}) : await getContracts({ page, size: pageSize, search });
       const { data: items } = response;
+      const filteredItems = items.filter(item => item.typeContract === 'Thuê Cây');
 
-      setData(items.map((item, index) => ({
+      setData(filteredItems.map((item, index) => ({
         ...item,
         key: item.contractId,
         userId: item.user.userName,
@@ -36,8 +37,8 @@ const ContractMng = () => {
         status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn',
       })));
 
-      if (items.length < pageSize) {
-        setTotalItems((page - 1) * pageSize + items.length);
+      if (filteredItems.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + filteredItems.length);
       } else {
         setTotalItems((page + 1) * pageSize);
       }

@@ -99,9 +99,19 @@ const ContractDetails = () => {
             <Form.Item label="Ngày tạo hợp đồng:" name="creationContractDate" className={editMode ? 'blurred-field' : ''}>
               <DatePicker showTime value={moment(contract?.creationContractDate)} disabled />
             </Form.Item>
-            <Form.Item label="Ngày kết thúc hợp đồng:" name="endContractDate">
+            {/* <Form.Item label="Ngày kết thúc hợp đồng:" name="endContractDate">
               <DatePicker showTime value={moment(contract?.endContractDate)} disabled={!editMode} />
-            </Form.Item>
+            </Form.Item> */}
+            <Form.Item label="Ngày kết thúc hợp đồng:" name="endContractDate">
+            <DatePicker 
+              showTime 
+              value={moment(contract?.endContractDate)} 
+              disabled={!editMode} 
+              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho phép chọn ngày sau ngày hiện tại
+            />
+          </Form.Item>
+
+
             {/* <Form.Item label="Tổng số tiền (VND):" name="totalAmount">
               <Input readOnly={!editMode} />
             </Form.Item> */}
@@ -126,8 +136,6 @@ const ContractDetails = () => {
           </Form.Item>
 
 
-
-
             <Form.Item label="Trạng thái hợp đồng:" name="isActive">
               <Select disabled={!editMode}>
                 <Option value={1}>Đã ký hợp đồng</Option>
@@ -146,7 +154,7 @@ const ContractDetails = () => {
               <Select disabled={!editMode}>
                 <Option value={1}>Đang hoạt động</Option>
                 <Option value={2}>Hết hạn hợp đồng</Option>
-                <Option value={0}>Bị hủy</Option>
+                <Option value={0}>Hủy hợp đồng</Option>
               </Select>
             </Form.Item>
             <Form.Item style={{ textAlign: 'center' }}>

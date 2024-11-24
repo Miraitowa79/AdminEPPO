@@ -100,6 +100,7 @@ export const getListPlantAuction = ({
     }
   });
 };
+
 export const getPlantDetails = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -125,3 +126,24 @@ export const getPlantDetails = (id) => {
 //         }
 //     });
 // };
+
+export const getAllCategories = ({ pageIndex = 1, pageSize = 100 }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data } = await baseApi().get(
+        "/GetList/Categories?page=1&size=100",
+        {
+          params: {
+            pageIndex,
+            pageSize,
+          },
+        }
+      );
+      console.log("data: ", data);
+      return resolve(data);
+    } catch (error) {
+      console.log("Error fetching accounts:", error);
+      return reject(error);
+    }
+  });
+};
