@@ -130,7 +130,7 @@ const ContractDetails = () => {
                 
                 // Validate nếu giá trị nhập vào là số hợp lệ và không âm
                 if (value && (Number(value) < 0 || isNaN(Number(value)))) {
-                  e.target.value = ''; // Xóa giá trị không hợp lệ
+                  e.target.value = ''; 
                 }
               }}
               placeholder="Chỉ nhập số dương"
