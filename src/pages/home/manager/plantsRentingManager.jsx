@@ -1,5 +1,5 @@
 import React, { useState ,useEffect} from 'react';
-import { Table, Input, Button, Pagination, Space, Select, Avatar } from 'antd';
+import { Table, Input, Button, Pagination, Space, Select, Avatar, Tag } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { apiPlant } from '../../../api/apiConfig'; 
@@ -74,11 +74,11 @@ const PlantsRenting = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1, 
     },
     {
-        title: 'Hình ảnh',
-        dataIndex: 'mainImage',
-        key: 'mainImage',
-        render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
-      },
+      title: 'Hình ảnh',
+      dataIndex: 'mainImage',
+      key: 'mainImage',
+      render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
+    },
     {
       title: 'Mã cây cảnh',
       dataIndex: 'plantId',
@@ -89,37 +89,92 @@ const PlantsRenting = () => {
       title: 'Tên cây',
       dataIndex: 'plantName',
       key: 'plantName',
+      ellipsis: true,
     },
     {
-      title: 'Số tiền',
-      dataIndex: 'price',
-      key: 'price',
+      title: 'Tiêu đề',
+      dataIndex: 'title',
+      key: 'title',
+      ellipsis: true,
     },
+    // {
+    //   title: 'Số tiền',
+    //   dataIndex: 'price',
+    //   key: 'price',
+    // },
     {
       title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
     },
+    // {
+    //   title: 'Mô hình kinh doanh',
+    //   dataIndex: 'typeEcommerceId',
+    //   key: 'typeEcommerceId',
+    // },
+    // {
+    //     title: 'Loại Cây',
+    //     dataIndex: 'categoryId',
+    //     key: 'categoryId',
+    //   },
+    // {
+    //     title: 'Chủ cây',
+    //     dataIndex: 'modificationBy',
+    //     key: 'modificationBy',
+    //   },
     {
-      title: 'Mô hình kinh doanh',
-      dataIndex: 'typeEcommerceId',
-      key: 'typeEcommerceId',
+      title: 'Hiệu lực',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      ellipsis: true,
+      render: (isActive) => {
+        if (isActive === true) {
+          return 'Có thể thuê cây';
+        } else if (isActive === false) {
+          return 'Không thể đặt/thuê/mua';
+        } else {
+          return 'Không xác định';
+        }
+      },
     },
+    
     {
-        title: 'Loại Cây',
-        dataIndex: 'categoryId',
-        key: 'categoryId',
-      },
-    {
-        title: 'Chủ cây',
-        dataIndex: 'modificationBy',
-        key: 'modificationBy',
-      },
+      title: 'Số tiền',
+      dataIndex: 'finalPrice',
+      key: 'finalPrice',
+      ellipsis: true,
+    },
+    // {
+    //   title: 'Trạng Thái',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    // },
     {
       title: 'Trạng Thái',
       dataIndex: 'status',
       key: 'status',
+      render: (status) => {
+        let statusText = '';
+        let color = '';
+  
+        switch (status) {
+          case 1:
+            statusText = 'Đang hoạt động';
+            color = 'green';  // Màu xanh cho "Đang hoạt động"
+            break;
+          case 2:
+            statusText = 'Đã hủy hợp đồng';
+            color = 'red';    // Màu đỏ cho "Ngừng hoạt động"
+            break;
+          default:
+            statusText = 'Không rõ';
+            color = 'gray';   // Màu xám cho "Không rõ"
+            break;
+        }
+  
+        return <Tag color={color}>{statusText}</Tag>;
+      },
     },
     {
       title: '',
@@ -150,7 +205,7 @@ const PlantsRenting = () => {
           onPressEnter={handleSearch}
           style={{ width: '50%' }}
         />
-        <Select
+        {/* <Select
           placeholder="Chọn loại cây"
           value={selectedType}
           onChange={handleTypeChange}
@@ -159,7 +214,7 @@ const PlantsRenting = () => {
           <Option value="">Tất cả</Option>
           <Option value="Cây phong thủy">Cây phong thủy</Option>
           <Option value="Cây cảnh">Cây cảnh</Option>
-        </Select>
+        </Select> */}
       </div>
       <Table
         columns={columns}

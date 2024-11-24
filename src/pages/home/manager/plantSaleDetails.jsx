@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Form, Input, Button, Typography, Card, Spin, message, Avatar, Upload } from 'antd';
-import { getPlantDetails } from '../../../api/plantsManagement';
+import { Form, Input, Button, Typography, Card, Spin, message, Avatar, Upload, DatePicker } from 'antd';
+import { getPlantDetails ,updatePlant } from '../../../api/plantsManagement';
 import moment from 'moment';
 import { UploadOutlined } from '@ant-design/icons';
 
@@ -14,6 +14,7 @@ const PlantSaleDetails = () => {
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
   const [extraForm] = Form.useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPlantDetails = async (id) => {
@@ -33,6 +34,42 @@ const PlantSaleDetails = () => {
       fetchPlantDetails(id);
     }
   }, [id, form]);
+
+
+  const handleUpdate = async () => {
+    try {
+      setIsSubmitting(true);
+      const values = await form.validateFields();
+      const updatedData = {
+        ...data.plant,
+        plantName: values.plantName,
+        title: values.title,
+        description: values.description,
+        length: values.length,
+        width: values.width,
+        height: values.height,
+        finalPrice: values.finalPrice,
+        categoryId: values.categoryId,
+        typeEcommerceId: values.typeEcommerceId,
+        isActive: values.isActive,
+        status: values.status,
+        activeDate: values.activeDate.toISOString(),
+        endDate: values.endDate.toISOString(),
+        modificationDate: new Date().toISOString(),
+        modificationBy: values.modificationBy,
+     
+      };
+      await updatePlant(id, updatedData);
+      message.success('Cập nhật thành công !');
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to fetch data:', error.response?.data || error.message);
+    }finally{
+      setIsSubmitting(false);
+    }
+  };
+
+
 
   const handleUpdateClick = () => {
     setEditMode(true);
@@ -66,7 +103,7 @@ const PlantSaleDetails = () => {
         <Form
           form={form}
           layout="horizontal"
-          labelCol={{ span: 6 }}
+          labelCol={{ span: 8 }}
           wrapperCol={{ span: 18 }}
           labelAlign="left"
           onFinish={handleFinish}
@@ -102,19 +139,8 @@ const PlantSaleDetails = () => {
           <Form.Item label="Chiều cao:" name="height">
             <Input readOnly={!editMode} />
           </Form.Item>
-
-          <Form.Item label="Giá nhập:" name="price">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-
           <Form.Item label="Giá bán:" name="finalPrice">
             <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Ngày đấu giá:" name="rentalStartDate">
-            <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
-          </Form.Item>
-          <Form.Item label="Ngày kết thúc đấu giá:" name="rentalEndDate">
-            <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
           </Form.Item>
 
 
@@ -125,6 +151,33 @@ const PlantSaleDetails = () => {
           <Form.Item label="Ngày kết thúc:" name="modificationDate">
             <Input value={moment(data.creationDate).format('YYYY-MM-DD')} readOnly />
           </Form.Item>
+
+
+          
+          <Form.Item label="Chức vụ">
+              <span
+                style={{
+                  color: data.isActive === true
+                    ? 'green'
+                    : 'gray',
+                  fontWeight: 'bold',
+                }}
+              >
+                {data.isActive === true
+                  ? 'Đang còn hàng'
+                  : data.isActive === false
+                  ? 'Đang trong trạng thái hoạt động'
+                  : 'Không xác định'}
+              </span>
+            </Form.Item>
+
+
+
+
+
+
+
+
 
           <Form.Item label="Trạng thái:" name="status">
             <Input readOnly={!editMode} />
@@ -144,64 +197,48 @@ const PlantSaleDetails = () => {
       </Card>
       </div>
 
-      {/* Form bổ sung bên phải */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div>
-        <Title level={4} style={{ textAlign: 'center' }}>Thông tin bổ sung</Title>
+      <div style={{ flex: 1, padding: '20px' }}>
+        <Title level={4} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
         <Card>
-          <Form
-            form={extraForm}
-            layout="vertical"
-            onFinish={(values) => {
-              console.log('Extra Form Values:', values);
-              message.success('Extra form submitted');
-            }}
-          >
-          <Form.Item label="Chủ nhà vườn (chủ cây):" name="modificationBy">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Loại mô hình kinh doanh" name="typeEcommerceId">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Loại cây:" name="categoryId">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Đã duyệt:" name="isActive">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          </Form>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr>
+                <td style={styles.label}><strong>Mã cây:</strong></td>
+                
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Tên cây:</strong></td>
+             
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Tiêu đề:</strong></td>
+            
+              </tr>
+              <tr>
+                <td style={styles.label}><strong>Mô tả:</strong></td>
+               
+              </tr>
+             
+           
+      
+            </tbody>
+          </table>
         </Card>
-      </div>
-      <div>
-
-        <Title level={4} style={{ textAlign: 'center' }}>Thông tin bổ sung</Title>
-        <Card>
-          <Form
-            form={extraForm}
-            layout="vertical"
-            onFinish={(values) => {
-              console.log('Extra Form Values:', values);
-              message.success('Extra form submitted');
-            }}
-          >
-          <Form.Item label="Chủ nhà vườn (chủ cây):" name="modificationBy">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Loại mô hình kinh doanh" name="typeEcommerceId">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Loại cây:" name="categoryId">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          <Form.Item label="Đã duyệt:" name="isActive">
-            <Input readOnly={!editMode} />
-          </Form.Item>
-          </Form>
-        </Card>
-      </div>
       </div>
     </div>
   );
 };
-
+const styles = {
+  label: {
+    padding: '10px',
+    textAlign: 'left',
+    backgroundColor: '#f5f5f5',
+    borderBottom: '1px solid #ddd',
+  },
+  value: {
+    padding: '10px',
+    textAlign: 'left',
+    borderBottom: '1px solid #ddd',
+  },
+};
 export default PlantSaleDetails;

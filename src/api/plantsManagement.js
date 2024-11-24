@@ -147,3 +147,25 @@ export const getAllCategories = ({ pageIndex = 1, pageSize = 100 }) => {
     }
   });
 };
+export const updatePlant = (updatedData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const plantId = updatedData.plantId; // Use the plantId from the updatedData object
+      const response = await baseApi().put(
+        `/GetList/Plants/UpdatePlant/${plantId}`, // Embed plantId dynamically in the URL
+        updatedData // Send the updated data in the request body
+      );
+
+      // Handle success
+      if (response.data.statusCode === 200) {
+        console.log("Plant updated successfully:", response.data.message);
+        resolve(response.data); // Resolve with the response data
+      } else {
+        reject("Error updating plant");
+      }
+    } catch (error) {
+      console.error("Error updating plant:", error); // Log the error for debugging
+      reject(error); // Reject with the error
+    }
+  });
+};
