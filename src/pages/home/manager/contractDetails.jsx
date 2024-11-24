@@ -55,6 +55,7 @@ const ContractDetails = () => {
     let cloneContract = { ...contract };
     cloneContract.endContractDate = moment(contract?.endContractDate);
     cloneContract.creationContractDate = moment(contract?.creationContractDate);
+  
     form.setFieldsValue(cloneContract);
   };
 
@@ -63,6 +64,7 @@ const ContractDetails = () => {
       const updatedContract = {
         ...contract,
         ...updatedData,
+        endContractDate: updatedData.endContractDate.format('YYYY-MM-DD'),
         endContractDate: updatedData.endContractDate.format('YYYY-MM-DD'),
       };
       await updateContractDetails(id, updatedContract);
@@ -257,10 +259,16 @@ const styles = {
     borderCollapse: 'collapse',
     margin: '10px 0',
   },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    margin: '10px 0',
+  },
   label: {
     padding: '10px',
     textAlign: 'left',
     borderBottom: '1px solid #ddd',
+    width: '150px',
     width: '150px',
   },
   value: {
@@ -272,6 +280,11 @@ const styles = {
     width: '100px',
     height: 'auto',
   },
+  image: {
+    width: '100px',
+    height: 'auto',
+  },
 };
 
 export default ContractDetails;
+
