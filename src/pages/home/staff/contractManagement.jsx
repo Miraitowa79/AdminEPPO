@@ -113,7 +113,7 @@ const ContractMng = () => {
       key: 'status',
     },
     {
-      title: 'Xem chi tiết',
+      title: 'Xem',
       key: 'action',
       render: (text, record) => (
         <Button

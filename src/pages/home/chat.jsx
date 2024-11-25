@@ -58,12 +58,11 @@ const Chat = () => {
     )
     if (message.trim()) {
       try {
-        await sendMessageByConversationId({
-          conversationId: selectedConversation.conversationId,
-          message1: message.trim(),
-          userId: getAuthUser().userId,
-          type:'text'
-        })
+        // await sendMessageByConversationId({
+        //   conversationId: selectedConversation.conversationId,
+        //   message1: message.trim(),
+        //   type:'text'
+        // })
         sendMessage(JSON.stringify({"Token": localStorage.getItem('authToken')}), true)
         // console.log('c', {Token: localStorage.getItem('authToken')})
         sendMessage(
@@ -75,7 +74,30 @@ const Chat = () => {
         }), true
         )
         setMessage('')
-        handleGetConversations()
+        let cloneConversation = [...conversations];
+        cloneConversation = cloneConversation.map((val) => {
+          if(val.conversationId === selectedConversation?.conversationId){
+            let messages = [...val.messages, {
+              conversationId: val.conversationId,
+              userId: Number(getAuthUser().userId),
+              type: 'text',
+              message1:message.trim()
+            }]
+
+            return {
+              ...val,
+              messages: messages
+            }
+            
+          }
+
+          return val
+        })
+        console.log('clone: ', cloneConversation)
+        setConversations([...cloneConversation])
+        setTimeout(() => {
+          handleGetConversations();
+        }, 3000);
       } catch (error) {
         console.log('err', error)
       }
@@ -85,11 +107,26 @@ const Chat = () => {
   const handleGetConversations =async () => {
     try {
       const res = await getConversations();
-      setConversations(res)
+      setConversations([...res])
+      console.log('res: ', res)
     } catch (error) {
       console.log('err', error)
     }
   }
+
+  const filteredConversations = conversations.filter((conversation) => {
+    const user =
+      conversation.userTwoNavigation.userId === getAuthUser().userId
+        ? conversation.userOneNavigation
+        : conversation.userTwoNavigation;
+
+    if (menuKey === 'staff') {
+      return user.userId !== getAuthUser().userId && [1, 2, 3].includes(user.roleId);
+    } else if (menuKey === 'customers') {
+      return user.userId !== getAuthUser().userId && [4, 5].includes(user.roleId);
+    }
+    return false;
+  });
 
 
   useEffect(() => {
@@ -114,7 +151,7 @@ const Chat = () => {
         </Menu>
         <List
           itemLayout="horizontal"
-          dataSource={conversations}
+          dataSource={filteredConversations}
           renderItem={(conversation) => (
             <List.Item
               onClick={() => handleUserClick(conversation)}
@@ -183,6 +220,7 @@ const Chat = () => {
           </div>
         </div>
         <div className="chat-input">
+            
           <Input
             placeholder="Gửi tin nhắn..."
             value={message}
@@ -194,6 +232,7 @@ const Chat = () => {
                 style={{ cursor: 'pointer', color: '#1890ff' }}
               />
             }
+            disabled = {!selectedConversation}
             onPressEnter={handleSendMessage}
           />
         </div>

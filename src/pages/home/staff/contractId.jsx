@@ -108,7 +108,7 @@ const ContractDetails = () => {
           </Form.Item>
           <Form.Item label="Trạng thái hợp đồng:" name="status">
             <Select disabled={!editMode}>
-              <Option value={0}>Đang xử lý</Option>
+              <Option value={2}>Hết hạn</Option>
               <Option value={1}>Đang hoạt động</Option>
             </Select>
           </Form.Item>

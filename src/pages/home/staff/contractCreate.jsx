@@ -91,7 +91,7 @@ const CreateContract = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="totalPrice" label="Tổng giá" rules={[{ required: true, message: 'Vui lòng nhập tổng giá' }]}>
+          <Form.Item name="totalPrice" label="Giá " rules={[{ required: true, message: 'Vui lòng nhập tổng giá' }]}>
             <Input />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 6, span: 18 }}>

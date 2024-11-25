@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getListPlantAuction } from '../../../api/plantsManagement';
 import { getAccounts } from '../../../api/accountManagement';
 import { createAuctionRoom } from '../../../api/auctionManagement';
+import {getAuthUser} from '@src/utils'
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -38,6 +39,8 @@ const CreateAuctionRoom = () => {
       }
     };
 
+    form.setFieldsValue({ modificationBy: getAuthUser().fullName });
+
     fetchPlants();
     fetchAllAccounts();
   }, []);
@@ -53,11 +56,16 @@ const CreateAuctionRoom = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const registrationOpenDate = values.registrationOpenDate.toISOString();
-      const registrationEndDate = values.registrationEndDate.toISOString();
-      const creationDate = values.creationDate.toISOString();
-      const activeDate = values.activeDate.toISOString();
-      const endDate = values.endDate.toISOString();
+      const registrationOpenDate = values.registrationOpenDate ? values.registrationOpenDate.toISOString() : null;
+      const registrationEndDate = values.registrationEndDate ? values.registrationEndDate.toISOString() : null;
+      const creationDate = values.creationDate ? values.creationDate.toISOString() : null;
+      const activeDate = values.activeDate ? values.activeDate.toISOString() : null;
+      const endDate = values.endDate ? values.endDate.toISOString() : null;
+
+      if (!registrationOpenDate || !registrationEndDate || !activeDate || !endDate) {
+        message.error('Vui lòng chọn tất cả các ngày cần thiết');
+        return;
+      }
 
       const newRoom = {
         plantId: values.plantId,
@@ -101,15 +109,6 @@ const CreateAuctionRoom = () => {
                 ))}
               </Select>
             </Form.Item>
-            {/* <Form.Item name="modificationBy" label="Modified By" rules={[{ required: true, message: 'Please select a modifier' }]}>
-              <Select placeholder="Select a modifier">
-                {accounts.map(account => (
-                  <Option key={account.id} value={account.id}>
-                    {account.userName}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item> */}
             <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày mở đăng ký' }]}>
               <DatePicker showTime placeholder='Chọn ngày'/>
             </Form.Item>
@@ -130,6 +129,16 @@ const CreateAuctionRoom = () => {
             </Form.Item>
             <Form.Item name="endDate" label="Ngày két thúc" rules={[{ required: true, message: 'Hãy chọn ngày kết thúc đấu giá' }]}>
               <DatePicker showTime placeholder='Chọn ngày'/>
+            </Form.Item>
+            <Form.Item name="modificationBy" label="Người thực hiện">
+              {/* <Select placeholder="Select a modifier">
+                {accounts.map(account => (
+                  <Option key={account.userId} value={account.userId}>
+                    {account.userName}
+                  </Option>
+                ))}
+              </Select> */}
+              <Input readOnly />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
               <Button type="primary" htmlType="submit" style={{ width: 'calc(50% - 10px)', marginRight: '20px' }}>

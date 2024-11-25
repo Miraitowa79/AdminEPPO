@@ -121,10 +121,10 @@ const OrderDetails = () => {
           <Form.Item label="Địa chỉ giao hàng" name="deliveryAddress" className={editMode ? 'blurred-field' : ''}>
             <Input readOnly />
           </Form.Item>
-          <Form.Item label="Giá cuối cùng" name="finalPrice" className={editMode ? 'blurred-field' : ''}>
+          <Form.Item label="Giá" name="finalPrice" className={editMode ? 'blurred-field' : ''}>
             <Input readOnly />
           </Form.Item>
-          <Form.Item label="Loại hình TMĐT" className={editMode ? 'blurred-field' : ''}>
+          <Form.Item label="Loại hình thức" className={editMode ? 'blurred-field' : ''}>
             <Input value={typeEcommerceTitle.title} readOnly />
           </Form.Item>
           <Form.Item label="Ngày tạo" name="creationDate" className={editMode ? 'blurred-field' : ''}>
