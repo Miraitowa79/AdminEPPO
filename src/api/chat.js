@@ -29,7 +29,6 @@ export const getConversationsByUserId = (userId) => {
 
 export const sendMessageByConversationId = ({
     conversationId,
-    userId,
     message1,
     type,
     imageLink=''
@@ -38,7 +37,6 @@ export const sendMessageByConversationId = ({
         try {
             const {data} = await baseApi().post('/Message', {
                 conversationId,
-                userId,
                 message1,
                 type,
                 imageLink

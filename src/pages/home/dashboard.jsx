@@ -3,8 +3,9 @@ import React from 'react';
 
 import { Menu, Card, Row, Col, Typography, List, Avatar } from 'antd';
 import { UserOutlined, DashboardOutlined, BarChartOutlined, FileOutlined } from '@ant-design/icons';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
 import { BarElement } from 'chart.js';
+
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale } from 'chart.js';
 
 // Register required components
@@ -82,9 +83,6 @@ const chartData = {
     },
   ],
 };
-
-
-
 
 
 function Dashboard() {

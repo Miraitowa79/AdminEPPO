@@ -37,7 +37,7 @@ const AuctionDetails = () => {
         setLoading(false);
       }
     };
-
+  
     const fetchAccounts = async () => {
       try {
         const { data } = await getAccounts({});
@@ -47,7 +47,7 @@ const AuctionDetails = () => {
         message.error('Error fetching accounts');
       }
     };
-
+  
     if (id) {
       fetchAuctionDetails(id);
       fetchAccounts();
@@ -126,10 +126,10 @@ const AuctionDetails = () => {
               <Input value={data.room.roomId || ''} readOnly />
             </Form.Item>
             <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
+              <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime disabled={!isEditing} />
             </Form.Item>
             <Form.Item name="registrationEndDate" label="Ngày đóng đăng ký" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
+              <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime disabled={!isEditing} />
             </Form.Item>
             <Form.Item label="Phí đăng ký" className="blurred-field">
               <Input value={data.room.registrationFee || ''} readOnly />
@@ -138,26 +138,17 @@ const AuctionDetails = () => {
               <Input disabled={!isEditing} />
             </Form.Item>
             <Form.Item label="Ngày tạo cuộc đấu giá" className="blurred-field">
-              <Input value={new Date(data.room.creationDate).toLocaleDateString() || ''} readOnly />
+              <Input value={new Date(data.room.creationDate).toLocaleString() || ''} readOnly />
             </Form.Item>
             <Form.Item name="activeDate" label="Thời gian diễn ra" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
+              <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime disabled={!isEditing} />
             </Form.Item>
             <Form.Item name="endDate" label="Thời gian kết thúc" rules={[{ required: true, message: 'Please select a date' }]}>
-              <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
+              <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime disabled={!isEditing} />
             </Form.Item>
             <Form.Item label="Thời gian sửa đổi lần cuối" className="blurred-field">
-              <Input value={new Date(data.room.modificationDate).toLocaleDateString() || ''} readOnly />
+              <Input value={new Date(data.room.modificationDate).toLocaleString() || ''} readOnly />
             </Form.Item>
-            {/* <Form.Item name="modificationBy" label="Modification By" rules={[{ required: true, message: 'Please select a user' }]}>
-              <Select placeholder="Select a modifier" disabled={!isEditing}>
-                {accounts.map(account => (
-                  <Option key={account.id} value={account.id}>
-                    {account.userName}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item> */}
             <Form.Item name="status" label="Trạng thái cuộc đấu giá" rules={[{ required: true, message: 'Please select a status' }]}>
               <Select placeholder="Select status" disabled={!isEditing}>
                 <Option value={1}>Chờ xác nhận</Option>
@@ -220,7 +211,7 @@ const AuctionDetails = () => {
               <Input value={data.room.plant.status === 1 ? 'Đã tạo.' : 'Đã hủy.'} readOnly />
             </Form.Item>
             <Form.Item label="Ngày tạo cây">
-              <Input value={new Date(data.room.plant.creationDate).toLocaleDateString() || ''} readOnly />
+              <Input value={new Date(data.room.plant.creationDate).toLocaleString() || ''} readOnly />
             </Form.Item>
             <Form.Item label="Mã cây">
               <Input value={data.room.plant.code || ''} readOnly />
