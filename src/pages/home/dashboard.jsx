@@ -2,6 +2,12 @@ import './dashboard.scss';
 import React from 'react';
 import { Menu, Card, Row, Col, Typography, List, Avatar } from 'antd';
 import { UserOutlined, DashboardOutlined, BarChartOutlined, FileOutlined } from '@ant-design/icons';
+import { Line, Pie } from 'react-chartjs-2';
+
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale } from 'chart.js';
+
+// Register required components
+ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale);
 
 const { Title, Text } = Typography;
 
@@ -23,6 +29,61 @@ const data = [
     description: '12,340,000 VND',
   },
 ];
+
+const dataPie = {
+  labels: ['Red', 'Blue', 'Yellow'],
+  datasets: [
+    {
+      label: 'My First Dataset',
+      data: [300, 50, 100],
+      backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
+      hoverOffset: 4,
+    },
+  ],
+};
+
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'top',
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Tháng',
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Doanh số (Triệu VND)',
+      },
+    },
+  },
+};
+
+
+const chartData = {
+  labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7'],
+  datasets: [
+    {
+      label: 'Doanh số (Triệu VND)',
+      data: [120, 150, 80, 200, 170, 250, 300],
+      backgroundColor: 'rgba(75,192,192,0.2)',
+      borderColor: 'rgba(75,192,192,1)',
+      borderWidth: 2,
+      tension: 0.4, // Smoothing the line
+    },
+  ],
+};
+
+
+
+
 
 function Dashboard() {
   return (
@@ -72,11 +133,13 @@ function Dashboard() {
           <Col span={16}>
             <Card title="Báo cáo bán hàng">
               {/* Chèn biểu đồ của bạn ở đây */}
+              {/* <Line data={chartData} options={chartOptions} /> */}
             </Card>
           </Col>
           <Col span={8}>
             <Card title="Nguồn doanh thu">
               {/* Chèn biểu đồ nguồn doanh thu của bạn ở đây */}
+              <Pie data={dataPie} />
             </Card>
           </Col>
         </Row>
