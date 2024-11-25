@@ -147,21 +147,21 @@ export const getAllCategories = ({ pageIndex = 1, pageSize = 100 }) => {
     }
   });
 };
-export const updatePlant = (updatedData) => {
+
+export const updatePlant = (plantId, updatedData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const plantId = updatedData.plantId; // Use the plantId from the updatedData object
       const response = await baseApi().put(
-        `/GetList/Plants/UpdatePlant/${plantId}`, // Embed plantId dynamically in the URL
-        updatedData // Send the updated data in the request body
+        `/GetList/Plants/Update/PlantId?plantId=${plantId}`, // Correct URL structure with query parameter
+        updatedData // Send the entire updated data if required, or specific fields
       );
 
-      // Handle success
-      if (response.data.statusCode === 200) {
+      // Check if the request was successful
+      if (response?.data?.statusCode === 200) {
         console.log("Plant updated successfully:", response.data.message);
         resolve(response.data); // Resolve with the response data
       } else {
-        reject("Error updating plant");
+        reject(new Error("Error updating plant: unexpected status code"));
       }
     } catch (error) {
       console.error("Error updating plant:", error); // Log the error for debugging
