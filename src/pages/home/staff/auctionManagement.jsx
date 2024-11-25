@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, message } from 'antd';
+import { Table, Input, Button, Pagination, message, Select, Tag } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { getAuctions } from '../../../api/auctionManagement';
+import { getAuctions, getAuctionStatus } from '../../../api/auctionManagement';
+import {getAuthUser} from '@src/utils'
+
+const { Option } = Select;
 
 const AuctionMng = () => {
   const navigate = useNavigate();
@@ -12,21 +15,27 @@ const AuctionMng = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const pageSize = 10;
+  const [selectedType, setSelectedType] = useState('');
 
-  const fetchData = async (page = 1, search = '') => {
+  const fetchData = async (page = 1, search = '', status = '') => {
     setLoading(true);
     try {
-      const response = await getAuctions({ page, size: pageSize, search });
+      const response = status 
+      ? await getAuctionStatus({ page, size: pageSize, search, status })
+      : await getAuctions({ page, size: pageSize, search });
+      const userId = getAuthUser().userId;
       const items = response.data;
-      setData(items);
+      const filteredItems = items.filter(item => item.modificationBy == userId);
+      setData(filteredItems);
+      console.log("filtered data: ", filteredItems);
 
-      if (items.length < pageSize) {
-        setTotalItems((page - 1) * pageSize + items.length);
+      if (filteredItems.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + filteredItems.length);
       } else {
         setTotalItems(page * pageSize);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Failed to fetch data:', error.response?.data || error.message);
       message.error('Failed to fetch data');
     } finally {
       setLoading(false);
@@ -34,12 +43,17 @@ const AuctionMng = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText]);
+    fetchData(currentPage, searchText, selectedType);
+  }, [currentPage, searchText, selectedType]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchData(1, searchText);
+    fetchData(1, searchText, selectedType);
+  };
+
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    setCurrentPage(1);
   };
 
   const handleViewDetails = (record) => {
@@ -66,40 +80,17 @@ const AuctionMng = () => {
       dataIndex: 'roomId',
       key: 'roomId',
     },
-    // {
-    //   title: 'Plant ID',
-    //   dataIndex: 'plantId',
-    //   key: 'plantId',
-    // },
     {
       title: 'Tên cây',
       dataIndex: ['plant', 'plantName'],
       key: 'plantName',
     },
-    // {
-    //   title: 'Registration Open Date',
-    //   dataIndex: 'registrationOpenDate',
-    //   key: 'registrationOpenDate',
-    //   render: (date) => new Date(date).toLocaleDateString(),
-    // },
-    // {
-    //   title: 'Registration End Date',
-    //   dataIndex: 'registrationEndDate',
-    //   key: 'registrationEndDate',
-    //   render: (date) => new Date(date).toLocaleDateString(),
-    // },
     {
       title: 'Phí đăng ký',
       dataIndex: 'registrationFee',
       key: 'registrationFee',
       render: (fee) => fee.toLocaleString(),
     },
-    // {
-    //   title: 'Price Step',
-    //   dataIndex: 'priceStep',
-    //   key: 'priceStep',
-    //   render: (step) => step.toLocaleString(),
-    // },
     {
       title: 'Ngày tạo',
       dataIndex: 'creationDate',
@@ -118,36 +109,41 @@ const AuctionMng = () => {
       key: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
-    // {
-    //   title: 'Modification Date',
-    //   dataIndex: 'modificationDate',
-    //   key: 'modificationDate',
-    //   render: (date) => new Date(date).toLocaleDateString(),
-    // },
     {
-      title: 'Modification By',
-      dataIndex: 'modificationBy',
-      key: 'modificationBy',
-    },
-    {
-      title: 'Trạng thái cuộc đấu giá',
+      title: 'Trạng thái đấu giá',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
+        let statusText = '';
+        let color = '';
+  
         switch (status) {
           case 1:
-            return 'Chờ xác nhận';
+            statusText = 'Chờ xác nhận';
+            color = 'yellow';
+            break;
           case 2:
-            return 'Đang hoạt động';
+            statusText = 'Đang hoạt động';
+            color = 'blue';
+            break;
           case 3:
-            return 'Đấu giá thành công';
+            statusText = 'Đấu giá thành công';
+            color = 'green';
+            break;
           case 4:
-            return 'Đấu giá thất bại';
+            statusText = 'Đấu giá thất bại';
+            color = 'red';
+            break;
           case 5:
-            return 'Đã hủy';
+            statusText = 'Đã hủy';
+            color = 'gray';
+            break;
           default:
-            return 'Không xác định';
+            statusText = 'Không xác định';
+            color = 'black';
         }
+  
+        return <Tag color={color}>{statusText}</Tag>;
       },
     },
     {
@@ -167,7 +163,7 @@ const AuctionMng = () => {
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <Input
-          placeholder="Search by plant name"
+          placeholder="Tìm kiếm phòng đấu giá"
           suffix={
             <SearchOutlined
               onClick={handleSearch}
@@ -183,6 +179,22 @@ const AuctionMng = () => {
           Tạo phòng đấu giá
         </Button>
       </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+          <Select
+          placeholder="Chọn trạng thái đấu giá"
+          value={selectedType}
+          onChange={handleTypeChange}
+          style={{ width: '200px', marginBottom: '20px' }}
+        >
+          <Option value="">Tất cả</Option>
+          <Option value="1">Chờ xác nhận</Option>
+          <Option value="2">Đang hoạt động</Option>
+          <Option value="3">Đấu giá thành công</Option>
+          <Option value="4">Đấu giá thất bại</Option>
+          <Option value="5">Đã hủy</Option>
+        </Select>
+      </div>
+      
       <Table
         columns={columns}
         dataSource={data}
