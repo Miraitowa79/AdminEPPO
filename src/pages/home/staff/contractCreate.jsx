@@ -3,6 +3,9 @@ import { Form, Input, Button, Select, Typography, Card, DatePicker, message } fr
 import { useNavigate } from 'react-router-dom';
 import { getPlants } from '../../../api/plantsManagement';
 import { createContract } from '../../../api/contractManagement';
+import { getOrders } from '../../../api/orderManagement';
+import { getOrderDetails } from '../../../api/orderManagement';
+import moment from 'moment';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -10,6 +13,7 @@ const { Option } = Select;
 const CreateContract = () => {
   const navigate = useNavigate();
   const [plants, setPlants] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -25,12 +29,47 @@ const CreateContract = () => {
         }
       } catch (error) {
         console.error('Error fetching plants:', error);
-        message.error('Error fetching plants');
+        message.error('Không có dữ liệu cây!');
+      }
+    };
+
+    const fetchOrders = async () => {
+      try {
+        const response = await getOrders({ pageSize: 5000 });
+        const { data } = response;
+        if (Array.isArray(data)) {
+          const filteredOrders = data.filter(order => order.typeEcommerceId === 2);
+          setOrders(filteredOrders);
+        } else {
+          setOrders([]);
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        message.error('Không có dữ liệu đơn hàng!');
       }
     };
 
     fetchPlants();
-  }, []);
+    fetchOrders();
+
+    // Set default value for creationContractDate
+    form.setFieldsValue({
+      creationContractDate: moment(),
+    });
+  }, [form]);
+
+  const handleOrderChange = async (orderId) => {
+    try {
+      const orderDetails = await getOrderDetails(orderId);
+      const totalPrice = orderDetails.data?.orderDetails?.reduce((acc, detail) => acc + detail.totalPrice, 0);
+      form.setFieldsValue({
+        totalAmount: totalPrice,
+      });
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      message.error('Error fetching order details');
+    }
+  };
 
   const handleSubmit = async (values) => {
     try {
@@ -64,35 +103,37 @@ const CreateContract = () => {
       <Title level={3} style={{ textAlign: 'center' }}>TẠO HỢP ĐỒNG MỚI</Title>
       <Card>
         <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} labelAlign="left" onFinish={handleSubmit}>
-          <Form.Item name="contractNumber" label="Số hợp đồng" rules={[{ required: true, message: 'Vui lòng nhập số hợp đồng' }]}>
-            <Input />
+          <Form.Item name="contractNumber" label="Mã đơn hàng" rules={[{ required: true, message: 'Vui lòng chọn mã đơn hàng' }]}>
+            <Select placeholder="Chọn mã đơn hàng" onChange={handleOrderChange}>
+              {orders.map(order => (
+                <Option key={order.orderId} value={order.orderId}>
+                  {order.contractNumber}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}>
             <Input />
           </Form.Item>
           <Form.Item name="creationContractDate" label="Ngày tạo" rules={[{ required: true, message: 'Vui lòng chọn ngày tạo' }]}>
-            <DatePicker format="YYYY-MM-DD" />
+            <DatePicker
+              format="YYYY-MM-DD"
+              disabledDate={current => current && current < moment().startOf('day')}
+              defaultValue={moment()}
+              disabled
+            />
           </Form.Item>
           <Form.Item name="endContractDate" label="Ngày kết thúc" rules={[{ required: true, message: 'Vui lòng chọn ngày kết thúc' }]}>
-            <DatePicker format="YYYY-MM-DD" />
+            <DatePicker
+              format="YYYY-MM-DD"
+              disabledDate={current => {
+                const creationDate = form.getFieldValue('creationContractDate');
+                return current && (current < moment().startOf('day') || (creationDate && current <= creationDate));
+              }}
+            />
           </Form.Item>
           <Form.Item name="totalAmount" label="Tổng số tiền" rules={[{ required: true, message: 'Vui lòng nhập tổng số tiền' }]}>
-            <Input />
-          </Form.Item>
-          {/* <Form.Item name="contractUrl" label="URL hợp đồng" rules={[{ required: true, message: 'Vui lòng nhập URL hợp đồng' }]}>
-            <Input />
-          </Form.Item> */}
-          <Form.Item name="plantId" label="Chọn cây trồng" rules={[{ required: true, message: 'Vui lòng chọn cây trồng' }]}>
-            <Select placeholder="Chọn cây trồng">
-              {plants.map(plant => (
-                <Option key={plant.plantId} value={plant.plantId}>
-                  {plant.plantName}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item name="totalPrice" label="Giá " rules={[{ required: true, message: 'Vui lòng nhập tổng giá' }]}>
-            <Input />
+            <Input readOnly />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
             <Button type="primary" htmlType="submit" style={{ width: '100%' }}>

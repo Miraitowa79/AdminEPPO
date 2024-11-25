@@ -27,7 +27,7 @@ const OrdersMng = () => {
         setAccounts(data);
       } catch (error) {
         console.error('Error fetching accounts:', error);
-        message.error('Error fetching accounts');
+        message.error('Không có dữ liệu tài khoản!');
       }
     };
 
@@ -37,7 +37,7 @@ const OrdersMng = () => {
         setTypeEcommerce(response.data);
       } catch (error) {
         console.error('Error fetching typeEcommerce:', error);
-        message.error('Error fetching typeEcommerce');
+        message.error('Không có dữ liệu hình thức TMĐT!');
       }
     };
 

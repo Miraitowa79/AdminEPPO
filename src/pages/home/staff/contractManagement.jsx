@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination } from 'antd';
+import { Table, Input, Button, Pagination, Select, Tag } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { apiContract } from '../../../api/apiConfig';
-import { getContracts } from '../../../api/contractManagement';
+import { getContracts, getContractStatus } from '../../../api/contractManagement';
+import './contractManagement.scss';
+
+const { Option } = Select;
 
 const ContractMng = () => {
   const [data, setData] = useState([]);
@@ -12,13 +13,16 @@ const ContractMng = () => {
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [selectedType, setSelectedType] = useState('');
   const pageSize = 10;
   const navigate = useNavigate();
 
-  const fetchData = async (page = 1, search = '') => {
+  const fetchData = async (page = 1, search = '', status = '') => {
     setLoading(true);
     try {
-      const response = await getContracts({ page, size: pageSize, search });
+      const response = status
+        ? await getContractStatus({ page, size: pageSize, search, status })
+        : await getContracts({ page, size: pageSize, search });
       const { data: items } = response;
 
       setData(items.map((item, index) => ({
@@ -45,12 +49,12 @@ const ContractMng = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText]);
+    fetchData(currentPage, searchText, selectedType);
+  }, [currentPage, searchText, selectedType]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchData(1, searchText);
+    fetchData(1, searchText, selectedType);
   };
 
   const handleViewDetails = (record) => {
@@ -59,6 +63,11 @@ const ContractMng = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    setCurrentPage(1);
   };
 
   const columns = [
@@ -72,16 +81,6 @@ const ContractMng = () => {
       dataIndex: 'contractId',
       key: 'contractId',
     },
-    // {
-    //   title: 'Số hợp đồng',
-    //   dataIndex: 'contractNumber',
-    //   key: 'contractNumber',
-    // },
-    {
-      title: 'Chủ hợp đồng',
-      dataIndex: 'userId',
-      key: 'userId',
-    },
     {
       title: 'Mô tả',
       dataIndex: 'description',
@@ -91,6 +90,11 @@ const ContractMng = () => {
       title: 'Số tiền',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
+    },
+    {
+      title: 'Mã đơn hàng',
+      dataIndex: 'contractNumber',
+      key: 'contractNumber',
     },
     {
       title: 'Ngày tạo',
@@ -111,6 +115,13 @@ const ContractMng = () => {
       title: 'Trạng Thái',
       dataIndex: 'status',
       key: 'status',
+      render: (text) => {
+        let color = 'gray';
+        if (text === 'Đang hoạt động') color = 'green';
+        else if (text === 'Hết hạn') color = 'red';
+    
+        return <Tag color={color}>{text}</Tag>;
+      },
     },
     {
       title: 'Xem',
@@ -125,36 +136,54 @@ const ContractMng = () => {
     },
   ];
 
+  // Function to determine row class
+  const rowClassName = (record) => {
+    return (record.creationContractDate === record.endContractDate && record.status === 'Đang hoạt động') ? 'red-row' : '';
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-      <Input
-        placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
-        suffix={
-          <SearchOutlined
-            onClick={handleSearch}
-            style={{ cursor: 'pointer' }}
-          />
-        }
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        onPressEnter={handleSearch}
-        style={{ width: '50%' }}
-      />
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => navigate('/staff/contract/create')}
-      >
-        Tạo hợp đồng mới
-      </Button>
-    </div>
+        <Input
+          placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
+          suffix={
+            <SearchOutlined
+              onClick={handleSearch}
+              style={{ cursor: 'pointer' }}
+            />
+          }
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onPressEnter={handleSearch}
+          style={{ width: '50%' }}
+        />
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate('/staff/contract/create')}
+        >
+          Tạo hợp đồng mới
+        </Button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+        <Select
+          placeholder="Chọn trạng thái"
+          value={selectedType}
+          onChange={handleTypeChange}
+          style={{ width: '200px' }}
+        >
+          <Option value="">Tất cả</Option>
+          <Option value="1">Đang hoạt động</Option>
+          <Option value="2">Hết hạn</Option>
+        </Select>
+      </div>
       <Table
         columns={columns}
         dataSource={data}
         pagination={false}
         rowKey="key"
         loading={loading}
+        rowClassName={rowClassName} // Apply the row class name
       />
       <Pagination
         current={currentPage}
