@@ -160,13 +160,13 @@ const PlantsRenting = () => {
   
         switch (status) {
           case 1:
-            statusText = 'Đang hoạt động';
-            color = 'green';  // Màu xanh cho "Đang hoạt động"
+            statusText = 'Đã tạo';
+            color = 'blue';    // Màu đỏ cho "Ngừng hoạt động"
             break;
           case 2:
-            statusText = 'Đã hủy hợp đồng';
-            color = 'red';    // Màu đỏ cho "Ngừng hoạt động"
-            break;
+            statusText = 'Đang hoạt động';
+            color = 'green';  // Màu xanh cho "Đang hoạt động"
+            break;            
           default:
             statusText = 'Không rõ';
             color = 'gray';   // Màu xám cho "Không rõ"
