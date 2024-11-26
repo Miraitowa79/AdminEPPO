@@ -34,7 +34,7 @@ const data = [
 ];
 
 const dataPie = {
-  labels: ['Red', 'Blue', 'Yellow'],
+  labels: ['Đấu giá', 'Bán', 'Cho thuê'],
   datasets: [
     {
       label: 'My First Dataset',
