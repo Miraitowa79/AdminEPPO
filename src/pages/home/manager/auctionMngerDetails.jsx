@@ -121,7 +121,7 @@ const AuctionDetails = () => {
         activeDate: values.activeDate.toISOString(),
         endDate: values.endDate.toISOString(),
         status: values.status,
-        modificationBy: values.modificationBy,
+        // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
       };
       await updateAuctionRoom(id, updatedData);
