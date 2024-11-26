@@ -1,13 +1,16 @@
 import './dashboard.scss';
 import React from 'react';
+
 import { Menu, Card, Row, Col, Typography, List, Avatar } from 'antd';
 import { UserOutlined, DashboardOutlined, BarChartOutlined, FileOutlined } from '@ant-design/icons';
-import { Line, Pie } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
+import { BarElement } from 'chart.js';
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale } from 'chart.js';
 
 // Register required components
 ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale);
+ChartJS.register(BarElement);
 
 const { Title, Text } = Typography;
 
@@ -68,21 +71,18 @@ const chartOptions = {
 
 
 const chartData = {
-  labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7'],
+  labels: ['Tháng 1', 'Tháng 2', 'Tháng 3','Tháng 4','Tháng 5','Tháng 6', 'Tháng 7','Tháng 8','Tháng 9','Tháng 10', 'Tháng 11','Tháng 12'],
   datasets: [
     {
       label: 'Doanh số (Triệu VND)',
-      data: [120, 150, 80, 200, 170, 250, 300],
+      data: [450, 150, 80, 40, 230, 150, 300, 240, 400, 200, 350, 200],
       backgroundColor: 'rgba(75,192,192,0.2)',
       borderColor: 'rgba(75,192,192,1)',
       borderWidth: 2,
-      tension: 0.4, // Smoothing the line
+      tension: 0.4, // Làm mềm đường
     },
   ],
 };
-
-
-
 
 
 function Dashboard() {
@@ -133,7 +133,7 @@ function Dashboard() {
           <Col span={16}>
             <Card title="Báo cáo bán hàng">
               {/* Chèn biểu đồ của bạn ở đây */}
-              {/* <Line data={chartData} options={chartOptions} /> */}
+              <Bar data={chartData} options={chartOptions} />
             </Card>
           </Col>
           <Col span={8}>
