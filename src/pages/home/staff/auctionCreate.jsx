@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, Typography, Card, DatePicker, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import { getListPlantAuction } from '../../../api/plantsManagement';
 import { getAccounts } from '../../../api/accountManagement';
 import { createAuctionRoom } from '../../../api/auctionManagement';
-import {getAuthUser} from '@src/utils'
+import { getAuthUser } from '@src/utils';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -12,9 +13,9 @@ const { Option } = Select;
 const CreateAuctionRoom = () => {
   const navigate = useNavigate();
   const [plants, setPlants] = useState([]);
-  const [accounts, setAccounts] = useState([]);
   const [selectedPlant, setSelectedPlant] = useState({ plantName: '', finalPrice: '' });
   const [form] = Form.useForm();
+  const currentUser = getAuthUser();
 
   useEffect(() => {
     const fetchPlants = async () => {
@@ -28,22 +29,14 @@ const CreateAuctionRoom = () => {
       }
     };
 
-    const fetchAllAccounts = async () => {
-      try {
-        const response = await getAccounts({});
-        const { data } = response;
-        setAccounts(data);
-      } catch (error) {
-        console.error('Error fetching accounts:', error);
-        message.error('Error fetching accounts');
-      }
-    };
-
-    form.setFieldsValue({ modificationBy: getAuthUser().fullName });
+    form.setFieldsValue({
+      modificationBy: currentUser.fullName,
+      creationDate: moment(),
+      modificationDate: moment(),
+    });
 
     fetchPlants();
-    fetchAllAccounts();
-  }, []);
+  }, [form, currentUser.fullName]);
 
   const handlePlantChange = (plantId) => {
     const plant = plants.find(p => p.plantId === plantId);
@@ -56,14 +49,25 @@ const CreateAuctionRoom = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const registrationOpenDate = values.registrationOpenDate ? values.registrationOpenDate.toISOString() : null;
-      const registrationEndDate = values.registrationEndDate ? values.registrationEndDate.toISOString() : null;
-      const creationDate = values.creationDate ? values.creationDate.toISOString() : null;
-      const activeDate = values.activeDate ? values.activeDate.toISOString() : null;
-      const endDate = values.endDate ? values.endDate.toISOString() : null;
+      const registrationOpenDate = values.registrationOpenDate.toISOString();
+      const registrationEndDate = values.registrationEndDate.toISOString();
+      const creationDate = moment().toISOString();
+      const activeDate = values.activeDate.toISOString();
+      const endDate = values.endDate.toISOString();
+      const modificationDate = creationDate;
 
-      if (!registrationOpenDate || !registrationEndDate || !activeDate || !endDate) {
-        message.error('Vui lòng chọn tất cả các ngày cần thiết');
+      if (moment(registrationEndDate).isBefore(registrationOpenDate)) {
+        message.error('Ngày đóng đăng ký phải sau ngày mở đăng ký');
+        return;
+      }
+
+      if (moment(activeDate).isBefore(registrationEndDate)) {
+        message.error('Ngày hoạt động phải sau ngày đóng đăng ký');
+        return;
+      }
+
+      if (moment(endDate).isBefore(activeDate)) {
+        message.error('Ngày kết thúc phải sau ngày hoạt động');
         return;
       }
 
@@ -73,11 +77,9 @@ const CreateAuctionRoom = () => {
         registrationEndDate,
         registrationFee: values.registrationFee,
         priceStep: values.priceStep,
-        creationDate,
         activeDate,
         endDate,
-        modificationDate: creationDate,
-        modificationBy: values.modificationBy,
+        modificationBy: getAuthUser().userId,
         status: values.status,
       };
 
@@ -86,7 +88,7 @@ const CreateAuctionRoom = () => {
       navigate('/staff/auction');
     } catch (error) {
       console.error('Error creating auction room:', error);
-      message.error('Error creating auction room');
+      message.error('Tạo phòng không thành công!');
     }
   };
 
@@ -110,34 +112,24 @@ const CreateAuctionRoom = () => {
               </Select>
             </Form.Item>
             <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày mở đăng ký' }]}>
-              <DatePicker showTime placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
             <Form.Item name="registrationEndDate" label="Ngày đóng đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày đóng đăng ký' }]}>
-              <DatePicker showTime placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
             <Form.Item name="registrationFee" label="Phí đăng ký tham gia">
               <Input type="number" placeholder='Phí đăng ký = 5% * giá cây' readOnly />
             </Form.Item>
             <Form.Item name="priceStep" label="Mức đấu giá" rules={[{ required: true, message: 'Hãy nhập mức đấu gia' }]}>
-              <Input type="number" placeholder='Nhập mức tăng mỗi lần đấu giá'/>
+              <Input type="number" placeholder='Nhập mức tăng mỗi lần đấu giá' />
             </Form.Item>
-            {/* <Form.Item name="creationDate" label="Ngày tạo" rules={[{ required: true, message: 'Please select a creation date' }]}>
-              <DatePicker format="YYYY-MM-DD" />
-            </Form.Item> */}
             <Form.Item name="activeDate" label="Ngày hoạt động" rules={[{ required: true, message: 'Hãy chọn ngày đấu giá hoạt động' }]}>
-              <DatePicker showTime placeholder='Chọn ngày'/>
+              <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
-            <Form.Item name="endDate" label="Ngày két thúc" rules={[{ required: true, message: 'Hãy chọn ngày kết thúc đấu giá' }]}>
-              <DatePicker showTime placeholder='Chọn ngày'/>
+            <Form.Item name="endDate" label="Ngày kết thúc" rules={[{ required: true, message: 'Hãy chọn ngày kết thúc đấu giá' }]}>
+              <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
             <Form.Item name="modificationBy" label="Người thực hiện">
-              {/* <Select placeholder="Select a modifier">
-                {accounts.map(account => (
-                  <Option key={account.userId} value={account.userId}>
-                    {account.userName}
-                  </Option>
-                ))}
-              </Select> */}
               <Input readOnly />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
@@ -152,7 +144,7 @@ const CreateAuctionRoom = () => {
         </Card>
       </div>
       <div style={{ flex: 1 }}>
-      <Title level={3} style={{ textAlign: 'center' }}>Cây đấu giá</Title>
+        <Title level={3} style={{ textAlign: 'center' }}>Cây đấu giá</Title>
         <Card>
           <p><strong>Tên cây:</strong> {selectedPlant.plantName || '-'}</p>
           <p><strong>Giá:</strong> {selectedPlant.finalPrice || '-'}</p>
