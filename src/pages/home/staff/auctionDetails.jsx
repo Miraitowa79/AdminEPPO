@@ -309,22 +309,16 @@ const AuctionDetails = () => {
             <Form.Item label="Mức đấu giá">
               <Input value={data.room.priceStep || ''} readOnly />
             </Form.Item>
-            {/* <Form.Item label="Ngày tạo cuộc đấu giá">
-              <Input value={new Date(data.room.creationDate).toLocaleString() || ''} readOnly />
-            </Form.Item> */}
             <Form.Item label="Thời gian diễn ra">
               <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime value={moment(data.room.activeDate)} disabled />
             </Form.Item>
             <Form.Item label="Thời gian kết thúc">
               <DatePicker format="YYYY-MM-DD HH:mm:ss" showTime value={moment(data.room.endDate)} disabled />
             </Form.Item>
-            {/* <Form.Item label="Thời gian sửa đổi lần cuối">
-              <Input value={new Date(data.room.modificationDate).toLocaleString() || ''} readOnly />
-            </Form.Item> */}
-            <Form.Item label="Ngày tạo cuộc đấu giá" >
+            <Form.Item label="Ngày tạo cuộc đấu giá">
               <Input value={new Date(data.room.creationDate).toLocaleDateString() || ''} readOnly />
             </Form.Item>
-            <Form.Item label="Thời gian sửa đổi lần cuối" >
+            <Form.Item label="Thời gian sửa đổi lần cuối">
               <Input value={new Date(data.room.modificationDate).toLocaleDateString() || ''} readOnly />
             </Form.Item>
             <Form.Item label="Trạng thái cuộc đấu giá">
@@ -335,6 +329,9 @@ const AuctionDetails = () => {
                 <Option value={4}>Đấu giá thất bại</Option>
                 <Option value={5}>Đã hủy</Option>
               </Select>
+            </Form.Item>
+            <Form.Item label="Số lượng đã đăng ký">
+              <Input value={data.registeredCount || 0} readOnly />
             </Form.Item>
           </Form>
         </Card>
@@ -378,10 +375,10 @@ const AuctionDetails = () => {
               />
             </Form.Item>
             <Form.Item label="Trạng thái">
-              <Input value={data.room.plant.isActive === true ? 'Có thể đặt mua / thuê / mang vào đấu giá.' : 'Không thể thuê, mua, đấu giá.'} readOnly />
+              <Input value={data.room.plant.isActive ? 'Có thể đặt mua / thuê / mang vào đấu giá.' : 'Không thể thuê, mua, đấu giá.'} readOnly />
             </Form.Item>
             <Form.Item label="Ngày tạo cây">
-              <Input value={new Date(data.room.plant.creationDate).toLocaleString() || ''} readOnly />
+              <Input value={new Date(data.room.plant.creationDate).toLocaleDateString()|| ''} readOnly />
             </Form.Item>
           </Form>
         </Card>
@@ -391,3 +388,4 @@ const AuctionDetails = () => {
 };
 
 export default AuctionDetails;
+
