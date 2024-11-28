@@ -36,7 +36,7 @@ const AuctionMng = () => {
       }
     } catch (error) {
       console.error('Failed to fetch data:', error.response?.data || error.message);
-      message.error('Failed to fetch data');
+      message.error('Không có dữ liệu');
     } finally {
       setLoading(false);
     }

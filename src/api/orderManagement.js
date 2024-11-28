@@ -41,3 +41,23 @@ export const updateOrderDetails = (updatedOrderData) => {
         }
     });
 };
+
+export const getFilteredOrders = ({ typeEcommerceId, startDate, endDate, pageIndex = 1, pageSize = 5000 }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { data } = await baseApi().get('/Order/GetOrdersByTypeEcommerceId', {
+                params: {
+                    typeEcommerceId,
+                    startDate,
+                    endDate,
+                    pageIndex,
+                    pageSize
+                }
+            });
+            return resolve(data);
+        } catch (error) {
+            console.log('Error fetching filtered orders:', error);
+            return reject(error);
+        }
+    });
+};

@@ -29,3 +29,15 @@ export const getFeedbackDetails = (id) => {
     }
   });
 };
+
+export const updateFeedbackDetails = (id, updatedData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data } = await baseApi().put(`/GetList/Feedback/Update/Feedback/Id?id=${id}`, updatedData);
+      return resolve(data);
+    } catch (error) {
+      console.log('Error updating feedback details:', error);
+      return reject(error);
+    }
+  });
+};

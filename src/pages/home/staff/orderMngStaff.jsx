@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, Space, message } from 'antd';
+import { Table, Input, Pagination, message, Tag, Select, DatePicker, Button } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
-import { getOrders } from '../../../api/orderManagement';
+import { getOrders, getFilteredOrders } from '../../../api/orderManagement'; // Import cả hai hàm API
 import { getAccounts } from '../../../api/accountManagement';
 import { getTypeEcommerce } from '../../../api/typeEcommerceApi';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import './ordersMng.scss';
+
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const OrdersMng = () => {
   const navigate = useNavigate();
@@ -17,6 +20,8 @@ const OrdersMng = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [selectedTypeEcommerce, setSelectedTypeEcommerce] = useState(null);
+  const [dateRange, setDateRange] = useState([]);
   const pageSize = 10;
 
   useEffect(() => {
@@ -43,12 +48,21 @@ const OrdersMng = () => {
 
     fetchAccounts();
     fetchTypeEcommerce();
+    fetchAllOrders(); // Fetch all orders initially
   }, []);
 
-  const fetchData = async (page = 1, search = '') => {
+  useEffect(() => {
+    if (selectedTypeEcommerce || dateRange.length > 0) {
+      fetchFilteredOrders(currentPage);
+    } else {
+      fetchAllOrders(currentPage);
+    }
+  }, [selectedTypeEcommerce, dateRange, currentPage]);
+
+  const fetchAllOrders = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await getOrders({ pageIndex: page, pageSize, search });
+      const response = await getOrders({ pageIndex: page, pageSize });
       const orders = response.data;
 
       const ordersWithDetails = orders.map(order => {
@@ -56,14 +70,12 @@ const OrdersMng = () => {
         const ecommerceType = typeEcommerce.find(type => type.typeEcommerceId === order.typeEcommerceId);
         return { 
           ...order, 
-          userName: user ? user.userName : 'N/A',
+          fullName: user ? user.fullName : 'N/A',
           typeEcommerceTitle: ecommerceType ? ecommerceType.title : 'N/A',
-          statusText: getStatusText(order.status)
         };
       });
 
       setData(ordersWithDetails);
-      
       if (orders.length < pageSize) {
         setTotalItems((page - 1) * pageSize + orders.length);
       } else {
@@ -76,13 +88,40 @@ const OrdersMng = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText, accounts, typeEcommerce]);
+  const fetchFilteredOrders = async (page = 1) => {
+    setLoading(true);
+    try {
+      const [startDate, endDate] = dateRange;
+      const response = await getFilteredOrders({
+        pageIndex: page,
+        pageSize,
+        typeEcommerceId: selectedTypeEcommerce,
+        startDate: startDate ? startDate.format('YYYY-MM-DD') : undefined,
+        endDate: endDate ? endDate.format('YYYY-MM-DD') : undefined,
+      });
+      const orders = response.data;
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchData(1, searchText);
+      const ordersWithDetails = orders.map(order => {
+        const user = accounts.find(account => account.userId === order.userId);
+        const ecommerceType = typeEcommerce.find(type => type.typeEcommerceId === order.typeEcommerceId);
+        return { 
+          ...order, 
+          fullName: user ? user.fullName : 'N/A',
+          typeEcommerceTitle: ecommerceType ? ecommerceType.title : 'N/A',
+        };
+      });
+
+      setData(ordersWithDetails);
+      if (orders.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + orders.length);
+      } else {
+        setTotalItems((page + 1) * pageSize);
+      }
+    } catch (error) {
+      console.error('Failed to fetch filtered data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleViewDetails = (record) => {
@@ -93,21 +132,20 @@ const OrdersMng = () => {
     setCurrentPage(page);
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 1:
-        return 'Chờ xác nhận';
-      case 2:
-        return 'Đang chuẩn bị hàng';
-      case 3:
-        return 'Đang giao';
-      case 4:
-        return 'Đã giao';
-      case 5:
-        return 'Đã hủy';
-      default:
-        return 'Không xác định';
+  const handleTypeEcommerceChange = (value) => {
+    setSelectedTypeEcommerce(value);
+  };
+
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates || []);
+  };
+
+  const disabledDate = (current) => {
+    if (!dateRange || dateRange.length === 0) {
+      return false;
     }
+    const [start] = dateRange;
+    return current && current < start;
   };
 
   const columns = [
@@ -124,28 +162,12 @@ const OrdersMng = () => {
     },
     {
       title: 'Khách hàng',
-      dataIndex: 'userName',
-      key: 'userName',
+      dataIndex: 'fullName',
+      key: 'fullName',
       className: 'wrap-text',
     },
     {
-      title: 'Địa chỉ giao hàng',
-      dataIndex: 'deliveryAddress',
-      key: 'deliveryAddress',
-      className: 'wrap-text',
-    },
-    // {
-    //   title: 'Tổng giá',
-    //   dataIndex: 'totalPrice',
-    //   key: 'totalPrice',
-    // },
-    // {
-    //   title: 'Phí giao hàng',
-    //   dataIndex: 'deliveryFee',
-    //   key: 'deliveryFee',
-    // },
-    {
-      title: 'Giá cuối cùng',
+      title: 'Tổng giá',
       dataIndex: 'finalPrice',
       key: 'finalPrice',
     },
@@ -155,20 +177,57 @@ const OrdersMng = () => {
       key: 'typeEcommerceTitle',
     },
     {
+      title: 'Ngày mua hàng',
+      dataIndex: 'creationDate',
+      key: 'creationDate',
+      render: (text) => moment(text).format('YYYY-MM-DD'),
+    },
+    {
       title: 'Trạng thái thanh toán',
       dataIndex: 'paymentStatus',
       key: 'paymentStatus',
     },
     {
-      title: 'Trạng thái đơn hàng',
-      dataIndex: 'statusText',
-      key: 'statusText',
+      title: 'Tình trạng vận chuyển',
+      dataIndex: 'deliveryDescription',
+      key: 'deliveryDescription',
     },
     {
-      title: 'Ngày tạo',
-      dataIndex: 'creationDate',
-      key: 'creationDate',
-      render: (text) => moment(text).format('YYYY-MM-DD'),
+      title: 'Trạng thái đơn hàng',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        let statusText = '';
+        let color = '';
+  
+        switch (status) {
+          case 1:
+            statusText = 'Chờ xác nhận';
+            color = 'red';
+            break;
+          case 2:
+            statusText = 'Đang chuẩn bị hàng';
+            color = 'yellow';
+            break;
+          case 3:
+            statusText = 'Đang giao';
+            color = 'blue';
+            break;  
+          case 4:
+            statusText = 'Đã giao';
+            color = 'green';
+            break;  
+          case 5:
+            statusText = 'Đã hủy';
+            color = 'grey';
+            break;  
+          default:
+            statusText = 'Không xác định';
+            color = 'black';
+        }
+  
+        return <Tag color={color}>{statusText}</Tag>;
+      },
     },
     {
       title: 'Xem',
@@ -185,20 +244,35 @@ const OrdersMng = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <Input
+      <div style={{ display: 'flex', justifyContent: 'end', marginBottom: '20px' }}>
+        {/* <Input
           placeholder="Tìm kiếm theo mã đơn hàng/ địa chỉ giao hàng"
           suffix={
             <SearchOutlined
-              onClick={handleSearch}
+              onClick={() => setCurrentPage(1)}
               style={{ cursor: 'pointer' }}
             />
           }
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: '50%' }}
-        />
+          onPressEnter={() => setCurrentPage(1)}
+          style={{ width: '30%' }}
+        /> */}
+        <Select
+          placeholder="Chọn hình thức"
+          onChange={handleTypeEcommerceChange}
+          style={{ width: '20%' }}
+          allowClear
+        >
+          <Option value={1}>Mua bán</Option>
+          <Option value={2}>Cho thuê</Option>
+          <Option value={3}>Đấu giá</Option>
+        </Select>
+        {/* <RangePicker
+          onChange={handleDateRangeChange}
+          style={{ width: '30%' }}
+          disabledDate={disabledDate}
+        /> */}
       </div>
       <Table
         columns={columns}

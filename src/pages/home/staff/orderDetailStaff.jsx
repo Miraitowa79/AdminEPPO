@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Form, Input, Button, Typography, Card, Spin, message, Select } from 'antd';
+import { Form, Input, Button, Typography, Card, Spin, message, Select, Row, Col, Image } from 'antd';
 import { getOrderDetails, updateOrderDetails } from '../../../api/orderManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
-import { getTypeEcommerceById } from '../../../api/typeEcommerceApi'; // Sử dụng hàm mới
+import { getTypeEcommerceById } from '../../../api/typeEcommerceApi';
+import { getPlantDetails } from '../../../api/plantsManagement';
 import moment from 'moment';
 import './orderDetailStaff.scss';
 
@@ -22,23 +23,24 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        // Lấy thông tin đơn hàng
         const { data: order } = await getOrderDetails(id);
         setOrderData(order);
 
-        // Lấy thông tin người dùng
         if (order.userId) {
           const { data: user } = await getAccountDetails(order.userId);
           setUserData(user);
         }
 
-        // Lấy thông tin loại hình TMĐT
         if (order.typeEcommerceId) {
           const { data: typeEcommerce } = await getTypeEcommerceById(order.typeEcommerceId);
           setTypeEcommerceTitle(typeEcommerce);
         }
 
-        // Đặt giá trị cho form
+        if (order.orderDetails.plantId) {
+          const { data: plant } = await getPlantDetails(order.orderDetails.plantId);
+          setUserData(plant);
+        }
+
         form.setFieldsValue({
           ...order,
           creationDate: moment(order.creationDate).format('YYYY-MM-DD'),
@@ -101,75 +103,115 @@ const OrderDetails = () => {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-      <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT ĐƠN HÀNG</Title>
-      <Card>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <Button type="primary" shape="round">Mã đơn hàng: {orderData.orderId}</Button>
-        </div>
-        <Form
-          form={form}
-          layout="horizontal"
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 18 }}
-          labelAlign="left"
-          onFinish={handleFinish}
-        >
-          <Form.Item label="Người dùng" className={editMode ? 'blurred-field' : ''}>
-            <Input value={userData.userName || 'N/A'} readOnly />
-          </Form.Item>
-          <Form.Item label="Địa chỉ giao hàng" name="deliveryAddress" className={editMode ? 'blurred-field' : ''}>
-            <Input readOnly />
-          </Form.Item>
-          <Form.Item label="Giá" name="finalPrice" className={editMode ? 'blurred-field' : ''}>
-            <Input readOnly />
-          </Form.Item>
-          <Form.Item label="Loại hình thức" className={editMode ? 'blurred-field' : ''}>
-            <Input value={typeEcommerceTitle.title} readOnly />
-          </Form.Item>
-          <Form.Item label="Ngày tạo" name="creationDate" className={editMode ? 'blurred-field' : ''}>
-            <Input value={moment(orderData.creationDate).format('YYYY-MM-DD')} readOnly />
-          </Form.Item>
-          <Form.Item label="Ngày sửa đổi" name="modificationDate" className={editMode ? 'blurred-field' : ''}>
-            <Input value={moment(orderData.modificationDate).format('YYYY-MM-DD')} readOnly />
-          </Form.Item>
-          <Form.Item label="Trạng thái thanh toán" name="paymentStatus">
-            {editMode ? (
-              <Select defaultValue={orderData.paymentStatus} style={{ width: '100%' }}>
-                <Option value="Chưa thanh toán">Chưa thanh toán</Option>
-                <Option value="Đã thanh toán">Đã thanh toán</Option>
-                <Option value="Hoàn thành">Hoàn thành</Option>
-                <Option value="Đã hủy">Đã hủy</Option>
-              </Select>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto' }}>
+      <Title level={3} style={{ textAlign: 'center' }}>THÔNG TIN ĐƠN HÀNG</Title>
+      <Row gutter={16}>
+        <Col span={16}>
+          <Card>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <Button type="primary" shape="round">Mã đơn hàng: {orderData.orderId}</Button>
+            </div>
+            <Form
+              form={form}
+              layout="horizontal"
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+              labelAlign="left"
+              onFinish={handleFinish}
+            >
+              <Form.Item label="Khách hàng" className={editMode ? 'blurred-field' : ''}>
+                <Input value={userData.fullName || 'N/A'} readOnly />
+              </Form.Item>
+              <Form.Item label="Địa chỉ giao hàng" name="deliveryAddress" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item label="Giá cây" name="totalPrice" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item label="Phí giao hàng" name="deliveryFee" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item label="Tổng đơn hàng" name="finalPrice" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item label="Loại hình thức" className={editMode ? 'blurred-field' : ''}>
+                <Input value={typeEcommerceTitle.title} readOnly />
+              </Form.Item>
+              <Form.Item label="Ngày mua" name="creationDate" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              {/* <Form.Item label="Ngày cập nhật" name="modificationDate" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item> */}
+              <Form.Item label="Trạng thái thanh toán" name="paymentStatus" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item label="Tình trạng giao hàng" name="deliveryDescription" className={editMode ? 'blurred-field' : ''}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item label="Trạng thái đơn hàng" name="status">
+                {editMode ? (
+                  <Select style={{ width: '100%' }}>
+                    <Option value={1}>Chờ xác nhận</Option>
+                    <Option value={2}>Đang chuẩn bị hàng</Option>
+                    <Option value={3}>Đang giao</Option>
+                    <Option value={4}>Đã giao</Option>
+                    <Option value={5}>Đã hủy</Option>
+                  </Select>
+                ) : (
+                  <Select value={orderData.status} disabled style={{ width: '100%' }}>
+                    <Option value={1}>Chờ xác nhận</Option>
+                    <Option value={2}>Đang chuẩn bị hàng</Option>
+                    <Option value={3}>Đang giao</Option>
+                    <Option value={4}>Đã giao</Option>
+                    <Option value={5}>Đã hủy</Option>
+                  </Select>
+                )}
+              </Form.Item>
+              <Form.Item style={{ textAlign: 'center' }}>
+                {editMode ? (
+                  <>
+                    <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
+                    <Button type="primary" htmlType="submit">Lưu</Button>
+                  </>
+                ) : (
+                  <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
+                )}
+              </Form.Item>
+            </Form>
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Chi tiết đơn hàng">
+            {orderData.orderDetails && orderData.orderDetails.map(detail => (
+              <div key={detail.orderDetailId} style={{ marginBottom: '10px' }}>
+                <p><strong>Plant ID:</strong> {detail.plantId}</p>
+                <p><strong>Ngày bắt đầu thuê:</strong> {moment(detail.rentalStartDate).format('DD-MM-YYYY')}</p>
+                <p><strong>Ngày kết thúc thuê:</strong> {moment(detail.rentalEndDate).format('DD-MM-YYYY')}</p>
+                <p><strong>Số tháng thuê:</strong> {detail.numberMonth}</p>
+              </div>
+            ))}
+          </Card>
+          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
+            {orderData.imageDeliveryOrders.length > 0 ? (
+              orderData.imageDeliveryOrders.map((image, index) => (
+                <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+              ))
             ) : (
-              <Input value={orderData.paymentStatus} readOnly />
+              <p>Không có hình ảnh</p>
             )}
-          </Form.Item>
-          <Form.Item label="Trạng thái đơn hàng" name="status">
-            {editMode ? (
-              <Select defaultValue={orderData.status} style={{ width: '100%' }}>
-                <Option value={1}>Chờ xác nhận</Option>
-                <Option value={2}>Đang chuẩn bị hàng</Option>
-                <Option value={3}>Đang giao</Option>
-                <Option value={4}>Đã giao</Option>
-                <Option value={5}>Đã hủy</Option>
-              </Select>
+          </Card>
+          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
+            {orderData.imageReturnOrders.length > 0 ? (
+              orderData.imageReturnOrders.map((image, index) => (
+                <Image key={index} src={image} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+              ))
             ) : (
-              <Input value={getStatusText(orderData.status)} readOnly />
+              <p>Không có hình ảnh</p>
             )}
-          </Form.Item>
-          <Form.Item style={{ textAlign: 'center' }}>
-            {editMode ? (
-              <>
-                <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
-                <Button type="primary" htmlType="submit">Lưu</Button>
-              </>
-            ) : (
-              <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
-            )}
-          </Form.Item>
-        </Form>
-      </Card>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };
