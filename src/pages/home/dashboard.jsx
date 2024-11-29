@@ -13,6 +13,13 @@ ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, Linear
 const { Title, Text } = Typography;
 
 const Dashboard = () => {
+  const [loading, setLoading] = useState(true); // Loading state to indicate data fetching
+  const [customerCount, setCustomerCount] = useState(0); // Initialize customer count state
+  const [orderCount, setOrderCount] = useState(0); 
+  const [orderRevenue, setOrderRevenue] = useState(0);
+  const [orderRevenueToday, setOrderRevenueToday] = useState(0);
+  const [customerList, setCustomerList] = useState([]);
+
   const [chartData, setChartData] = useState({
     labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
     datasets: [
@@ -38,13 +45,6 @@ const Dashboard = () => {
       },
     ],
   });
-
-  const [customerList, setCustomerList] = useState([
-    { title: 'Jenny Wilson', description: '12,340,000 VND' },
-    { title: 'Devon Lane', description: '12,340,000 VND' },
-    { title: 'Jane Cooper', description: '12,340,000 VND' },
-    { title: 'Dianne Russell', description: '12,340,000 VND' },
-  ]);
 
   const fetchRevenueDataBar = async () => {
     try {
@@ -94,22 +94,88 @@ const Dashboard = () => {
   };
   const fetchCustomerCount = async () => {
     try {
-      const response = await fetch('https://localhost:7202/api/v1/Count/Customer/Status');
+      const response = await fetch('https://sep490ne-001-site1.atempurl.com/api/v1/Count/Customer/Status');
       if (response.ok) {
         const data = await response.json();
-        setCustomerCount(data.count); // Giả sử API trả về số lượng trong trường `count`
+        setCustomerCount(data.data); // Use the 'data' field which contains the count of customers
       } else {
         console.error('Failed to fetch customer count');
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false once data fetching is done
     }
   };
 
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch('https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Status');
+      if (response.ok) {
+        const data = await response.json();
+        setOrderCount(data.data); // Use the 'data' field which contains the count of customers
+      } else {
+        console.error('Failed to fetch order count');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false once data fetching is done
+    }
+  };
+
+  const fetchOrdersRevenue = async () => {
+    try {
+      const response = await fetch('https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Total/Revenue');
+      if (response.ok) {
+        const data = await response.json();
+        setOrderRevenue(data.data); // Use the 'data' field which contains the count of customers
+      } else {
+        console.error('Failed to fetch order count');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false once data fetching is done
+    }
+  };
+
+  const fetchOrdersRevenueToday = async () => {
+    try {
+      const response = await fetch('https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Today/Revenue');
+      if (response.ok) {
+        const data = await response.json();
+        setOrderRevenueToday(data.data); // Use the 'data' field which contains the count of customers
+      } else {
+        console.error('Failed to fetch order count');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false); // Set loading to false once data fetching is done
+    }
+  };
+
+  const fetchCustomerList = async () => {
+    try {
+      const response = await axios.get('https://localhost:7202/api/v1/GetUser/Users/TopCustomers?page=1&size=5'); // Replace with your API URL
+      if (response.data?.data) {
+        setCustomerList(response.data.data); // Update state with the fetched data
+      }
+    } catch (error) {
+      console.error('Error fetching customer list:', error);
+    }
+  };
+  
+  
   useEffect(() => {
     fetchRevenueDataBar();
     fetchRevenueDataPie();
     fetchCustomerCount();
+    fetchOrders();
+    fetchOrdersRevenue();
+    fetchOrdersRevenueToday();
+    fetchCustomerList();
   }, []);
 
   const chartOptions = {
@@ -143,25 +209,25 @@ const Dashboard = () => {
           <Col span={6}>
             <Card>
               <Title level={4}>Tổng doanh số hôm nay</Title>
-              <Text>12,426,000</Text>
+              <Text style={{ textAlign: 'right', display: 'block' }}>{orderRevenueToday.toLocaleString('en-US')} VND</Text>
             </Card>
           </Col>
           <Col span={6}>
             <Card>
               <Title level={4}>Tổng doanh số</Title>
-              <Text>2,38,485</Text>
+              <Text style={{ textAlign: 'right', display: 'block' }}>{orderRevenue.toLocaleString('en-US')} VND</Text>
             </Card>
           </Col>
           <Col span={6}>
             <Card>
               <Title level={4}>Tổng các đơn hàng</Title>
-              <Text>84,382</Text>
+              <Text style={{ textAlign: 'right', display: 'block' }}>{orderCount}</Text>
             </Card>
           </Col>
           <Col span={6}>
             <Card>
               <Title level={4}>Tổng khách hàng</Title>
-              <Text>33,493</Text>
+              <Text style={{ textAlign: 'right', display: 'block' }}>{customerCount}</Text>
             </Card>
           </Col>
         </Row>
@@ -185,19 +251,36 @@ const Dashboard = () => {
           </Col>
           <Col span={8}>
             <Card title="Khách hàng thân thiết">
-              <List
+            <List
                 itemLayout="horizontal"
                 dataSource={customerList}
-                renderItem={(item) => (
+                renderItem={(item, index) => (
                   <List.Item>
                     <List.Item.Meta
-                      avatar={<Avatar icon={<UserOutlined />} />}
-                      title={item.title}
-                      description={item.description}
+                      avatar={
+                        item.imageUrl ? (
+                          <Avatar src={item.imageUrl} />
+                        ) : (
+                          <Avatar icon={<UserOutlined />} />
+                        )
+                      }
+                      title={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <span>{item.fullName}</span>
+                          {/* Hiển thị xếp hạng bên cạnh */}
+                          {index === 0 && <span style={{ marginLeft: '8px', color: 'gold', fontWeight: 'bold' }}>1st</span>}
+                          {index === 1 && <span style={{ marginLeft: '8px', color: 'silver', fontWeight: 'bold' }}>2nd</span>}
+                          {index === 2 && <span style={{ marginLeft: '8px', color: '#cd7f32', fontWeight: 'bold' }}>3rd</span>}
+                        </div>
+                      }
+                      description={item.wallet.numberBalance} VND
                     />
                   </List.Item>
                 )}
               />
+
+
+
             </Card>
           </Col>
         </Row>
