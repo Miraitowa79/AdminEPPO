@@ -284,7 +284,7 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current <= moment().endOf('day')} // Không cho chọn ngày quá khứ
             />
           </Form.Item>
 
@@ -297,7 +297,7 @@ const AuctionDetails = () => {
             showTime
             disabled={!isEditing}
             readOnly
-            disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+            disabledDate={(current) => current && current <= moment().endOf('day')} // Không cho chọn ngày quá khứ
           />
         </Form.Item>
 
