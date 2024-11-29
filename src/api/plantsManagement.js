@@ -29,7 +29,7 @@ export const getListPlantSale = ({
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get(
-        "/GetList/Plants/Filter/ByTypeEcommerceId?typeEcommerceId=1",
+        "/GetList/Plants/Filter/TypeEcommerceId?typeEcommerceId=1",
         {
           params: {
             pageIndex,
@@ -56,7 +56,7 @@ export const getListPlantRenting = ({
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get(
-        "/GetList/Plants/Filter/ByTypeEcommerceId?typeEcommerceId=2",
+        "/GetList/Plants/Filter/TypeEcommerceId?typeEcommerceId=2",
         {
           params: {
             pageIndex,
@@ -83,7 +83,7 @@ export const getListPlantAuction = ({
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get(
-        "/GetList/Plants/Filter/ByTypeEcommerceId?typeEcommerceId=3",
+        "/GetList/Plants/Filter/TypeEcommerceId?typeEcommerceId=3",
         {
           params: {
             pageIndex,
