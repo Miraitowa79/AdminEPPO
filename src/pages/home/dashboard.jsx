@@ -169,14 +169,33 @@ const Dashboard = () => {
   
   
   useEffect(() => {
-    fetchRevenueDataBar();
-    fetchRevenueDataPie();
-    fetchCustomerCount();
-    fetchOrders();
-    fetchOrdersRevenue();
-    fetchOrdersRevenueToday();
-    fetchCustomerList();
+    const fetchAllData = async () => {
+      try {
+        // Dùng Promise.allSettled để đảm bảo tất cả hàm được gọi
+        const results = await Promise.allSettled([
+          fetchRevenueDataBar(),
+          fetchRevenueDataPie(),
+          fetchCustomerCount(),
+          fetchOrders(),
+          fetchOrdersRevenue(),
+          fetchOrdersRevenueToday(),
+          fetchCustomerList()
+        ]);
+  
+        // Kiểm tra kết quả từng promise
+        results.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            console.error(`Fetch function ${index} failed:`, result.reason);
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchAllData();
   }, []);
+  
 
   const chartOptions = {
     responsive: true,

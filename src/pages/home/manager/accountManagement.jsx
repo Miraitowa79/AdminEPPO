@@ -63,7 +63,7 @@ const AccountMng = () => {
   };
 
   const handleAddAccount = () => {
-    navigate('/admin/list/users/create-account');
+    navigate('/manager/create/account');
   };
 
   const columns = [

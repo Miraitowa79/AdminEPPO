@@ -215,6 +215,10 @@ const managerRoutes = {
     {
       path: 'contract/:id',
       element:  <ContractDetails />
+    },
+    {
+      path: 'create/account',
+      element:  <CreateAccount />
     }
   ],
 };
