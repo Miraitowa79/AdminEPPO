@@ -1,107 +1,129 @@
 import './dashboard.scss';
-import React from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { Menu, Card, Row, Col, Typography, List, Avatar } from 'antd';
 import { UserOutlined, DashboardOutlined, BarChartOutlined, FileOutlined } from '@ant-design/icons';
 import { Bar, Pie } from 'react-chartjs-2';
 import { BarElement } from 'chart.js';
-
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale } from 'chart.js';
+import axios from 'axios';
 
-// Register required components
-ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale);
-ChartJS.register(BarElement);
+// Đăng ký các thành phần của Chart.js
+ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale, BarElement);
 
 const { Title, Text } = Typography;
 
-const data = [
-  {
-    title: 'Jenny Wilson',
-    description: '12,340,000 VND',
-  },
-  {
-    title: 'Devon Lane',
-    description: '12,340,000 VND',
-  },
-  {
-    title: 'Jane Cooper',
-    description: '12,340,000 VND',
-  },
-  {
-    title: 'Dianne Russell',
-    description: '12,340,000 VND',
-  },
-];
+const Dashboard = () => {
+  const [chartData, setChartData] = useState({
+    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+    datasets: [
+      {
+        label: 'Doanh số (Triệu VND)',
+        data: Array(12).fill(0), // Khởi tạo dữ liệu mặc định là 0
+        backgroundColor: 'rgba(75,192,192,0.2)',
+        borderColor: 'rgba(75,192,192,1)',
+        borderWidth: 2,
+        tension: 0.4,
+      },
+    ],
+  });
 
-const dataPie = {
-  labels: ['Đấu giá', 'Bán', 'Cho thuê'],
-  datasets: [
-    {
-      label: 'My First Dataset',
-      data: [300, 50, 100],
-      backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
-      hoverOffset: 4,
-    },
-  ],
-};
+  const [revenuePieData, setRevenuePieData] = useState({
+    labels: ['Đấu giá', 'Bán', 'Cho thuê'],
+    datasets: [
+      {
+        label: 'Nguồn doanh thu',
+        data: [0, 0, 0], // Mẫu dữ liệu mặc định
+        backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
+        hoverOffset: 4,
+      },
+    ],
+  });
 
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      display: true,
-      position: 'top',
-    },
-  },
-  scales: {
-    x: {
-      title: {
+  const [customerList, setCustomerList] = useState([
+    { title: 'Jenny Wilson', description: '12,340,000 VND' },
+    { title: 'Devon Lane', description: '12,340,000 VND' },
+    { title: 'Jane Cooper', description: '12,340,000 VND' },
+    { title: 'Dianne Russell', description: '12,340,000 VND' },
+  ]);
+
+  const fetchRevenueDataBar = async () => {
+    try {
+      const response = await axios.get('https://localhost:7202/api/v1/Count/Order/Revenue/Month', {
+        params: { status: 4, year: 2024 },
+      });      
+      if (response.data?.data) {
+        const revenueData = response.data.data.map((value) => value / 1_000_000); // Chuyển từ đồng sang triệu VND
+        setChartData((prevData) => ({
+          ...prevData,
+          datasets: [
+            {
+              ...prevData.datasets[0],
+              data: revenueData,
+            },
+          ],
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching revenue data:', error);
+    } 
+  };
+  const fetchRevenueDataPie = async () => {
+    try {
+      const response = await axios.get('https://localhost:7202/api/v1/Count/Order/Revenue/TypeEcommerceId', {
+        params: { status: 4, year: 2024 },
+      });
+
+      if (response.data?.data) {
+        // Dữ liệu từ API (Dữ liệu phần trăm cho các loại doanh thu)
+        const { auction, sell, rent } = response.data.data.percentages;
+
+        // Cập nhật dữ liệu cho biểu đồ tròn (Pie chart)
+        setRevenuePieData((prevData) => ({
+          ...prevData,
+          datasets: [
+            {
+              ...prevData.datasets[0],
+              data: [auction, sell, rent], // Cập nhật tỷ lệ phần trăm cho từng loại
+            },
+          ],
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching revenue data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRevenueDataBar();
+    fetchRevenueDataPie();
+  }, []);
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
         display: true,
-        text: 'Tháng',
+        position: 'top',
       },
     },
-    y: {
-      title: {
-        display: true,
-        text: 'Doanh số (Triệu VND)',
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Tháng',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Doanh số (Triệu VND)',
+        },
       },
     },
-  },
-};
+  };
 
-
-const chartData = {
-  labels: ['Tháng 1', 'Tháng 2', 'Tháng 3','Tháng 4','Tháng 5','Tháng 6', 'Tháng 7','Tháng 8','Tháng 9','Tháng 10', 'Tháng 11','Tháng 12'],
-  datasets: [
-    {
-      label: 'Doanh số (Triệu VND)',
-      data: [450, 150, 80, 40, 230, 150, 300, 240, 400, 200, 350, 200],
-      backgroundColor: 'rgba(75,192,192,0.2)',
-      borderColor: 'rgba(75,192,192,1)',
-      borderWidth: 2,
-      tension: 0.4, // Làm mềm đường
-    },
-  ],
-};
-
-
-function Dashboard() {
   return (
     <div className="dashboard">
-      {/* <header className="header">
-        <div className="logo" />
-        <Menu mode="horizontal" defaultSelectedKeys={['1']}>
-          <Menu.Item key="1" icon={<DashboardOutlined />}>
-            Dashboard
-          </Menu.Item>
-          <Menu.Item key="2" icon={<BarChartOutlined />}>
-            Reports
-          </Menu.Item>
-          <Menu.Item key="3" icon={<FileOutlined />}>
-            Files
-          </Menu.Item>
-        </Menu>
-      </header> */}
       <div className="content">
         <Row gutter={16} style={{ margin: '16px 0' }}>
           <Col span={6}>
@@ -132,29 +154,27 @@ function Dashboard() {
         <Row gutter={16}>
           <Col span={16}>
             <Card title="Báo cáo bán hàng">
-              {/* Chèn biểu đồ của bạn ở đây */}
               <Bar data={chartData} options={chartOptions} />
             </Card>
           </Col>
           <Col span={8}>
             <Card title="Nguồn doanh thu">
-              {/* Chèn biểu đồ nguồn doanh thu của bạn ở đây */}
-              <Pie data={dataPie} />
+              <Pie data={revenuePieData} />
             </Card>
           </Col>
         </Row>
         <Row gutter={16} style={{ marginTop: '16px' }}>
           <Col span={16}>
             <Card title="Top sản phẩm">
-              {/* Chèn danh sách sản phẩm của bạn ở đây */}
+              {/* Có thể chèn thêm danh sách sản phẩm */}
             </Card>
           </Col>
           <Col span={8}>
             <Card title="Khách hàng thân thiết">
               <List
                 itemLayout="horizontal"
-                dataSource={data}
-                renderItem={item => (
+                dataSource={customerList}
+                renderItem={(item) => (
                   <List.Item>
                     <List.Item.Meta
                       avatar={<Avatar icon={<UserOutlined />} />}
@@ -170,6 +190,6 @@ function Dashboard() {
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;
