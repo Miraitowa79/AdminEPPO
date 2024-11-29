@@ -194,13 +194,13 @@ const Dashboard = () => {
     };
   
     fetchAllData();
-    fetchRevenueDataBar();
-    fetchRevenueDataPie();
-    fetchCustomerCount();
-    fetchOrders();
-    fetchOrdersRevenue();
-    fetchOrdersRevenueToday();
-    fetchCustomerList();
+    // fetchRevenueDataBar();
+    // fetchRevenueDataPie();
+    // fetchCustomerCount();
+    // fetchOrders();
+    // fetchOrdersRevenue();
+    // fetchOrdersRevenueToday();
+    // fetchCustomerList();
   }, []);
   
 
