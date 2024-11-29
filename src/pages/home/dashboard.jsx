@@ -48,7 +48,7 @@ const Dashboard = () => {
 
   const fetchRevenueDataBar = async () => {
     try {
-      const response = await axios.get('https://localhost:7202/api/v1/Count/Order/Revenue/Month', {
+      const response = await axios.get('https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Revenue/Month', {
         params: { status: 4, year: 2024 },
       });      
       if (response.data?.data) {
@@ -69,7 +69,7 @@ const Dashboard = () => {
   };
   const fetchRevenueDataPie = async () => {
     try {
-      const response = await axios.get('https://localhost:7202/api/v1/Count/Order/Revenue/TypeEcommerceId', {
+      const response = await axios.get('https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Revenue/TypeEcommerceId', {
         params: { status: 4, year: 2024 },
       });
 
@@ -92,10 +92,24 @@ const Dashboard = () => {
       console.error('Error fetching revenue data:', error);
     }
   };
+  const fetchCustomerCount = async () => {
+    try {
+      const response = await fetch('https://localhost:7202/api/v1/Count/Customer/Status');
+      if (response.ok) {
+        const data = await response.json();
+        setCustomerCount(data.count); // Giả sử API trả về số lượng trong trường `count`
+      } else {
+        console.error('Failed to fetch customer count');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
     fetchRevenueDataBar();
     fetchRevenueDataPie();
+    fetchCustomerCount();
   }, []);
 
   const chartOptions = {
