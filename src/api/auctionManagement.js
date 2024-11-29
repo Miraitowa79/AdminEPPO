@@ -3,7 +3,7 @@ import { baseApi } from "./baseClient";
 export const getAuctions = ({ page = 1, size = 2000, search = "" }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { data } = await baseApi().get("/GetList/Rooms", {
+      const { data } = await baseApi().get("/GetList/AllRoom", {
         params: {
           page,
           size,
@@ -57,10 +57,7 @@ export const getAuctionDetails = (id) => {
 export const createAuctionRoom = (roomData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const data = await baseApi().post(
-        "/GetList/Rooms/Create/Room",
-        roomData
-      );
+      const data = await baseApi().post("/GetList/Rooms/Create/Room", roomData);
       return resolve(data);
     } catch (error) {
       console.log("Error creating auction room:", error);
