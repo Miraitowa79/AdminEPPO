@@ -158,7 +158,7 @@ const Dashboard = () => {
 
   const fetchCustomerList = async () => {
     try {
-      const response = await axios.get('https://localhost:7202/api/v1/GetUser/Users/TopCustomers?page=1&size=5'); // Replace with your API URL
+      const response = await axios.get('https://sep490ne-001-site1.atempurl.com/api/v1/GetUser/Users/TopCustomers?page=1&size=5'); // Replace with your API URL
       if (response.data?.data) {
         setCustomerList(response.data.data); // Update state with the fetched data
       }
