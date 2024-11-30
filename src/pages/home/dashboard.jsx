@@ -172,7 +172,9 @@ const Dashboard = () => {
   
   const fetchFeedbackList = async () => {
     try {
-      const response = await axios.get('https://sep490ne-001-site1.atempurl.com/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=10'); 
+
+      const response = await axios.get('https://sep490ne-001-site1.atempurl.com/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=5'); 
+
       if (response.data?.data) {
         setFeedbackList(response.data.data); // Update state with the fetched data
         console.log("Feedback list:" ,response.data.data )
