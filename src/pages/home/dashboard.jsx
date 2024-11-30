@@ -203,15 +203,15 @@ const Dashboard = () => {
       try {
         // Dùng Promise.allSettled để đảm bảo tất cả hàm được gọi
         const results = await Promise.allSettled([
-          fetchRevenueDataBar(),
-          fetchRevenueDataPie(),
-          fetchCustomerCount(),
-          fetchOrders(),
-          fetchOrdersRevenue(),
-          fetchOrdersRevenueToday(),
-          fetchCustomerList(),
-          fetchFeedbackList(),
-          fetchTopRatedPlants(),
+          await   fetchRevenueDataBar(),
+          await   fetchRevenueDataPie(),
+          await   fetchCustomerCount(),
+          await   fetchOrders(),
+          await   fetchOrdersRevenue(),
+          await   fetchOrdersRevenueToday(),
+          await   fetchCustomerList(),
+          await   fetchFeedbackList(),
+          await   fetchTopRatedPlants(),
         ]);
   
         // Kiểm tra kết quả từng promise
@@ -224,15 +224,7 @@ const Dashboard = () => {
         console.error('Error fetching data:', error);
       }
     };
-  
-    fetchAllData();
-    // fetchRevenueDataBar();
-    // fetchRevenueDataPie();
-    // fetchCustomerCount();
-    // fetchOrders();
-    // fetchOrdersRevenue();
-    // fetchOrdersRevenueToday();
-    // fetchCustomerList();
+     fetchAllData();
   }, []);
   
 
