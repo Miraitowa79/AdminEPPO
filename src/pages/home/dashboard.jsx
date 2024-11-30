@@ -19,6 +19,9 @@ const Dashboard = () => {
   const [orderRevenue, setOrderRevenue] = useState(0);
   const [orderRevenueToday, setOrderRevenueToday] = useState(0);
   const [customerList, setCustomerList] = useState([]);
+  const [feedbackList, setFeedbackList] = useState([]);
+  const [plants, setPlants] = useState([]); // State to store the list of top rated plants
+  
 
   const [chartData, setChartData] = useState({
     labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
@@ -167,6 +170,33 @@ const Dashboard = () => {
     }
   };
   
+  const fetchFeedbackList = async () => {
+    try {
+      const response = await axios.get('https://localhost:7202/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=10'); 
+      if (response.data?.data) {
+        setFeedbackList(response.data.data); // Update state with the fetched data
+      }
+    } catch (error) {
+      console.error('Error fetching customer list:', error);
+    }
+  };
+
+  const fetchTopRatedPlants = async () => {
+    try {
+      const response = await axios.get('https://localhost:7202/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting', {
+        params: { page: 1, size: 10 },
+      });
+
+      if (response.data?.data) {
+        setPlants(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching top rated plants:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   
   useEffect(() => {
     const fetchAllData = async () => {
@@ -179,7 +209,9 @@ const Dashboard = () => {
           fetchOrders(),
           fetchOrdersRevenue(),
           fetchOrdersRevenueToday(),
-          fetchCustomerList()
+          fetchCustomerList(),
+          fetchFeedbackList(),
+          fetchTopRatedPlants(),
         ]);
   
         // Kiểm tra kết quả từng promise
@@ -271,8 +303,30 @@ const Dashboard = () => {
         </Row>
         <Row gutter={16} style={{ marginTop: '16px' }}>
           <Col span={16}>
-            <Card title="Top sản phẩm">
-              {/* Có thể chèn thêm danh sách sản phẩm */}
+            <Card title="Top sản phẩm đánh giá">
+            <List
+        loading={loading}
+        itemLayout="vertical"
+        size="large"
+        dataSource={plants}
+        renderItem={(plant) => (
+          <List.Item
+            key={plant.PlantId}
+            extra={<img width={100} alt="plant" src={plant.MainImage} />}
+          >
+            <List.Item.Meta
+              avatar={<Avatar src={plant.MainImage} />}
+              title={<a href={`/plant/${plant.PlantId}`}>{plant.PlantName}</a>}
+              description={`Đánh giá: ${plant.TotalAvg.toFixed(1)} / 5 (Tổng đánh giá: ${plant.TotalFeedbacks})`}
+            />
+            <div>
+              <Text>{plant.Description}</Text>
+              <br />
+              <Text strong>Giá: {plant.FinalPrice.toLocaleString('en-US')} VND</Text>
+            </div>
+          </List.Item>
+        )}
+      />
             </Card>
           </Col>
           <Col span={8}>
