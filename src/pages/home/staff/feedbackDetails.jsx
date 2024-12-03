@@ -121,15 +121,17 @@ const FeedbackDetails = () => {
                   <td style={styles.value}>{renderRatingStars(data.rating)}</td>
                 </tr>
                 <tr className={editMode ? 'blurred-field' : ''}>
-                  <td style={styles.label}><strong>Người sửa đổi:</strong></td>
+                  <td style={styles.label}><strong>Người phản hồi:</strong></td>
                   <td style={styles.value}>{data.modificationByUser || 'N/A'}</td>
                 </tr>
                 <tr className={editMode ? 'blurred-field' : ''}>
                   <td style={styles.label}><strong>Hình ảnh:</strong></td>
                   <td style={styles.value}>
-                    {data.imageFeedbacks && data.imageFeedbacks.map((img) => (
-                      <Image key={img.imgageFeedbackId} src={img.imageUrl} shape="square" size={64} style={{ marginRight: '10px' }} />
-                    ))}
+                    <div style={styles.imageContainer}>
+                      {data.imageFeedbacks && data.imageFeedbacks.map((img) => (
+                        <Image key={img.imgageFeedbackId} src={img.imageUrl} shape="square" size={64} style={styles.imageItem} />
+                      ))}
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -254,6 +256,17 @@ const styles = {
   image: {
     width: '100px',
     height: 'auto',
+  },
+  imageContainer: {
+    display: 'flex',
+    overflowX: 'scroll',
+    whiteSpace: 'nowrap',
+    padding: '10px 0',
+  },
+  imageItem: {
+    width: '64px',
+    height: '64px',
+    marginRight: '10px',
   },
 };
 
