@@ -1,6 +1,6 @@
 import './dashboard.scss';
 import React, { useState, useEffect } from 'react';
-import { Menu, Card, Row, Col, Typography, List, Avatar } from 'antd';
+import { Menu, Card, Row, Col, Typography, List, Avatar, Rate } from 'antd';
 import { UserOutlined, DashboardOutlined, BarChartOutlined, FileOutlined } from '@ant-design/icons';
 import { Bar, Pie } from 'react-chartjs-2';
 import { BarElement } from 'chart.js';
@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [orderRevenueToday, setOrderRevenueToday] = useState(0);
   const [customerList, setCustomerList] = useState([]);
   const [feedbackList, setFeedbackList] = useState([]);
-  const [plants, setPlants] = useState([]); // State to store the list of top rated plants
+ 
   
 
   const [chartData, setChartData] = useState({
@@ -172,30 +172,18 @@ const Dashboard = () => {
   
   const fetchFeedbackList = async () => {
     try {
-      const response = await axios.get('https://localhost:7202/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=10'); 
+
+      const response = await axios.get('https://sep490ne-001-site1.atempurl.com/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=5'); 
       if (response.data?.data) {
         setFeedbackList(response.data.data); // Update state with the fetched data
+        console.log("Feedback list:" ,response.data.data )
       }
     } catch (error) {
       console.error('Error fetching customer list:', error);
     }
   };
 
-  const fetchTopRatedPlants = async () => {
-    try {
-      const response = await axios.get('https://localhost:7202/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting', {
-        params: { page: 1, size: 10 },
-      });
 
-      if (response.data?.data) {
-        setPlants(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching top rated plants:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   
   useEffect(() => {
@@ -203,15 +191,14 @@ const Dashboard = () => {
       try {
         // Dùng Promise.allSettled để đảm bảo tất cả hàm được gọi
         const results = await Promise.allSettled([
-          fetchRevenueDataBar(),
-          fetchRevenueDataPie(),
-          fetchCustomerCount(),
-          fetchOrders(),
-          fetchOrdersRevenue(),
-          fetchOrdersRevenueToday(),
-          fetchCustomerList(),
-          fetchFeedbackList(),
-          fetchTopRatedPlants(),
+          await   fetchRevenueDataBar(),
+          await   fetchRevenueDataPie(),
+          await   fetchCustomerCount(),
+          await   fetchOrders(),
+          await   fetchOrdersRevenue(),
+          await   fetchOrdersRevenueToday(),
+          await   fetchCustomerList(),
+          await   fetchFeedbackList(),
         ]);
   
         // Kiểm tra kết quả từng promise
@@ -224,15 +211,7 @@ const Dashboard = () => {
         console.error('Error fetching data:', error);
       }
     };
-  
-    fetchAllData();
-    // fetchRevenueDataBar();
-    // fetchRevenueDataPie();
-    // fetchCustomerCount();
-    // fetchOrders();
-    // fetchOrdersRevenue();
-    // fetchOrdersRevenueToday();
-    // fetchCustomerList();
+     fetchAllData();
   }, []);
   
 
@@ -304,29 +283,37 @@ const Dashboard = () => {
         <Row gutter={16} style={{ marginTop: '16px' }}>
           <Col span={16}>
             <Card title="Top sản phẩm đánh giá">
-            <List
-        loading={loading}
-        itemLayout="vertical"
-        size="large"
-        dataSource={plants}
-        renderItem={(plant) => (
-          <List.Item
-            key={plant.PlantId}
-            extra={<img width={100} alt="plant" src={plant.MainImage} />}
-          >
-            <List.Item.Meta
-              avatar={<Avatar src={plant.MainImage} />}
-              title={<a href={`/plant/${plant.PlantId}`}>{plant.PlantName}</a>}
-              description={`Đánh giá: ${plant.TotalAvg.toFixed(1)} / 5 (Tổng đánh giá: ${plant.TotalFeedbacks})`}
-            />
-            <div>
-              <Text>{plant.Description}</Text>
-              <br />
-              <Text strong>Giá: {plant.FinalPrice.toLocaleString('en-US')} VND</Text>
+
+
+            <div style={{ maxHeight: '500px', overflowY: 'auto' }}>  {/* Thêm style để cho phép cuộn dọc */}
+      <List
+        dataSource={feedbackList}
+        renderItem={(item) => (
+          <List.Item key={item.plantId}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+              {/* Hiển thị hình ảnh chính của cây */}
+              <Avatar src={item.mainImage} size={64} style={{ marginRight: '16px' }} />
+
+              <div style={{ flex: 1 }}>
+                {/* Hiển thị tên cây */}
+                <Title level={4}>{item.plantName} <Text strong>({item.ownerName})</Text> </Title>       
+
+                {/* Hiển thị xếp hạng */}
+                <div style={{ marginTop: '8px' }}>
+                  <Rate disabled value={item.totalRating} />
+                  <Text style={{ marginLeft: '8px' }}>({item.totalRating})</Text> <Text>/{item.totalFeedbacks} Feedbacks</Text>
+                </div>
+
+                {/* Hiển thị mô tả cây */}
+                <Text>{item.description}</Text>
+              </div>
             </div>
           </List.Item>
         )}
       />
+    </div>
+
+
             </Card>
           </Col>
           <Col span={8}>
