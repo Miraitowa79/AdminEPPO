@@ -152,11 +152,10 @@ const OrderDetails = () => {
               <Form.Item label="Trạng thái đơn hàng" name="status">
                 {editMode ? (
                   <Select style={{ width: '100%' }}>
-                    <Option value={1}>Chờ xác nhận</Option>
-                    <Option value={2}>Đang chuẩn bị hàng</Option>
-                    <Option value={3}>Đang giao</Option>
-                    <Option value={4}>Đã giao</Option>
-                    <Option value={5}>Đã hủy</Option>
+                    {orderData.status < 2 && <Option value={2}>Đang chuẩn bị hàng</Option>}
+                    {orderData.status < 3 && <Option value={3}>Đang giao</Option>}
+                    {orderData.status < 4 && <Option value={4}>Đã giao</Option>}
+                    {orderData.status < 5 && <Option value={5}>Đã hủy</Option>}
                   </Select>
                 ) : (
                   <Select value={orderData.status} disabled style={{ width: '100%' }}>
@@ -175,7 +174,9 @@ const OrderDetails = () => {
                     <Button type="primary" htmlType="submit">Lưu</Button>
                   </>
                 ) : (
-                  <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
+                  orderData.status !== 5 && (
+                    <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
+                  )
                 )}
               </Form.Item>
             </Form>

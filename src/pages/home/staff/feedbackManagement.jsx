@@ -171,7 +171,7 @@ const FeedbackMng = () => {
           onPressEnter={handleSearch}
           style={{ width: '30%' }}
         /> */}
-        <Select
+        {/* <Select
           placeholder="Chọn đánh giá"
           value={ratingFilter}
           onChange={handleRatingFilterChange}
@@ -194,7 +194,7 @@ const FeedbackMng = () => {
           <Option value="1">Chờ xác nhận</Option>
           <Option value="2">Đang xử lý</Option>
           <Option value="3">Đã phản hồi</Option>
-        </Select>
+        </Select> */}
       </div>
       <Table
         columns={columns}
