@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Typography, Card, DatePicker, message } from 'antd';
+import { Form, Input, Button, Select, Typography, Card, DatePicker, message, InputNumber } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { getListPlantAuction } from '../../../api/plantsManagement';
-import { getAccounts } from '../../../api/accountManagement';
 import { createAuctionRoom } from '../../../api/auctionManagement';
 import { getAuthUser } from '@src/utils';
 
@@ -111,22 +110,105 @@ const CreateAuctionRoom = () => {
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày mở đăng ký' }]}>
+            <Form.Item 
+              name="registrationOpenDate" 
+              label="Ngày mở đăng ký" 
+              rules={[
+                { required: true, message: 'Hãy chọn 1 ngày mở đăng ký' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || value.isAfter(moment())) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Thời gian mở đăng ký phải từ sau ngày hôm nay'));
+                  },
+                }),
+              ]}
+            >
               <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
-            <Form.Item name="registrationEndDate" label="Ngày đóng đăng ký" rules={[{ required: true, message: 'Hãy chọn 1 ngày đóng đăng ký' }]}>
+
+            <Form.Item 
+              name="registrationEndDate" 
+              label="Ngày đóng đăng ký" 
+              rules={[
+                { required: true, message: 'Hãy chọn 1 ngày đóng đăng ký' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const openDate = getFieldValue('registrationOpenDate');
+                    if (!value || (openDate && value.isAfter(openDate.add(30, 'minutes')))) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Thời gian đóng đăng ký phải từ sau thời gian mở đăng ký ít nhất 30 phút'));
+                  },
+                }),
+              ]}
+            >
               <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
             <Form.Item name="registrationFee" label="Phí đăng ký tham gia">
               <Input type="number" placeholder='Phí đăng ký = 5% * giá cây' readOnly />
             </Form.Item>
-            <Form.Item name="priceStep" label="Mức đấu giá" rules={[{ required: true, message: 'Hãy nhập mức đấu gia' }]}>
-              <Input type="number" placeholder='Nhập mức tăng mỗi lần đấu giá' />
+            <Form.Item 
+              name="priceStep" 
+              label="Mức đấu giá" 
+              rules={[
+                { required: true, message: 'Hãy nhập mức đấu giá' },
+                () => ({
+                  validator(_, value) {
+                    if (!value || (value >= 10000 && value <= 500000 && value % 5000 === 0)) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Mức đấu giá phải từ 10,000 đến 500,000 và là bội số của 5,000'));
+                  },
+                }),
+              ]}
+            >
+              <InputNumber
+                placeholder='Nhập mức tăng mỗi lần đấu giá'
+                min={10000}
+                max={500000}
+                step={5000}
+                style={{ width: '100%' }}
+                formatter={value => `${value}`.replace(/\D/g, '')} // Display only digits
+                parser={value => value.replace(/\D/g, '')} // Parse only digits
+              />
             </Form.Item>
-            <Form.Item name="activeDate" label="Ngày hoạt động" rules={[{ required: true, message: 'Hãy chọn ngày đấu giá hoạt động' }]}>
+            <Form.Item 
+              name="activeDate" 
+              label="Ngày hoạt động" 
+              rules={[
+                { required: true, message: 'Hãy chọn ngày đấu giá hoạt động' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const endDate = getFieldValue('registrationEndDate');
+                    if (!value || (endDate && value.isAfter(endDate))) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Thời gian hoạt động phải từ sau thời gian đóng đăng ký'));
+                  },
+                }),
+              ]}
+            >
               <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
-            <Form.Item name="endDate" label="Ngày kết thúc" rules={[{ required: true, message: 'Hãy chọn ngày kết thúc đấu giá' }]}>
+
+            <Form.Item 
+              name="endDate" 
+              label="Ngày kết thúc" 
+              rules={[
+                { required: true, message: 'Hãy chọn ngày kết thúc đấu giá' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const activeDate = getFieldValue('activeDate');
+                    if (!value || (activeDate && value.isAfter(activeDate.add(30, 'minutes')))) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Thời gian kết thúc phải từ sau thời gian hoạt động ít nhất 30 phút'));
+                  },
+                }),
+              ]}
+            >
               <DatePicker showTime placeholder='Chọn ngày' />
             </Form.Item>
             <Form.Item name="modificationBy" label="Người thực hiện">

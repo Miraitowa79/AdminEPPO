@@ -318,9 +318,9 @@ const AuctionDetails = () => {
             <Form.Item label="Ngày tạo cuộc đấu giá">
               <Input value={new Date(data.room.creationDate).toLocaleDateString() || ''} readOnly />
             </Form.Item>
-            <Form.Item label="Thời gian sửa đổi lần cuối">
+            {/* <Form.Item label="Thời gian sửa đổi lần cuối">
               <Input value={new Date(data.room.modificationDate).toLocaleDateString() || ''} readOnly />
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item label="Trạng thái cuộc đấu giá">
               <Select value={data.room.status} disabled>
                 <Option value={1}>Chờ xác nhận</Option>
