@@ -5,7 +5,7 @@ import { getPlantDetails, updatePlant } from '../../../api/plantsManagement';
 import moment from 'moment';
 import { UploadOutlined } from '@ant-design/icons';
 import { getAuthUser } from "@utils/index";
-
+import { getAccountDetails } from '../../../api/accountManagement';
 
 const { Title } = Typography;
 
@@ -19,7 +19,7 @@ const PlantRentingDetails = () => {
   const user = getAuthUser();
   const [extraForm] = Form.useForm();
   const [file, setFile] = useState(null); 
-
+  const [accountDetails, setAccountDetails] = useState({});
   useEffect(() => {
     const fetchPlantDetails = async (id) => {
       try {
@@ -40,6 +40,22 @@ const PlantRentingDetails = () => {
     }
   }, [id, form]);
 
+  useEffect(() => {
+    const fetchAccountDetails = async () => {
+      try {
+        const response = await getAccountDetails(data.code);
+        setAccountDetails(response.data);
+        console.error("Data user:", response.data);
+      } catch (error) {
+        console.error("Error fetching account details:", error);
+        message.error("Lỗi khi tải thông tin tài khoản.");
+      }
+    };
+  
+    if (data.code) {
+      fetchAccountDetails();
+    }
+  }, [data.code]);
   const handleUpdate = async () => {
     try {
       setIsSubmitting(true);
@@ -270,29 +286,58 @@ const PlantRentingDetails = () => {
         </Card>
       </div>
 
-      {/* Auction Information */}
-      <div style={{ flex: 1, padding: '20px' }}>
-        <Title level={4} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
-        <Card>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <tbody>
-              <tr>
-                <td style={styles.label}><strong>Mã cây:</strong></td>
-                {/* You can display the plant's auction information here */}
-              </tr>
-              <tr>
-                <td style={styles.label}><strong>Tên cây:</strong></td>
-              </tr>
-              <tr>
-                <td style={styles.label}><strong>Tiêu đề:</strong></td>
-              </tr>
-              <tr>
-                <td style={styles.label}><strong>Mô tả:</strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </Card>
+        {/* Auction Information */}
+        <div style={{ flex: 1, padding: '20px',display: 'flex' }}>
+      <div style={{ flex: 1 }}>
+          <Title level={4} style={{ textAlign: 'center', marginBottom: '20px' }}>THÔNG TIN CHỦ CÂY</Title>
+          <Card>
+            <table style={styles.table}>
+              <tbody>
+                <tr>
+                  <td style={styles.label}><strong>Họ và tên:</strong></td>
+                  <td style={styles.value}>{accountDetails.fullName || "N/A"}</td>
+                </tr>
+                <tr>
+                  <td style={styles.label}><strong>Giới tính:</strong></td>
+                  <td style={styles.value}>{accountDetails.gender || "N/A"}</td>
+                </tr>
+                <tr>
+                  <td style={styles.label}><strong>Số điện thoại:</strong></td>
+                  <td style={styles.value}>{accountDetails.phoneNumber || "N/A"}</td>
+                </tr>
+                <tr>
+                  <td style={styles.label}><strong>Email:</strong></td>
+                  <td style={styles.value}>{accountDetails.email || "N/A"}</td>
+                </tr>
+                <tr>
+                    <td style={styles.label}><strong>Địa chỉ:</strong></td>
+                    <td style={styles.value}>
+                      {accountDetails.addresses && accountDetails.addresses.length > 0 ? (
+                        <ul>
+                          {accountDetails.addresses.map((address, index) => (
+                            <li key={index}>{address || "N/A"}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                  </tr>
+
+             
+                <tr>
+                  <td style={styles.label}><strong>Hình ảnh:</strong></td>
+            
+                  <td style={styles.value}>
+                    <img src={accountDetails?.imageUrl} alt={accountDetails.imageUrl} style={styles.image} />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </Card>
+        </div>
       </div>
+
     </div>
   );
 };
