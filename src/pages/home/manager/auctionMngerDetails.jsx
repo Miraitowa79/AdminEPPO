@@ -54,12 +54,12 @@ const AuctionDetails = () => {
         const { data } = await getAuctionDetails(id);
         setData(data);
         form.setFieldsValue({
-          registrationOpenDate: moment(data.room.registrationOpenDate),
-          registrationEndDate: moment(data.room.registrationEndDate),
+          registrationOpenDate: moment.utc(data.room.registrationOpenDate),
+          registrationEndDate: moment.utc(data.room.registrationEndDate),
           priceStep: data.room.priceStep,
           registrationFee: data.room.registrationFee,
-          activeDate: moment(data.room.activeDate),
-          endDate: moment(data.room.endDate),
+          activeDate: moment.utc(data.room.activeDate),
+          endDate: moment.utc(data.room.endDate),
           status: data.room.status,
           modificationBy: data.room.modificationBy,
         });
