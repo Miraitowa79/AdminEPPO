@@ -76,11 +76,7 @@ function SideNav({ color }) {
                 name: 'Đánh giá',
                 icon: <CommentOutlined />
             },
-            {
-                path:'/management/chat',
-                name: 'Chat',
-                icon: <MessageOutlined />
-            },
+       
         ],
         3:[
             {

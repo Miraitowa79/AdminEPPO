@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Avatar, Button, Pagination } from 'antd';
+import { Table, Input, Button, Pagination, Tag, Rate, Select } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getFeedbacks } from '../../../api/feedbackManagement';
@@ -11,14 +11,18 @@ const FeedbackMng = () => {
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 5;
+  const [ratingFilter, setRatingFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const pageSize = 10;
 
-  const fetchData = async (page = 1, search = '') => {
+  const fetchData = async (page = 1, search = '', rating = '', status = '') => {
     setLoading(true);
     try {
-      const response = await getFeedbacks({ page, size: pageSize, search });
-      const { data: items } = response;
+      const response = await getFeedbacks({ page, size: pageSize, search, rating, status });
+      const items = response.data;
+      
       setData(items);
+
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
@@ -30,14 +34,24 @@ const FeedbackMng = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
-    fetchData(currentPage, searchText);
-  }, [currentPage, searchText]);
+    fetchData(currentPage, searchText, ratingFilter, statusFilter);
+  }, [currentPage, searchText, ratingFilter, statusFilter]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchData(1, searchText);
+    fetchData(1, searchText, ratingFilter, statusFilter);
+  };
+  const handleRatingFilterChange = (value) => {
+    setRatingFilter(value);
+    setCurrentPage(1);
+    fetchData(1, searchText, value, statusFilter);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+    fetchData(1, searchText, ratingFilter, value);
   };
 
   const handleViewDetails = (record) => {
@@ -48,6 +62,13 @@ const FeedbackMng = () => {
     setCurrentPage(page);
   };
 
+  const getStarColor = (rating) => {
+    if (rating === 1) return 'red';
+    if (rating === 2 || rating === 3) return 'orange';
+    return 'gold';
+  };
+
+
   const columns = [
     {
       title: 'STT',
@@ -56,40 +77,66 @@ const FeedbackMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Title',
+      title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
+      title: 'Khách hàng',
+      dataIndex: ['user', 'fullName'],
+      key: 'fullName',
     },
     {
-      title: 'Creation Date',
+      title: 'Tên cây',
+      dataIndex: ['plant', 'plantName'],
+      key: 'plantName',
+    },
+    {
+      title: 'Ngày gửi',
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Status',
+      title: 'Đánh giá',
+      dataIndex: 'rating',
+      key: 'rating',
+      render: (rating) => (
+        <Rate
+          disabled
+          value={rating}
+          count={5}
+          style={{ color: getStarColor(rating) }}
+        />
+      ),
+    },
+    {
+      title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
+        let statusText = '';
+        let color = '';
+  
         switch (status) {
           case 1:
-            return 'Active';
+            statusText = 'Đang xử lý';
+            color = 'yellow';
+            break;
           case 2:
-            return 'Pending';
-          case 3:
-            return 'Resolved';
+            statusText = 'Đã phản hồi';
+            color = 'green';
+            break;
           default:
-            return 'Unknown';
+            statusText = 'Không xác định';
+            color = 'black';
         }
+  
+        return <Tag color={color}>{statusText}</Tag>;
       },
     },
     {
-      title: 'View Details',
+      title: 'Xem',
       key: 'action',
       render: (text, record) => (
         <Button
@@ -100,23 +147,9 @@ const FeedbackMng = () => {
       ),
     },
   ];
-
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <Input
-          placeholder="Search by title or description"
-          suffix={
-            <SearchOutlined
-              onClick={handleSearch}
-              style={{ cursor: 'pointer' }}
-            />
-          }
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: '50%' }}
-        />
+      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '20px' }}>
       </div>
       <Table
         columns={columns}

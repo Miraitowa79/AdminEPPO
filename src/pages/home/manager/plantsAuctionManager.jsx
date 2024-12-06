@@ -16,7 +16,7 @@ const PlantsAuction = () => {
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
-  const pageSize = 5;
+  const pageSize = 10;
   const [categories, setCategories] = useState([]);
   
   const fetchData = async (page = 1, search = '') => {
@@ -91,35 +91,35 @@ const PlantsAuction = () => {
       key: 'mainImage',
       render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
     },
-    {
-      title: 'Mã cây cảnh',
-      dataIndex: 'plantId',
-      key: 'plantId',
+    // {
+    //   title: 'Mã cây cảnh',
+    //   dataIndex: 'plantId',
+    //   key: 'plantId',
   
-    },
+    // },
     {
       title: 'Tên cây',
       dataIndex: 'plantName',
       key: 'plantName',
       ellipsis: true,
     },
-    {
-      title: 'Tiêu đề',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
-    },
+    // {
+    //   title: 'Tiêu đề',
+    //   dataIndex: 'title',
+    //   key: 'title',
+    //   ellipsis: true,
+    // },
     // {
     //   title: 'Số tiền',
     //   dataIndex: 'price',
     //   key: 'price',
     // },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-    },
+    // {
+    //   title: 'Mô tả',
+    //   dataIndex: 'description',
+    //   key: 'description',
+    //   ellipsis: true,
+    // },
     // {
     //   title: 'Mô hình kinh doanh',
     //   dataIndex: 'typeEcommerceId',
@@ -136,27 +136,42 @@ const PlantsAuction = () => {
     //     key: 'modificationBy',
     //   },
     {
-      title: 'Hiệu lực',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      ellipsis: true,
-      render: (isActive) => {
-        if (isActive === true) {
-          return 'Có thể đặt đấu giá';
-        } else if (isActive === false) {
-          return 'Không thể đặt đấu giá';
-        } else {
-          return 'Không xác định';
-        }
-      },
-    },
-    
-    {
       title: 'Số tiền',
       dataIndex: 'finalPrice',
       key: 'finalPrice',
       ellipsis: true,
+      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
     },
+    
+    {
+      title: 'Hiệu lực',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      render: (isActive) => {
+        let statusText = '';
+        let color = '';
+    
+        if (isActive === true) {
+          statusText = 'Có thể mua cây';
+          color = 'green'; // Màu xanh
+        } else if (isActive === false) {
+          statusText = 'Không thể đặt/thuê/mua';
+          color = 'red'; // Màu đỏ
+        } else {
+          statusText = 'Không xác định';
+          color = 'gray'; // Màu xám
+        }
+    
+        return <Tag color={color}>{statusText}</Tag>;
+      },
+    },
+    
+  
+    // {
+    //   title: 'Trạng Thái',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    // },
     {
       title: 'Trạng Thái',
       dataIndex: 'status',

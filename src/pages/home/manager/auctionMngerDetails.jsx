@@ -114,12 +114,12 @@ const AuctionDetails = () => {
       const values = await form.validateFields();
       const updatedData = {
         ...data.room,
-        registrationOpenDate: values.registrationOpenDate.toISOString(),
-        registrationEndDate: values.registrationEndDate.toISOString(),
+        registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
+        registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
         priceStep: values.priceStep,
         registrationFee: values.registrationFee,
-        activeDate: values.activeDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        activeDate: values.activeDate.add(7, 'hours').toISOString(),
+        endDate: values.endDate.add(7, 'hours').toISOString(),
         status: values.status,
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
@@ -141,12 +141,12 @@ const AuctionDetails = () => {
   const handleCancelEdit = () => {
     form.resetFields();
     form.setFieldsValue({
-      registrationOpenDate: moment(data.room.registrationOpenDate),
-      registrationEndDate: moment(data.room.registrationEndDate),
+      registrationOpenDate: moment.utc(data.room.registrationOpenDate).local(),
+      registrationEndDate: moment.utc(data.room.registrationEndDate).local(),
       priceStep: data.room.priceStep,
       registrationFee: data.room.registrationFee,
-      activeDate: moment(data.room.activeDate),
-      endDate: moment(data.room.endDate),
+      activeDate: moment.utc(data.room.activeDate).local(),
+      endDate: moment(data.room.endDate).local(),
       status: data.room.status,
       modificationBy: data.room.modificationBy,
     });
@@ -198,7 +198,8 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+            
             />
           </Form.Item>
           <Form.Item
@@ -210,7 +211,7 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment().endOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
             />
           </Form.Item>
             <Form.Item
@@ -284,7 +285,14 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current <= moment().endOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+              onChange={(date) => {
+                if (date) {
+                  setActiveDate(date);
+                } else {
+                  message.error('Thời gian không hợp lệ!');
+                }
+              }}
             />
           </Form.Item>
 
@@ -297,7 +305,7 @@ const AuctionDetails = () => {
             showTime
             disabled={!isEditing}
             readOnly
-            disabledDate={(current) => current && current <= moment().endOf('day')} // Không cho chọn ngày quá khứ
+            disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
           />
         </Form.Item>
 
