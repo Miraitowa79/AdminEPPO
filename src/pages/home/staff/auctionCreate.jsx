@@ -103,7 +103,7 @@ const CreateAuctionRoom = () => {
           <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} labelAlign="left" onFinish={handleSubmit}>
             <Form.Item name="plantId" label="Chọn cây" rules={[{ required: true, message: 'Hãy chọn cây!' }]}>
               <Select placeholder="Chọn cây" onChange={handlePlantChange}>
-                {plants.map(plant => (
+                {plants.filter(plant => plant.isActive === true).map(plant => (
                   <Option key={plant.plantId} value={plant.plantId}>
                     {plant.plantName}
                   </Option>
