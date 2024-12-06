@@ -100,14 +100,15 @@ const AuctionDetails = () => {
   const handleCancelEdit = () => {
     form.resetFields();
     form.setFieldsValue({
-      registrationOpenDate: moment(data.room.registrationOpenDate),
-      registrationEndDate: moment(data.room.registrationEndDate),
+      registrationOpenDate: moment.utc(data.room.registrationOpenDate),
+      registrationEndDate: moment.utc(data.room.registrationEndDate),
       priceStep: data.room.priceStep,
-      activeDate: moment(data.room.activeDate),
-      endDate: moment(data.room.endDate),
+      activeDate: moment.utc(data.room.activeDate),
+      endDate: moment.utc(data.room.endDate),
       status: data.room.status,
       modificationBy: data.room.modificationBy,
     });
+    
     setIsEditing(false);
   };
 
