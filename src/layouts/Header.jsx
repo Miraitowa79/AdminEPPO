@@ -56,14 +56,30 @@ function Header({
 
   return (
     <Row gutter={[24, 0]} style={{ padding: '10px 20px' }}>
-      <Col span={12} md={6}>
+      {/* <Col span={12} md={6}>
         <div onClick={() => {
           navigation('/')
         }} className="brand hover-point" style={{ display: 'flex', alignItems: 'center' }}>
           <img src={logo}  width={58} alt="Logo" style={{ marginRight: 10 }} />
           <span style={{ fontSize: 18, color: '#5457FB' }}>Quản lí hệ thống EPPO</span>
         </div>
-      </Col>
+      </Col> */}
+      <Col span={12} md={6}>
+  <div
+    onClick={() => {
+      navigation('/');
+    }}
+    className="brand hover-point"
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+    }}
+  >
+    <img src={logo} width={58} alt="Logo" style={{ marginRight: 10 }} />
+    <span style={{ fontSize: 18, color: '#1976d2' }}>Quản lí hệ thống EPPO</span> {/* Màu xanh dương đậm */}
+  </div>
+</Col>
+
       <Col span={12} md={18} style={{ textAlign: 'right' }}>
         <ButtonContainer>
           {/* <Button type="link">
