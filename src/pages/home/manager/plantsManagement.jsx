@@ -16,7 +16,7 @@ const PlantsMng = () => {
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
-  const pageSize = 5;
+  const pageSize = 10;
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
@@ -77,35 +77,35 @@ const PlantsMng = () => {
       key: 'mainImage',
       render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
     },
-    {
-      title: 'Mã cây cảnh',
-      dataIndex: 'plantId',
-      key: 'plantId',
+    // {
+    //   title: 'Mã cây cảnh',
+    //   dataIndex: 'plantId',
+    //   key: 'plantId',
   
-    },
+    // },
     {
       title: 'Tên cây',
       dataIndex: 'plantName',
       key: 'plantName',
       ellipsis: true,
     },
-    {
-      title: 'Tiêu đề',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
-    },
+    // {
+    //   title: 'Tiêu đề',
+    //   dataIndex: 'title',
+    //   key: 'title',
+    //   ellipsis: true,
+    // },
     // {
     //   title: 'Số tiền',
     //   dataIndex: 'price',
     //   key: 'price',
     // },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-    },
+    // {
+    //   title: 'Mô tả',
+    //   dataIndex: 'description',
+    //   key: 'description',
+    //   ellipsis: true,
+    // },
     // {
     //   title: 'Mô hình kinh doanh',
     //   dataIndex: 'typeEcommerceId',
@@ -122,6 +122,14 @@ const PlantsMng = () => {
     //     key: 'modificationBy',
     //   },
     {
+      title: 'Số tiền',
+      dataIndex: 'finalPrice',
+      key: 'finalPrice',
+      ellipsis: true,
+      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
+    },
+    
+    {
       title: 'Hiệu lực',
       dataIndex: 'isActive',
       key: 'isActive',
@@ -137,12 +145,7 @@ const PlantsMng = () => {
       },
     },
     
-    {
-      title: 'Số tiền',
-      dataIndex: 'finalPrice',
-      key: 'finalPrice',
-      ellipsis: true,
-    },
+  
     // {
     //   title: 'Trạng Thái',
     //   dataIndex: 'status',

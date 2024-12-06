@@ -16,7 +16,7 @@ const PlantsAuction = () => {
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
-  const pageSize = 5;
+  const pageSize = 10;
   const [categories, setCategories] = useState([]);
   
   const fetchData = async (page = 1, search = '') => {
@@ -91,35 +91,35 @@ const PlantsAuction = () => {
       key: 'mainImage',
       render: (mainImage) => <Avatar src={mainImage ? mainImage : avatar} />,
     },
-    {
-      title: 'Mã cây cảnh',
-      dataIndex: 'plantId',
-      key: 'plantId',
+    // {
+    //   title: 'Mã cây cảnh',
+    //   dataIndex: 'plantId',
+    //   key: 'plantId',
   
-    },
+    // },
     {
       title: 'Tên cây',
       dataIndex: 'plantName',
       key: 'plantName',
       ellipsis: true,
     },
-    {
-      title: 'Tiêu đề',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
-    },
+    // {
+    //   title: 'Tiêu đề',
+    //   dataIndex: 'title',
+    //   key: 'title',
+    //   ellipsis: true,
+    // },
     // {
     //   title: 'Số tiền',
     //   dataIndex: 'price',
     //   key: 'price',
     // },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-    },
+    // {
+    //   title: 'Mô tả',
+    //   dataIndex: 'description',
+    //   key: 'description',
+    //   ellipsis: true,
+    // },
     // {
     //   title: 'Mô hình kinh doanh',
     //   dataIndex: 'typeEcommerceId',
@@ -136,27 +136,35 @@ const PlantsAuction = () => {
     //     key: 'modificationBy',
     //   },
     {
+      title: 'Số tiền',
+      dataIndex: 'finalPrice',
+      key: 'finalPrice',
+      ellipsis: true,
+      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
+    },
+    
+    {
       title: 'Hiệu lực',
       dataIndex: 'isActive',
       key: 'isActive',
       ellipsis: true,
       render: (isActive) => {
         if (isActive === true) {
-          return 'Có thể đặt đấu giá';
+          return 'Có thể mua cây ';
         } else if (isActive === false) {
-          return 'Không thể đặt đấu giá';
+          return 'Không thể đặt/thuê/mua';
         } else {
           return 'Không xác định';
         }
       },
     },
     
-    {
-      title: 'Số tiền',
-      dataIndex: 'finalPrice',
-      key: 'finalPrice',
-      ellipsis: true,
-    },
+  
+    // {
+    //   title: 'Trạng Thái',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    // },
     {
       title: 'Trạng Thái',
       dataIndex: 'status',
