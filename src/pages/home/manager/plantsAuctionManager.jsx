@@ -147,15 +147,22 @@ const PlantsAuction = () => {
       title: 'Hiệu lực',
       dataIndex: 'isActive',
       key: 'isActive',
-      ellipsis: true,
       render: (isActive) => {
+        let statusText = '';
+        let color = '';
+    
         if (isActive === true) {
-          return 'Có thể mua cây ';
+          statusText = 'Có thể mua cây';
+          color = 'green'; // Màu xanh
         } else if (isActive === false) {
-          return 'Không thể đặt/thuê/mua';
+          statusText = 'Không thể đặt/thuê/mua';
+          color = 'red'; // Màu đỏ
         } else {
-          return 'Không xác định';
+          statusText = 'Không xác định';
+          color = 'gray'; // Màu xám
         }
+    
+        return <Tag color={color}>{statusText}</Tag>;
       },
     },
     
