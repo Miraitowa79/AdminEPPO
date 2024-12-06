@@ -11,7 +11,7 @@ const AuthRoute = () => {
         localStorage.clear('authUser')
         notification.error({
           duration: 5,
-          message: 'Permission denied, pls use another account!'
+          message: 'Yêu cầu bị từ chối, vui lòng sử dụng tài khoản khác!'
         })
         return <Navigate to={LOGIN_PATH} />;
       }
@@ -20,7 +20,7 @@ const AuthRoute = () => {
       localStorage.clear('authUser')
       notification.error({
         duration: 5,
-        message: 'Token is expired, pls login again!'
+        message: 'Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!'
       })
     }
   }

@@ -162,7 +162,7 @@ const AuctionMng = () => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <Input
+        {/* <Input
           placeholder="Tìm kiếm phòng đấu giá"
           suffix={
             <SearchOutlined
@@ -174,7 +174,7 @@ const AuctionMng = () => {
           onChange={(e) => setSearchText(e.target.value)}
           onPressEnter={handleSearch}
           style={{ width: '50%' }}
-        />
+        /> */}
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateRoom}>
           Tạo phòng đấu giá
         </Button>

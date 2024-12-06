@@ -74,7 +74,6 @@ const OrdersMng = () => {
           typeEcommerceTitle: ecommerceType ? ecommerceType.title : 'N/A',
         };
       });
-
       setData(ordersWithDetails);
       if (orders.length < pageSize) {
         setTotalItems((page - 1) * pageSize + orders.length);
@@ -119,6 +118,7 @@ const OrdersMng = () => {
       }
     } catch (error) {
       console.error('Failed to fetch filtered data:', error);
+      message.error('Không có dữ liệu');
     } finally {
       setLoading(false);
     }
@@ -173,8 +173,20 @@ const OrdersMng = () => {
     },
     {
       title: 'Hình thức',
-      dataIndex: 'typeEcommerceTitle',
-      key: 'typeEcommerceTitle',
+      dataIndex: 'typeEcommerceId',
+      key: 'typeEcommerceId',
+      render: (typeEcommerceId) => {
+        switch (typeEcommerceId) {
+          case 1:
+            return 'Mua bán';
+          case 2:
+            return 'Cho thuê';
+          case 3:
+            return 'Đấu giá';
+          default:
+            return 'Không xác định';
+        }
+      },
     },
     {
       title: 'Ngày mua hàng',
