@@ -3,6 +3,7 @@ import { Table, Button, Pagination, Select, Tag, Tabs } from 'antd';
 import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getContracts, getContractStatus } from '../../../api/contractManagement';
+import moment from 'moment';
 import './contractManagement.scss';
 
 const { Option } = Select;
@@ -21,12 +22,9 @@ const ContractMng = () => {
   const fetchData = async (page = 1, status = '') => {
     setLoading(true);
     try {
-      let response;
-      if (activeTab === 'main') {
-        response = await getContracts({ page, size: pageSize });
-      } else {
-        response = await getContractStatus({ page, size: pageSize, status });
-      }
+      const response = status
+        ? await getContractStatus({ page, size: pageSize, status })
+        : await getContracts({ page, size: pageSize });
 
       const { data: items } = response;
 
@@ -35,8 +33,10 @@ const ContractMng = () => {
         key: item.contractId,
         userId: item.user.userName,
         totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-        creationContractDate: item.creationContractDate.split('T')[0],
-        endContractDate: item.endContractDate.split('T')[0],
+        // creationContractDate: item.creationContractDate.split('T')[0],
+        // endContractDate: item.endContractDate.split('T')[0],
+        creationContractDate: moment(item.creationContractDate).format('DD-MM-YYYY'),
+        endContractDate: moment(item.endContractDate).format('DD-MM-YYYY'),
         status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn',
       })));
 

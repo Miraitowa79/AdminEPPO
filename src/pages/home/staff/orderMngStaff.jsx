@@ -74,6 +74,7 @@ const OrdersMng = () => {
           typeEcommerceTitle: ecommerceType ? ecommerceType.title : 'N/A',
         };
       });
+
       setData(ordersWithDetails);
       if (orders.length < pageSize) {
         setTotalItems((page - 1) * pageSize + orders.length);
@@ -103,6 +104,7 @@ const OrdersMng = () => {
       const ordersWithDetails = orders.map(order => {
         const user = accounts.find(account => account.userId === order.userId);
         const ecommerceType = typeEcommerce.find(type => type.typeEcommerceId === order.typeEcommerceId);
+        
         return { 
           ...order, 
           fullName: user ? user.fullName : 'N/A',
@@ -192,7 +194,7 @@ const OrdersMng = () => {
       title: 'Ngày mua hàng',
       dataIndex: 'creationDate',
       key: 'creationDate',
-      render: (text) => moment(text).format('YYYY-MM-DD'),
+      render: (text) => moment(text).format('DD-MM-YYYY'),
     },
     {
       title: 'Trạng thái thanh toán',

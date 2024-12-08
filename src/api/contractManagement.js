@@ -48,6 +48,25 @@ export const createContract = (newContract) => {
   });
 };
 
+export const createContractWithUserId = (userId, newContract) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const contractData = {userId, ...newContract};
+
+      const { data } = await baseApi().post(
+        "/GetList/Contracts/Create/Contract/Addendum",
+        contractData
+      );
+      return resolve(data);
+    } catch (error) {
+      console.log("Error creating contract with userId:", error);
+      return reject(error);
+    }
+  });
+};
+
+
+
 export const updateContractDetails = (id, updatedContract) => {
   return new Promise(async (resolve, reject) => {
     try {
