@@ -14,16 +14,20 @@ const ContractMng = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [selectedType, setSelectedType] = useState('');
-  const [activeTab, setActiveTab] = useState('addendum'); // New state for active tab
+  const [activeTab, setActiveTab] = useState('main');
   const pageSize = 10;
   const navigate = useNavigate();
 
   const fetchData = async (page = 1, status = '') => {
     setLoading(true);
     try {
-      const response = status
-        ? await getContractStatus({ page, size: pageSize, status })
-        : await getContracts({ page, size: pageSize });
+      let response;
+      if (activeTab === 'main') {
+        response = await getContracts({ page, size: pageSize });
+      } else {
+        response = await getContractStatus({ page, size: pageSize, status });
+      }
+
       const { data: items } = response;
 
       setData(items.filter(item => item.isAddendum === (activeTab === 'addendum')).map((item, index) => ({
@@ -92,11 +96,11 @@ const ContractMng = () => {
       dataIndex: 'description',
       key: 'description',
     },
-    {
-      title: 'Số tiền',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
-    },
+    // {
+    //   title: 'Số tiền',
+    //   dataIndex: 'totalAmount',
+    //   key: 'totalAmount',
+    // },
     {
       title: 'Mã ĐH',
       dataIndex: 'contractNumber',
