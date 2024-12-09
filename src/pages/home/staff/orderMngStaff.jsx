@@ -104,6 +104,7 @@ const OrdersMng = () => {
       const ordersWithDetails = orders.map(order => {
         const user = accounts.find(account => account.userId === order.userId);
         const ecommerceType = typeEcommerce.find(type => type.typeEcommerceId === order.typeEcommerceId);
+        
         return { 
           ...order, 
           fullName: user ? user.fullName : 'N/A',
@@ -119,6 +120,7 @@ const OrdersMng = () => {
       }
     } catch (error) {
       console.error('Failed to fetch filtered data:', error);
+      message.error('Không có dữ liệu');
     } finally {
       setLoading(false);
     }
@@ -173,14 +175,26 @@ const OrdersMng = () => {
     },
     {
       title: 'Hình thức',
-      dataIndex: 'typeEcommerceTitle',
-      key: 'typeEcommerceTitle',
+      dataIndex: 'typeEcommerceId',
+      key: 'typeEcommerceId',
+      render: (typeEcommerceId) => {
+        switch (typeEcommerceId) {
+          case 1:
+            return 'Mua bán';
+          case 2:
+            return 'Cho thuê';
+          case 3:
+            return 'Đấu giá';
+          default:
+            return 'Không xác định';
+        }
+      },
     },
     {
       title: 'Ngày mua hàng',
       dataIndex: 'creationDate',
       key: 'creationDate',
-      render: (text) => moment(text).format('YYYY-MM-DD'),
+      render: (text) => moment(text).format('DD-MM-YYYY'),
     },
     {
       title: 'Trạng thái thanh toán',

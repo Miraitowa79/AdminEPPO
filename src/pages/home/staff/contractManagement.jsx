@@ -1,37 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, Select, Tag } from 'antd';
-import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Pagination, Select, Tag, Tabs } from 'antd';
+import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getContracts, getContractStatus } from '../../../api/contractManagement';
+import moment from 'moment';
 import './contractManagement.scss';
 
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const ContractMng = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [selectedType, setSelectedType] = useState('');
+  const [activeTab, setActiveTab] = useState('main');
   const pageSize = 10;
   const navigate = useNavigate();
 
-  const fetchData = async (page = 1, search = '', status = '') => {
+  const fetchData = async (page = 1, status = '') => {
     setLoading(true);
     try {
       const response = status
-        ? await getContractStatus({ page, size: pageSize, search, status })
-        : await getContracts({ page, size: pageSize, search });
+        ? await getContractStatus({ page, size: pageSize, status })
+        : await getContracts({ page, size: pageSize });
+
       const { data: items } = response;
 
-      setData(items.map((item, index) => ({
+      setData(items.filter(item => item.isAddendum === (activeTab === 'addendum')).map((item, index) => ({
         ...item,
         key: item.contractId,
         userId: item.user.userName,
         totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-        creationContractDate: item.creationContractDate.split('T')[0],
-        endContractDate: item.endContractDate.split('T')[0],
+        // creationContractDate: item.creationContractDate.split('T')[0],
+        // endContractDate: item.endContractDate.split('T')[0],
+        creationContractDate: moment(item.creationContractDate).format('DD-MM-YYYY'),
+        endContractDate: moment(item.endContractDate).format('DD-MM-YYYY'),
         status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn',
       })));
 
@@ -49,13 +54,8 @@ const ContractMng = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, searchText, selectedType);
-  }, [currentPage, searchText, selectedType]);
-
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchData(1, searchText, selectedType);
-  };
+    fetchData(currentPage, selectedType);
+  }, [currentPage, selectedType, activeTab]);
 
   const handleViewDetails = (record) => {
     navigate(`/staff/contract/${record.contractId}`);
@@ -70,6 +70,11 @@ const ContractMng = () => {
     setCurrentPage(1);
   };
 
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    setCurrentPage(1);
+  };
+
   const columns = [
     {
       title: 'STT',
@@ -77,22 +82,27 @@ const ContractMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1
     },
     {
-      title: 'Mã hợp đồng',
+      title: 'Mã HĐ',
       dataIndex: 'contractId',
       key: 'contractId',
+    },
+    {
+      title: 'Chủ hợp đồng',
+      dataIndex: 'userId',
+      key: 'userId',
     },
     {
       title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
     },
+    // {
+    //   title: 'Số tiền',
+    //   dataIndex: 'totalAmount',
+    //   key: 'totalAmount',
+    // },
     {
-      title: 'Số tiền',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
-    },
-    {
-      title: 'Mã đơn hàng',
+      title: 'Mã ĐH',
       dataIndex: 'contractNumber',
       key: 'contractNumber',
     },
@@ -144,19 +154,6 @@ const ContractMng = () => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <Input
-          placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
-          suffix={
-            <SearchOutlined
-              onClick={handleSearch}
-              style={{ cursor: 'pointer' }}
-            />
-          }
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: '50%' }}
-        />
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -177,14 +174,28 @@ const ContractMng = () => {
           <Option value="2">Hết hạn</Option>
         </Select>
       </div>
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-        rowKey="key"
-        loading={loading}
-        rowClassName={rowClassName} // Apply the row class name
-      />
+      <Tabs defaultActiveKey="main" onChange={handleTabChange}>
+        <TabPane tab="Hợp đồng chính" key="main">
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            rowKey="key"
+            loading={loading}
+            rowClassName={rowClassName}
+          />
+        </TabPane>
+        <TabPane tab="Phụ lục" key="addendum">
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            rowKey="key"
+            loading={loading}
+            rowClassName={rowClassName}
+          />
+        </TabPane>
+      </Tabs>
       <Pagination
         current={currentPage}
         total={totalItems}

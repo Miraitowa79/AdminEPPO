@@ -12,7 +12,7 @@ const AdminRoute = () => {
     }else{
       notification.error({
         duration: 5,
-        message: 'Token is expired, pls login again!'
+        message: 'Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!'
       })
       localStorage.clear('authUser')
       return <Navigate to={LOGIN_PATH} />;
@@ -20,7 +20,7 @@ const AdminRoute = () => {
   }
   notification.warning({
     duration: 5,
-    message: 'Permission denined!'
+    message: 'Yêu cầu bị từ chối!'
   })
   return <Navigate to={'/'} />;
 };

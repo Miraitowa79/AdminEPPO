@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Typography, Card, DatePicker, message, InputNumber } from 'antd';
+import { Form, Input, Button, Select, Typography, Card, message, InputNumber } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import Datetime from 'react-datetime';
+import "react-datetime/css/react-datetime.css";
 import { getListPlantAuction } from '../../../api/plantsManagement';
 import { createAuctionRoom } from '../../../api/auctionManagement';
 import { getAuthUser } from '@src/utils';
@@ -23,8 +25,8 @@ const CreateAuctionRoom = () => {
         const { data } = response;
         setPlants(data);
       } catch (error) {
-        console.error('Error fetching plants:', error);
-        message.error('Error fetching plants');
+        console.error('Lỗi khi lấy dữ liệu cây:', error);
+        message.error('Không có dữ liệu cây.');
       }
     };
 
@@ -48,27 +50,12 @@ const CreateAuctionRoom = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const registrationOpenDate = values.registrationOpenDate.toISOString();
-      const registrationEndDate = values.registrationEndDate.toISOString();
-      const creationDate = moment().toISOString();
-      const activeDate = values.activeDate.toISOString();
-      const endDate = values.endDate.toISOString();
+      const registrationOpenDate = moment(values.registrationOpenDate).add(7, 'hours').utc().toISOString();
+      const registrationEndDate = moment(values.registrationEndDate).add(7, 'hours').utc().toISOString();
+      const creationDate = moment().add(7, 'hours').utc().toISOString();
+      const activeDate = moment(values.activeDate).add(7, 'hours').utc().toISOString();
+      const endDate = moment(values.endDate).add(7, 'hours').utc().toISOString();
       const modificationDate = creationDate;
-
-      if (moment(registrationEndDate).isBefore(registrationOpenDate)) {
-        message.error('Ngày đóng đăng ký phải sau ngày mở đăng ký');
-        return;
-      }
-
-      if (moment(activeDate).isBefore(registrationEndDate)) {
-        message.error('Ngày hoạt động phải sau ngày đóng đăng ký');
-        return;
-      }
-
-      if (moment(endDate).isBefore(activeDate)) {
-        message.error('Ngày kết thúc phải sau ngày hoạt động');
-        return;
-      }
 
       const newRoom = {
         plantId: values.plantId,
@@ -76,17 +63,19 @@ const CreateAuctionRoom = () => {
         registrationEndDate,
         registrationFee: values.registrationFee,
         priceStep: values.priceStep,
+        creationDate,
         activeDate,
         endDate,
+        modificationDate,
         modificationBy: getAuthUser().userId,
         status: values.status,
       };
 
       await createAuctionRoom(newRoom);
-      message.success('Auction room created successfully');
+      message.success('Lên kế hoạch và tạo phòng đấu giá thành công.');
       navigate('/staff/auction');
     } catch (error) {
-      console.error('Error creating auction room:', error);
+      console.error('Lỗi khi tạo phòng đấu giá:', error);
       message.error('Tạo phòng không thành công!');
     }
   };
@@ -94,6 +83,35 @@ const CreateAuctionRoom = () => {
   const handleCancel = () => {
     navigate('/staff/auction');
   };
+
+  const validateDate = (current) => {
+    return current.isAfter(moment().subtract(1, 'day'));
+  };
+
+  const validateDateInput = (_, value) => {
+    if (!value || moment(value).isAfter(moment())) {
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error('Ngày không được là ngày trong quá khứ!'));
+  };
+
+  const renderDateTimePicker = (name, label) => (
+    <Form.Item
+      name={name}
+      label={label}
+      rules={[
+        { required: true, message: `Hãy chọn ${label.toLowerCase()}!` },
+        { validator: validateDateInput },
+      ]}
+    >
+      <Datetime
+        dateFormat="DD-MM-YYYY"
+        timeFormat="HH:mm"
+        inputProps={{ placeholder: 'Chọn ngày và giờ' }}
+        isValidDate={validateDate}
+      />
+    </Form.Item>
+  );
 
   return (
     <div style={{ padding: '20px', maxWidth: '1000px', margin: 'auto', display: 'flex', gap: '20px' }}>
@@ -110,42 +128,8 @@ const CreateAuctionRoom = () => {
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item 
-              name="registrationOpenDate" 
-              label="Ngày mở đăng ký" 
-              rules={[
-                { required: true, message: 'Hãy chọn 1 ngày mở đăng ký' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || value.isAfter(moment())) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Thời gian mở đăng ký phải từ sau ngày hôm nay'));
-                  },
-                }),
-              ]}
-            >
-              <DatePicker showTime placeholder='Chọn ngày' />
-            </Form.Item>
-
-            <Form.Item 
-              name="registrationEndDate" 
-              label="Ngày đóng đăng ký" 
-              rules={[
-                { required: true, message: 'Hãy chọn 1 ngày đóng đăng ký' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    const openDate = getFieldValue('registrationOpenDate');
-                    if (!value || (openDate && value.isAfter(openDate.add(30, 'minutes')))) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Thời gian đóng đăng ký phải từ sau thời gian mở đăng ký ít nhất 30 phút'));
-                  },
-                }),
-              ]}
-            >
-              <DatePicker showTime placeholder='Chọn ngày' />
-            </Form.Item>
+            {renderDateTimePicker("registrationOpenDate", "Ngày mở đăng ký")}
+            {renderDateTimePicker("registrationEndDate", "Ngày đóng đăng ký")}
             <Form.Item name="registrationFee" label="Phí đăng ký tham gia">
               <Input type="number" placeholder='Phí đăng ký = 5% * giá cây' readOnly />
             </Form.Item>
@@ -170,47 +154,12 @@ const CreateAuctionRoom = () => {
                 max={500000}
                 step={5000}
                 style={{ width: '100%' }}
-                formatter={value => `${value}`.replace(/\D/g, '')} // Display only digits
-                parser={value => value.replace(/\D/g, '')} // Parse only digits
+                formatter={value => `${value}`.replace(/\D/g, '')} // Hiển thị chỉ số
+                parser={value => value.replace(/\D/g, '')} // Phân tích chỉ số
               />
             </Form.Item>
-            <Form.Item 
-              name="activeDate" 
-              label="Ngày hoạt động" 
-              rules={[
-                { required: true, message: 'Hãy chọn ngày đấu giá hoạt động' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    const endDate = getFieldValue('registrationEndDate');
-                    if (!value || (endDate && value.isAfter(endDate))) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Thời gian hoạt động phải từ sau thời gian đóng đăng ký'));
-                  },
-                }),
-              ]}
-            >
-              <DatePicker showTime placeholder='Chọn ngày' />
-            </Form.Item>
-
-            <Form.Item 
-              name="endDate" 
-              label="Ngày kết thúc" 
-              rules={[
-                { required: true, message: 'Hãy chọn ngày kết thúc đấu giá' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    const activeDate = getFieldValue('activeDate');
-                    if (!value || (activeDate && value.isAfter(activeDate.add(30, 'minutes')))) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Thời gian kết thúc phải từ sau thời gian hoạt động ít nhất 30 phút'));
-                  },
-                }),
-              ]}
-            >
-              <DatePicker showTime placeholder='Chọn ngày' />
-            </Form.Item>
+            {renderDateTimePicker("activeDate", "Ngày hoạt động")}
+            {renderDateTimePicker("endDate", "Ngày kết thúc")}
             <Form.Item name="modificationBy" label="Người thực hiện">
               <Input readOnly />
             </Form.Item>

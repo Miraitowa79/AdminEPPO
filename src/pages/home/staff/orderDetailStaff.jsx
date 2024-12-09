@@ -43,8 +43,8 @@ const OrderDetails = () => {
 
         form.setFieldsValue({
           ...order,
-          creationDate: moment(order.creationDate).format('YYYY-MM-DD'),
-          modificationDate: moment(order.modificationDate).format('YYYY-MM-DD'),
+          creationDate: moment(order.creationDate).format('DD-MM-YYYY'),
+          modificationDate: moment(order.modificationDate).format('DD-MM-YYYY'),
         });
       } catch (error) {
         console.error('Error fetching order details:', error);
@@ -122,6 +122,9 @@ const OrderDetails = () => {
               <Form.Item label="Khách hàng" className={editMode ? 'blurred-field' : ''}>
                 <Input value={userData.fullName || 'N/A'} readOnly />
               </Form.Item>
+              <Form.Item label="Số điện thoại" className={editMode ? 'blurred-field' : ''}>
+                <Input value={userData.phoneNumber || 'N/A'} readOnly />
+              </Form.Item>
               <Form.Item label="Địa chỉ giao hàng" name="deliveryAddress" className={editMode ? 'blurred-field' : ''}>
                 <Input readOnly />
               </Form.Item>
@@ -138,7 +141,7 @@ const OrderDetails = () => {
                 <Input value={typeEcommerceTitle.title} readOnly />
               </Form.Item>
               <Form.Item label="Ngày mua" name="creationDate" className={editMode ? 'blurred-field' : ''}>
-                <Input readOnly />
+                <Input value={moment(orderData.creationDate).format('DD-MM-YYYY')} readOnly />
               </Form.Item>
               {/* <Form.Item label="Ngày cập nhật" name="modificationDate" className={editMode ? 'blurred-field' : ''}>
                 <Input readOnly />
@@ -147,7 +150,7 @@ const OrderDetails = () => {
                 <Input readOnly />
               </Form.Item>
               <Form.Item label="Tình trạng giao hàng" name="deliveryDescription" className={editMode ? 'blurred-field' : ''}>
-                <Input readOnly />
+                <Input value={orderData.deliveryDescription} readOnly />
               </Form.Item>
               <Form.Item label="Trạng thái đơn hàng" name="status">
                 {editMode ? (
@@ -174,7 +177,7 @@ const OrderDetails = () => {
                     <Button type="primary" htmlType="submit">Lưu</Button>
                   </>
                 ) : (
-                  orderData.status !== 5 && (
+                  orderData.status !== 4 && orderData.status !== 5 && (
                     <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
                   )
                 )}
@@ -193,7 +196,7 @@ const OrderDetails = () => {
               </div>
             ))}
           </Card>
-          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
+          {/* <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
             {orderData.imageDeliveryOrders.length > 0 ? (
               orderData.imageDeliveryOrders.map((image, index) => (
                 <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
