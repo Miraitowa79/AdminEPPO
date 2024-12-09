@@ -213,6 +213,24 @@ const OrderDetails = () => {
             ) : (
               <p>Không có hình ảnh</p>
             )}
+          </Card> */}
+          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
+            {orderData.imageDeliveryOrders && orderData.imageDeliveryOrders.length > 0 ? (
+              orderData.imageDeliveryOrders.map((image, index) => (
+                <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+              ))
+            ) : (
+              <p>Không có hình ảnh</p>
+            )}
+          </Card>
+          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
+            {orderData.imageReturnOrders && orderData.imageReturnOrders.length > 0 ? (
+              orderData.imageReturnOrders.map((image, index) => (
+                <Image key={index} src={image} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+              ))
+            ) : (
+              <p>Không có hình ảnh</p>
+            )}
           </Card>
         </Col>
       </Row>
