@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, DatePicker, Typography, Card, Spin, message, Select, Modal } from 'antd';
-import { getContractDetails, updateContractDetails, createContract } from '../../../api/contractManagement';
+import { getContractDetails, updateContractDetails, createContractWithUserId, createContract } from '../../../api/contractManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import moment from 'moment';
 import './orderDetailStaff.scss';
@@ -88,12 +88,14 @@ const ContractDetails = () => {
             contractNumber: contract.contractNumber,
             description: `Gia hạn hợp đồng ${contract.contractId}`,
             creationContractDate: moment().format('YYYY-MM-DD'),
-            endContractDate: moment(contract.endContractDate).add(1, 'month').format('YYYY-MM-DD'), // Gia hạn thêm 1 tháng
+            endContractDate: moment(contract.endContractDate).add(1, 'month').format('YYYY-MM-DD'),
             totalAmount: contract.totalAmount,
             contractUrl: contract.contractUrl,
             contractDetails: contract.contractDetails,
           };
 
+          console.log('check', newContract)
+  
           const { contractId } = await createContract(newContract);
           const { data: supplementaryContractData } = await getContractDetails(contractId);
           setSupplementaryContract(supplementaryContractData);
@@ -105,6 +107,7 @@ const ContractDetails = () => {
       },
     });
   };
+  
 
   const handleExpireContract = async () => {
     try {
@@ -212,6 +215,7 @@ const ContractDetails = () => {
                             <>
                               <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
                               <Button type="default" onClick={handleRenewal}>Gia hạn</Button>
+  
                             </>
                           )}
                         </>
