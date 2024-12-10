@@ -51,10 +51,10 @@ export const createContract = (newContract) => {
 export const createContractWithUserId = (userId, newContract) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const contractData = {userId, ...newContract};
+      const contractData = { userId, ...newContract };
 
       const { data } = await baseApi().post(
-        "/GetList/Contracts/Create/Contract/Addendum",
+        `/GetList/Contracts/Create/Contract/Addendum?userId=${userId}`,
         contractData
       );
       return resolve(data);
@@ -64,8 +64,6 @@ export const createContractWithUserId = (userId, newContract) => {
     }
   });
 };
-
-
 
 export const updateContractDetails = (id, updatedContract) => {
   return new Promise(async (resolve, reject) => {
