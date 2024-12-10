@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, DatePicker, Typography, Card, Spin, message, Select, Modal } from 'antd';
-import { getContractDetails, updateContractDetails, createContractWithUserId } from '../../../api/contractManagement';
+import { getContractDetails, updateContractDetails, createContract } from '../../../api/contractManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import moment from 'moment';
 import './orderDetailStaff.scss';
@@ -76,7 +76,7 @@ const ContractDetails = () => {
     }
   };
 
-  const handleRenewal = (userId) => {
+  const handleRenewal = () => {
     Modal.confirm({
       title: 'Gia hạn hợp đồng',
       content: 'Bạn muốn gia hạn hợp đồng này thêm 1 tháng?',
@@ -88,17 +88,13 @@ const ContractDetails = () => {
             contractNumber: contract.contractNumber,
             description: `Gia hạn hợp đồng ${contract.contractId}`,
             creationContractDate: moment().format('YYYY-MM-DD'),
-            endContractDate: moment(contract.endContractDate).add(1, 'month').format('YYYY-MM-DD'),
+            endContractDate: moment(contract.endContractDate).add(1, 'month').format('YYYY-MM-DD'), // Gia hạn thêm 1 tháng
             totalAmount: contract.totalAmount,
             contractUrl: contract.contractUrl,
             contractDetails: contract.contractDetails,
           };
 
-
-          console.log('check', newContract)
-  
-          const { contractId } = await createContractWithUserId(userId, newContract);
-
+          const { contractId } = await createContract(newContract);
           const { data: supplementaryContractData } = await getContractDetails(contractId);
           setSupplementaryContract(supplementaryContractData);
           message.success('Gia hạn hợp đồng thành công!');
@@ -109,7 +105,6 @@ const ContractDetails = () => {
       },
     });
   };
-  
 
   const handleExpireContract = async () => {
     try {
@@ -216,8 +211,7 @@ const ContractDetails = () => {
                           {contract.isActive === 1 && (
                             <>
                               <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
-                              <Button type="default" onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
-  
+                              <Button type="default" onClick={handleRenewal}>Gia hạn</Button>
                             </>
                           )}
                         </>
