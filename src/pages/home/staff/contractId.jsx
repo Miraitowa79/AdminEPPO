@@ -97,6 +97,7 @@ const ContractDetails = () => {
           console.log('check', newContract)
   
           const { contractId } = await createContractWithUserId(userId, newContract);
+          console.log("userId", user.userId)
           const { data: supplementaryContractData } = await getContractDetails(contractId);
           setSupplementaryContract(supplementaryContractData);
           message.success('Gia hạn hợp đồng thành công!');
