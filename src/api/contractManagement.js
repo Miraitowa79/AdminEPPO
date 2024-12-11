@@ -63,8 +63,6 @@ export const createContractWithUserId = (userId, newContract) => {
   });
 };
 
-
-
 export const updateContractDetails = (id, updatedContract) => {
   return new Promise(async (resolve, reject) => {
     try {
