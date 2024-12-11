@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, Typography, Card, Spin, message, Select, Row, Col, Image } from 'antd';
-import { getOrderDetails, updateOrderDetails } from '../../../api/orderManagement';
+import { getOrderDetails, updateOrderDetails, updateOrderDetailDeposit } from '../../../api/orderManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import { getTypeEcommerceById } from '../../../api/typeEcommerceApi';
 import { getPlantDetails } from '../../../api/plantsManagement';
@@ -24,23 +24,27 @@ const OrderDetails = () => {
     const fetchDetails = async () => {
       try {
         const { data: order } = await getOrderDetails(id);
+        console.log('Order Details:', order);
         setOrderData(order);
-
+  
         if (order.userId) {
           const { data: user } = await getAccountDetails(order.userId);
+          console.log('User Details:', user);
           setUserData(user);
         }
-
+  
         if (order.typeEcommerceId) {
           const { data: typeEcommerce } = await getTypeEcommerceById(order.typeEcommerceId);
+          console.log('Type Ecommerce:', typeEcommerce);
           setTypeEcommerceTitle(typeEcommerce);
         }
-
+  
         if (order.orderDetails.plantId) {
           const { data: plant } = await getPlantDetails(order.orderDetails.plantId);
+          console.log('Plant Details:', plant);
           setUserData(plant);
         }
-
+  
         form.setFieldsValue({
           ...order,
           creationDate: moment(order.creationDate).format('DD-MM-YYYY'),
@@ -53,11 +57,11 @@ const OrderDetails = () => {
         setLoading(false);
       }
     };
-
+  
     if (id) {
       fetchDetails();
     }
-  }, [id, form]);
+  }, [id, form]);  
 
   const handleUpdateClick = () => {
     setEditMode(true);
@@ -70,14 +74,50 @@ const OrderDetails = () => {
 
   const handleFinish = async (updatedData) => {
     try {
+      const currentStatus = orderData.status;
+      const newStatus = updatedData.status;
+
+      if (newStatus <= currentStatus) {
+        message.error('Không thể quay lại trạng thái trước đó.');
+        return;
+      }
+
       const newModificationDate = moment().format('YYYY-MM-DD');
-      const updatedOrderData = { ...orderData, ...updatedData, modificationDate: newModificationDate };
+      const updatedOrderData = {
+        ...orderData,
+        status: updatedData.status,
+        modificationDate: newModificationDate,
+      };
+      console.log('Updated Order Data:', updatedOrderData);
       await updateOrderDetails(updatedOrderData);
       setOrderData(updatedOrderData);
       setEditMode(false);
       message.success('Cập nhật đơn hàng thành công!');
     } catch (error) {
       message.error('Error updating order details');
+    }
+  };
+
+  const handleReclaimClick = async (orderDetailId) => {
+    try {
+      const detail = orderData.orderDetails.find(detail => detail.orderDetailId === orderDetailId);
+      console.log('reclaim', detail)
+      if (!detail) {
+        message.error('Order detail not found.');
+        return;
+      }
+
+      await updateOrderDetailDeposit({
+        orderDetailId: detail.orderDetailId,
+        depositDescription: detail.depositDescription,
+        depositReturnCustomer: detail.depositReturnCustomer,
+        depositReturnOwner: detail.depositReturnOwner,
+      });
+
+      message.success('Thu hồi sản phẩm thành công!');
+    } catch (error) {
+      console.error('Error reclaiming product:', error);
+      message.error('Thu hồi sản phẩm không thành công!');
     }
   };
 
@@ -93,6 +133,8 @@ const OrderDetails = () => {
         return 'Đã giao';
       case 5:
         return 'Đã hủy';
+      case 6: 
+        return 'Thu hồi';
       default:
         return 'Không xác định';
     }
@@ -143,9 +185,6 @@ const OrderDetails = () => {
               <Form.Item label="Ngày mua" name="creationDate" className={editMode ? 'blurred-field' : ''}>
                 <Input value={moment(orderData.creationDate).format('DD-MM-YYYY')} readOnly />
               </Form.Item>
-              {/* <Form.Item label="Ngày cập nhật" name="modificationDate" className={editMode ? 'blurred-field' : ''}>
-                <Input readOnly />
-              </Form.Item> */}
               <Form.Item label="Trạng thái thanh toán" name="paymentStatus" className={editMode ? 'blurred-field' : ''}>
                 <Input readOnly />
               </Form.Item>
@@ -167,19 +206,25 @@ const OrderDetails = () => {
                     <Option value={3}>Đang giao</Option>
                     <Option value={4}>Đã giao</Option>
                     <Option value={5}>Đã hủy</Option>
+                    <Option value={6}>Thu hồi</Option>
                   </Select>
                 )}
               </Form.Item>
               <Form.Item style={{ textAlign: 'center' }}>
                 {editMode ? (
                   <>
-                    <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
+                  <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
                     <Button type="primary" htmlType="submit">Lưu</Button>
                   </>
                 ) : (
-                  orderData.status !== 4 && orderData.status !== 5 && (
-                    <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
-                  )
+                  <>
+                    {orderData.status !== 4 && orderData.status !== 5 && orderData.status !== 6 && (
+                      <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
+                    )}
+                    {/* {orderData.status === 4 && (
+                      <Button type="primary" danger onClick={() => handleReclaimClick(orderData.orderDetailId)}>Thu hồi sản phẩm</Button>
+                    )} */}
+                  </>
                 )}
               </Form.Item>
             </Form>
@@ -193,6 +238,15 @@ const OrderDetails = () => {
                 <p><strong>Ngày bắt đầu thuê:</strong> {moment(detail.rentalStartDate).format('DD-MM-YYYY')}</p>
                 <p><strong>Ngày kết thúc thuê:</strong> {moment(detail.rentalEndDate).format('DD-MM-YYYY')}</p>
                 <p><strong>Số tháng thuê:</strong> {detail.numberMonth}</p>
+                {/* Display deposit-related information */}
+                <p><strong>Tiền đặt cọc:</strong> {detail.deposit || '-'}</p>
+                <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || '-'}</p>
+                <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || '-'}</p>
+                <p><strong>Tiền trả lại nhà vườn:</strong> {detail.depositReturnOwner || '-'}</p>
+                {/* Reclaim button for each detail */}
+                {orderData.status === 4 && (
+                  <Button type="primary" danger onClick={() => handleReclaimClick(detail.orderDetailId)}>Thu hồi sản phẩm</Button>
+                )}
               </div>
             ))}
           </Card>

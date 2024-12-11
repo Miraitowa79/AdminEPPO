@@ -1,6 +1,6 @@
 import { baseApi } from "./baseClient";
 
-export const getContracts = ({ page = 1, size = 100, search = "" }) => {
+export const getContracts = ({ page = 1, size = 1000, search = "" }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get("/GetList/Contracts", {
@@ -51,11 +51,9 @@ export const createContract = (newContract) => {
 export const createContractWithUserId = (userId, newContract) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const contractData = {userId, ...newContract};
-
       const { data } = await baseApi().post(
-        "/GetList/Contracts/Create/Contract/Addendum",
-        contractData
+        `/GetList/Contracts/Create/Contract/Addendum?userId=${userId}`,
+        newContract
       );
       return resolve(data);
     } catch (error) {
@@ -102,7 +100,7 @@ export const getContractsByUserId = (userId, { page = 1, size = 100 }) => {
 
 export const getContractStatus = ({
   page = 1,
-  size = 100,
+  size = 1000,
   search = "",
   status,
 }) => {

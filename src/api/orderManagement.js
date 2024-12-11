@@ -61,3 +61,22 @@ export const getFilteredOrders = ({ typeEcommerceId, startDate, endDate, pageInd
         }
     });
 };
+
+export const updateOrderDetailDeposit = ({ orderDetailId, depositDescription, depositReturnCustomer, depositReturnOwner }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { data } = await baseApi().put('/Order/UpdateOrderDetailDeposit', {
+                params: {
+                    orderDetailId,
+                    depositDescription,
+                    depositReturnCustomer,
+                    depositReturnOwner
+                }
+            });
+            return resolve(data);
+        } catch (error) {
+            console.log('Error updating order detail deposit:', error);
+            return reject(error);
+        }
+    });
+};

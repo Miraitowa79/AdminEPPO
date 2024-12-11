@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Pagination, Select, Tag, Tabs } from 'antd';
+import { Table, Button, Select, Tag, Tabs, Input } from 'antd';
 import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getContracts, getContractStatus } from '../../../api/contractManagement';
@@ -8,6 +8,7 @@ import './contractManagement.scss';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
+const { Search } = Input;
 
 const ContractMng = () => {
   const [data, setData] = useState([]);
@@ -16,7 +17,8 @@ const ContractMng = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedType, setSelectedType] = useState('');
   const [activeTab, setActiveTab] = useState('main');
-  const pageSize = 10;
+  const [searchQuery, setSearchQuery] = useState('');
+  const pageSize = 1000;
   const navigate = useNavigate();
 
   const fetchData = async (page = 1, status = '') => {
@@ -27,14 +29,13 @@ const ContractMng = () => {
         : await getContracts({ page, size: pageSize });
 
       const { data: items } = response;
+      console.log('data:', response);
 
       setData(items.filter(item => item.isAddendum === (activeTab === 'addendum')).map((item, index) => ({
         ...item,
         key: item.contractId,
         userId: item.user.userName,
         totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-        // creationContractDate: item.creationContractDate.split('T')[0],
-        // endContractDate: item.endContractDate.split('T')[0],
         creationContractDate: moment(item.creationContractDate).format('DD-MM-YYYY'),
         endContractDate: moment(item.endContractDate).format('DD-MM-YYYY'),
         status: item.status === 1 ? 'Đang hoạt động' : 'Hết hạn',
@@ -75,6 +76,16 @@ const ContractMng = () => {
     setCurrentPage(1);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value.toLowerCase());
+  };
+
+  const filteredData = data.filter(item => 
+    String(item.contractId).toLowerCase().includes(searchQuery) ||
+    String(item.contractNumber).toLowerCase().includes(searchQuery) ||
+    String(item.userId).toLowerCase().includes(searchQuery)
+  );
+
   const columns = [
     {
       title: 'STT',
@@ -96,11 +107,6 @@ const ContractMng = () => {
       dataIndex: 'description',
       key: 'description',
     },
-    // {
-    //   title: 'Số tiền',
-    //   dataIndex: 'totalAmount',
-    //   key: 'totalAmount',
-    // },
     {
       title: 'Mã ĐH',
       dataIndex: 'contractNumber',
@@ -122,7 +128,7 @@ const ContractMng = () => {
       key: 'typeContract',
     },
     {
-      title: 'Trạng Thái',
+      title: 'Hiệu lực hoạt động',
       dataIndex: 'status',
       key: 'status',
       render: (text) => {
@@ -146,14 +152,21 @@ const ContractMng = () => {
     },
   ];
 
-  // Function to determine row class
   const rowClassName = (record) => {
-    return (record.creationContractDate === record.endContractDate && record.status === 'Đang hoạt động') ? 'red-row' : '';
+    const today = moment();
+    const endDate = moment(record.endContractDate, 'DD-MM-YYYY');
+    
+    return (endDate.isSameOrBefore(today) && record.status === 'Đang hoạt động') ? 'red-row' : '';
   };
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <Input
+          placeholder="Tìm kiếm theo mã HĐ, mã ĐH, hoặc chủ hợp đồng"
+          onChange={handleSearchChange}
+          style={{ width: 400, marginRight: '20px' }}
+        />
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -178,8 +191,8 @@ const ContractMng = () => {
         <TabPane tab="Hợp đồng chính" key="main">
           <Table
             columns={columns}
-            dataSource={data}
-            pagination={false}
+            dataSource={filteredData}
+            pagination={{ pageSize: 10 }}
             rowKey="key"
             loading={loading}
             rowClassName={rowClassName}
@@ -188,22 +201,14 @@ const ContractMng = () => {
         <TabPane tab="Phụ lục" key="addendum">
           <Table
             columns={columns}
-            dataSource={data}
-            pagination={false}
+            dataSource={filteredData}
+            pagination={{ pageSize: 10 }}
             rowKey="key"
             loading={loading}
             rowClassName={rowClassName}
           />
         </TabPane>
       </Tabs>
-      <Pagination
-        current={currentPage}
-        total={totalItems}
-        pageSize={pageSize}
-        onChange={handlePageChange}
-        showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
-      />
     </div>
   );
 };
