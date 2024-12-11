@@ -53,9 +53,19 @@ function SideNav({ color }) {
                 icon: <UserOutlined />
             },
             {
+                path:'/manager/contract',
+                name:'Hợp đồng',
+                icon:  <FileTextOutlined />
+            },
+            {
                 path:'/manager/auction',
                 name: 'Đấu giá',
                 icon: <FolderOpenOutlined />
+            },
+            {
+                path:'/manager/feedback',
+                name: 'Đánh giá',
+                icon: <CommentOutlined />
             },
             {
                 name:'Cây cảnh',
@@ -66,16 +76,7 @@ function SideNav({ color }) {
                     { path: '/manager/products/plants/auction', name: 'Cây đấu giá' },
                 ]
             },
-            {
-                path:'/manager/contract',
-                name:'Hợp đồng',
-                icon:  <FileTextOutlined />
-            },
-            {
-                path:'/manager/feedback',
-                name: 'Đánh giá',
-                icon: <CommentOutlined />
-            },
+            
        
         ],
         3:[
