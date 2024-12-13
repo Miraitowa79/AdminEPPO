@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form, Input, Button, Typography, Card, Spin, message, Select, Row, Col, Image } from 'antd';
-import { getOrderDetails, updateOrderDetails, updateOrderDetailDeposit } from '../../../api/orderManagement';
+import { getOrderDetails, updateOrderDetails } from '../../../api/orderManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import { getTypeEcommerceById } from '../../../api/typeEcommerceApi';
-import { getPlantDetails } from '../../../api/plantsManagement';
 import moment from 'moment';
 import './orderDetailStaff.scss';
 
@@ -19,32 +18,24 @@ const OrderDetails = () => {
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
   const [typeEcommerceTitle, setTypeEcommerceTitle] = useState('');
+  const [selectedDetailId, setSelectedDetailId] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         const { data: order } = await getOrderDetails(id);
-        console.log('Order Details:', order);
         setOrderData(order);
-  
+
         if (order.userId) {
           const { data: user } = await getAccountDetails(order.userId);
-          console.log('User Details:', user);
           setUserData(user);
         }
-  
+
         if (order.typeEcommerceId) {
           const { data: typeEcommerce } = await getTypeEcommerceById(order.typeEcommerceId);
-          console.log('Type Ecommerce:', typeEcommerce);
           setTypeEcommerceTitle(typeEcommerce);
         }
-  
-        if (order.orderDetails.plantId) {
-          const { data: plant } = await getPlantDetails(order.orderDetails.plantId);
-          console.log('Plant Details:', plant);
-          setUserData(plant);
-        }
-  
+
         form.setFieldsValue({
           ...order,
           creationDate: moment(order.creationDate).format('DD-MM-YYYY'),
@@ -57,11 +48,11 @@ const OrderDetails = () => {
         setLoading(false);
       }
     };
-  
+
     if (id) {
       fetchDetails();
     }
-  }, [id, form]);  
+  }, [id, form]);
 
   const handleUpdateClick = () => {
     setEditMode(true);
@@ -88,7 +79,6 @@ const OrderDetails = () => {
         status: updatedData.status,
         modificationDate: newModificationDate,
       };
-      console.log('Updated Order Data:', updatedOrderData);
       await updateOrderDetails(updatedOrderData);
       setOrderData(updatedOrderData);
       setEditMode(false);
@@ -98,27 +88,8 @@ const OrderDetails = () => {
     }
   };
 
-  const handleReclaimClick = async (orderDetailId) => {
-    try {
-      const detail = orderData.orderDetails.find(detail => detail.orderDetailId === orderDetailId);
-      console.log('reclaim', detail)
-      if (!detail) {
-        message.error('Order detail not found.');
-        return;
-      }
-
-      await updateOrderDetailDeposit({
-        orderDetailId: detail.orderDetailId,
-        depositDescription: detail.depositDescription,
-        depositReturnCustomer: detail.depositReturnCustomer,
-        depositReturnOwner: detail.depositReturnOwner,
-      });
-
-      message.success('Thu hồi sản phẩm thành công!');
-    } catch (error) {
-      console.error('Error reclaiming product:', error);
-      message.error('Thu hồi sản phẩm không thành công!');
-    }
+  const handleReclaimClick = (orderDetailId) => {
+    setSelectedDetailId(orderDetailId);
   };
 
   const getStatusText = (status) => {
@@ -133,7 +104,7 @@ const OrderDetails = () => {
         return 'Đã giao';
       case 5:
         return 'Đã hủy';
-      case 6: 
+      case 6:
         return 'Thu hồi';
       default:
         return 'Không xác định';
@@ -213,7 +184,7 @@ const OrderDetails = () => {
               <Form.Item style={{ textAlign: 'center' }}>
                 {editMode ? (
                   <>
-                  <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
+                    <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
                     <Button type="primary" htmlType="submit">Lưu</Button>
                   </>
                 ) : (
@@ -221,9 +192,6 @@ const OrderDetails = () => {
                     {orderData.status !== 4 && orderData.status !== 5 && orderData.status !== 6 && (
                       <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
                     )}
-                    {/* {orderData.status === 4 && (
-                      <Button type="primary" danger onClick={() => handleReclaimClick(orderData.orderDetailId)}>Thu hồi sản phẩm</Button>
-                    )} */}
                   </>
                 )}
               </Form.Item>
@@ -235,52 +203,51 @@ const OrderDetails = () => {
             {orderData.orderDetails && orderData.orderDetails.map(detail => (
               <div key={detail.orderDetailId} style={{ marginBottom: '10px' }}>
                 <p><strong>Plant ID:</strong> {detail.plantId}</p>
-                <p><strong>Ngày bắt đầu thuê:</strong> {moment(detail.rentalStartDate).format('DD-MM-YYYY')}</p>
-                <p><strong>Ngày kết thúc thuê:</strong> {moment(detail.rentalEndDate).format('DD-MM-YYYY')}</p>
-                <p><strong>Số tháng thuê:</strong> {detail.numberMonth}</p>
-                {/* Display deposit-related information */}
-                <p><strong>Tiền đặt cọc:</strong> {detail.deposit || '-'}</p>
-                <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || '-'}</p>
-                <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || '-'}</p>
-                <p><strong>Tiền trả lại nhà vườn:</strong> {detail.depositReturnOwner || '-'}</p>
+                <p><strong>Ngày bắt đầu thuê:</strong> {detail.rentalStartDate ? moment(detail.rentalStartDate).format('DD-MM-YYYY') : 'N/A'}</p>
+                <p><strong>Ngày kết thúc thuê:</strong> {detail.rentalEndDate ? moment(detail.rentalEndDate).format('DD-MM-YYYY') : 'N/A'}</p>
+                <p><strong>Số tháng thuê:</strong> {detail.numberMonth || 'N/A'}</p>
+                
                 {/* Reclaim button for each detail */}
                 {orderData.status === 4 && (
-                  <Button type="primary" danger onClick={() => handleReclaimClick(detail.orderDetailId)}>Thu hồi sản phẩm</Button>
+                  <Button type="primary" danger onClick={() => handleReclaimClick(detail.orderDetailId)}>
+                    Thu hồi sản phẩm
+                  </Button>
+                )}
+
+                {/* Conditionally display deposit information */}
+                {selectedDetailId === detail.orderDetailId && (
+                  <div style={{ marginTop: '10px' }}>
+                    <p><strong>Tiền đặt cọc:</strong> {detail.deposit || 'N/A'}</p>
+                    <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || 'N/A'}</p>
+                    <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || 'N/A'}</p>
+                    <p><strong>Tiền trả lại chủ sở hữu:</strong> {detail.depositReturnOwner || 'N/A'}</p>
+                  </div>
                 )}
               </div>
             ))}
           </Card>
-          {/* <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
-            {orderData.imageDeliveryOrders.length > 0 ? (
-              orderData.imageDeliveryOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
-              ))
-            ) : (
-              <p>Không có hình ảnh</p>
-            )}
-          </Card>
-          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
-            {orderData.imageReturnOrders.length > 0 ? (
-              orderData.imageReturnOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
-              ))
-            ) : (
-              <p>Không có hình ảnh</p>
-            )}
-          </Card> */}
-          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
+
+          {/* Scrollable Image Delivery Orders */}
+          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>
             {orderData.imageDeliveryOrders && orderData.imageDeliveryOrders.length > 0 ? (
-              orderData.imageDeliveryOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+              orderData.imageDeliveryOrders.map((imageOrder) => (
+                <Image
+                  key={imageOrder.imageDeliveryOrderId}
+                  src={imageOrder.imageUrl}
+                  alt={`Delivery ${imageOrder.imageDeliveryOrderId}`}
+                  style={{ width: '100%', marginBottom: '10px' }}
+                />
               ))
             ) : (
               <p>Không có hình ảnh</p>
             )}
           </Card>
-          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
+
+          {/* Scrollable Image Return Orders */}
+          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>
             {orderData.imageReturnOrders && orderData.imageReturnOrders.length > 0 ? (
               orderData.imageReturnOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+                <Image key={index} src={image.imageUrl} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
               ))
             ) : (
               <p>Không có hình ảnh</p>
