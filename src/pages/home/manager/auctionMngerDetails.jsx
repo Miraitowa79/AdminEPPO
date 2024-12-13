@@ -114,12 +114,12 @@ const AuctionDetails = () => {
       const values = await form.validateFields();
       const updatedData = {
         ...data.room,
-        registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
-        registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
+        // registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
+        // registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
         priceStep: values.priceStep,
         registrationFee: values.registrationFee,
-        activeDate: values.activeDate.add(7, 'hours').toISOString(),
-        endDate: values.endDate.add(7, 'hours').toISOString(),
+        // activeDate: values.activeDate.add(7, 'hours').toISOString(),
+        // endDate: values.endDate.add(7, 'hours').toISOString(),
         status: values.status,
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
