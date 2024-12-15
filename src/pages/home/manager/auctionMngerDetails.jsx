@@ -5,6 +5,8 @@ import moment from 'moment';
 import { getAuctionDetails, updateAuctionRoom } from '../../../api/auctionManagement';
 import { getAccounts } from '../../../api/accountManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
+import { ConfigProvider } from 'antd';
+import viVN from 'antd/lib/locale/vi_VN';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -50,16 +52,18 @@ const AuctionDetails = () => {
 
   useEffect(() => {
     const fetchAuctionDetails = async (id) => {
+      setLoading(true);
       try {
         const { data } = await getAuctionDetails(id);
         setData(data);
+
         form.setFieldsValue({
-          registrationOpenDate: moment(data.room.registrationOpenDate),
-          registrationEndDate: moment(data.room.registrationEndDate),
+          registrationOpenDate: moment(data.room.registrationOpenDate).local(),
+          registrationEndDate: moment(data.room.registrationEndDate).local(),
           priceStep: data.room.priceStep,
           registrationFee: data.room.registrationFee,
-          activeDate: moment(data.room.activeDate),
-          endDate: moment(data.room.endDate),
+          activeDate: moment(data.room.activeDate).local(),
+          endDate: moment(data.room.endDate).local(),
           status: data.room.status,
           modificationBy: data.room.modificationBy,
         });
@@ -114,12 +118,12 @@ const AuctionDetails = () => {
       const values = await form.validateFields();
       const updatedData = {
         ...data.room,
-        // registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
-        // registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
+        // registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString().local(),
+        // registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString().local(),
         priceStep: values.priceStep,
         registrationFee: values.registrationFee,
-        // activeDate: values.activeDate.add(7, 'hours').toISOString(),
-        // endDate: values.endDate.add(7, 'hours').toISOString(),
+        // activeDate: values.activeDate.add(7, 'hours').toISOString().local(),
+        // endDate: values.endDate.add(7, 'hours').toISOString().local(),
         status: values.status,
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
@@ -194,6 +198,7 @@ const AuctionDetails = () => {
             label="Ngày mở đăng ký"
             rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
           >
+
             <DatePicker
               showTime
               disabled={!isEditing}
