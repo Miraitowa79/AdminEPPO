@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, message, Select, Tag } from 'antd';
+import { Table, Input, Button, Pagination, message, Select, Tag, DatePicker, Space, InputNumber } from 'antd';
 import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getAuctions, getAuctionStatus } from '../../../api/auctionManagement';
@@ -14,7 +14,15 @@ const AuctionMng = () => {
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 10;
+
+  const [creationDateRange, setCreationDateRange] = useState([null, null]);
+  const [activeDateRange, setActiveDateRange] = useState([null, null]);
+  const [endDateRange, setEndDateRange] = useState([null, null]);
+
+  const [minFee, setMinFee] = useState(null);
+  const [maxFee, setMaxFee] = useState(null);
+
+  const pageSize = 1000;
   const [selectedType, setSelectedType] = useState('');
 
   const fetchData = async (page = 1, search = '', status = '') => {
@@ -42,14 +50,27 @@ const AuctionMng = () => {
     }
   };
 
+  const isDateInRange = (date, range) => {
+    if (!range[0] || !range[1]) return true;
+    const momentDate = moment(date);
+    return momentDate.isSameOrAfter(range[0], 'day') && momentDate.isSameOrBefore(range[1], 'day');
+  };  
+
   useEffect(() => {
     fetchData(currentPage, searchText, selectedType);
   }, [currentPage, searchText, selectedType]);
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchData(1, searchText, selectedType);
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
   };
+
+  const filteredData = data.filter((item) => {
+    const searchString = searchText.toLowerCase();
+    return (
+      String(item.roomId).toLowerCase().includes(searchString) ||
+      String(item.plantName).toLowerCase().includes(searchString)
+    );
+  });
 
   const handleTypeChange = (value) => {
     setSelectedType(value);
@@ -90,29 +111,189 @@ const AuctionMng = () => {
       dataIndex: 'registrationFee',
       key: 'registrationFee',
       render: (fee) => fee.toLocaleString(),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Space>
+            <InputNumber
+              placeholder="Min"
+              value={selectedKeys[0]?.[0] || minFee}
+              onChange={(value) => {
+                const max = selectedKeys[0]?.[1];
+                setSelectedKeys(value !== null ? [[value, max]] : []);
+                setMinFee(value);
+              }}
+              style={{ marginBottom: 8, width: 100 }}
+            />
+            <InputNumber
+              placeholder="Max"
+              value={selectedKeys[0]?.[1] || maxFee}
+              onChange={(value) => {
+                const min = selectedKeys[0]?.[0];
+                setSelectedKeys(value !== null ? [[min, value]] : []);
+                setMaxFee(value);
+              }}
+              style={{ marginBottom: 8, width: 100 }}
+            />
+          </Space>
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Lọc
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters();
+                setMinFee(null);
+                setMaxFee(null);
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Xóa
+            </Button>
+          </Space>
+        </div>
+      ),
+      onFilter: (value, record) => {
+        const [min, max] = value;
+        if (min !== null && record.registrationFee < min) return false;
+        if (max !== null && record.registrationFee > max) return false;
+        return true;
+      },
     },
     {
       title: 'Ngày tạo',
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (date) => new Date(date).toLocaleDateString(),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <DatePicker.RangePicker
+            value={selectedKeys[0] || creationDateRange}
+            onChange={(dates) => {
+              setSelectedKeys(dates ? [dates] : []);
+              setCreationDateRange(dates);
+            }}
+            format="DD/MM/YYYY"
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Lọc
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters();
+                setCreationDateRange([null, null]);
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Xóa
+            </Button>
+          </Space>
+        </div>
+      ),
+      onFilter: (value, record) => isDateInRange(record.creationDate, creationDateRange),
     },
     {
       title: 'Ngày bắt đầu',
       dataIndex: 'activeDate',
       key: 'activeDate',
       render: (date) => new Date(date).toLocaleDateString(),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <DatePicker.RangePicker
+            value={selectedKeys[0] || activeDateRange}
+            onChange={(dates) => {
+              setSelectedKeys(dates ? [dates] : []);
+              setActiveDateRange(dates);
+            }}
+            format="DD/MM/YYYY"
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Lọc
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters();
+                setActiveDateRange([null, null]);
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Xóa
+            </Button>
+          </Space>
+        </div>
+      ),
+      onFilter: (value, record) => isDateInRange(record.activeDate, activeDateRange),
     },
     {
       title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <DatePicker.RangePicker
+            value={selectedKeys[0] || endDateRange}
+            onChange={(dates) => {
+              setSelectedKeys(dates ? [dates] : []);
+              setEndDateRange(dates);
+            }}
+            format="DD/MM/YYYY"
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Lọc
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters();
+                setEndDateRange([null, null]);
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Xóa
+            </Button>
+          </Space>
+        </div>
+      ),
+      onFilter: (value, record) => isDateInRange(record.endDate, endDateRange),
     },
     {
       title: 'Trạng thái đấu giá',
       dataIndex: 'status',
       key: 'status',
+      filters: [
+        { text: 'Chờ xác nhận', value: 1 },
+        { text: 'Đang hoạt động', value: 2 },
+        { text: 'Đấu giá thành công', value: 3 },
+        { text: 'Đấu giá thất bại', value: 4 },
+        { text: 'Đã hủy', value: 5 },
+      ],
+      onFilter: (value, record) => record.status === value,
       render: (status) => {
         let statusText = '';
         let color = '';
@@ -157,58 +338,30 @@ const AuctionMng = () => {
         />
       ),
     },
-  ];
+  ];  
 
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        {/* <Input
-          placeholder="Tìm kiếm phòng đấu giá"
-          suffix={
-            <SearchOutlined
-              onClick={handleSearch}
-              style={{ cursor: 'pointer' }}
-            />
-          }
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: '50%' }}
-        /> */}
+        <Space>
+          <Input
+            placeholder="Tìm kiếm theo mã phòng hoặc tên cây đấu giá"
+            value={searchText}
+            onChange={handleSearchChange}
+            style={{ width: 400 }}
+          />
+        </Space>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateRoom}>
           Tạo phòng đấu giá
         </Button>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-          <Select
-          placeholder="Chọn trạng thái đấu giá"
-          value={selectedType}
-          onChange={handleTypeChange}
-          style={{ width: '200px', marginBottom: '20px' }}
-        >
-          <Option value="">Tất cả</Option>
-          <Option value="1">Chờ xác nhận</Option>
-          <Option value="2">Đang hoạt động</Option>
-          <Option value="3">Đấu giá thành công</Option>
-          <Option value="4">Đấu giá thất bại</Option>
-          <Option value="5">Đã hủy</Option>
-        </Select>
-      </div>
       
       <Table
         columns={columns}
-        dataSource={data}
-        pagination={false}
+        dataSource={filteredData}
+        pagination={{ pageSize: 10 }}
         rowKey="roomId"
         loading={loading}
-      />
-      <Pagination
-        current={currentPage}
-        total={totalItems}
-        pageSize={pageSize}
-        onChange={handlePageChange}
-        showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
       />
     </div>
   );

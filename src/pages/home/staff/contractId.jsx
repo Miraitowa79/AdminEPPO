@@ -65,7 +65,8 @@ const ContractDetails = () => {
       const updatedContract = {
         ...contract,
         ...updatedData,
-        endContractDate: updatedData.endContractDate.format('YYYY-MM-DD'),
+        endContractDate: updatedData.endContractDate.add(7, 'hours').toISOString(),
+        status: updatedData.status,
       };
       await updateContractDetails(id, updatedContract);
       setContract(updatedContract);
@@ -112,12 +113,24 @@ const ContractDetails = () => {
 
   const handleExpireContract = async () => {
     try {
-      const updatedContract = {
-        ...contract,
-        isActive: 2, // Hết hạn hợp đồng
+      const expiredContract = {
+        contractId: contract.contractId,
+        userId: contract.userId,
+        contractNumber: contract.contractNumber,
+        description: contract.description,
+        creationContractDate: new Date(contract.creationContractDate).toISOString(),
+        endContractDate: new Date(contract.endContractDate).toISOString(),
+        totalAmount: contract.totalAmount,
+        createdAt: new Date(contract.createdAt).toISOString(),
+        updatedAt: new Date().toISOString(),
+        typeContract: contract.typeContract,
+        contractUrl: contract.contractUrl,
+        isActive: 2,
+        status: 2
       };
-      await updateContractDetails(id, updatedContract);
-      setContract(updatedContract);
+      console.log('check send exp', expiredContract)
+      await updateContractDetails(id, expiredContract);
+      setContract(expiredContract);
       message.success('Hợp đồng đã được đánh dấu là hết hạn!');
     } catch (error) {
       console.error('Error expiring contract:', error);
@@ -130,6 +143,7 @@ const ContractDetails = () => {
   }
 
   const isContractEndingToday = moment(contract.endContractDate).isSame(moment(), 'day');
+  const isContractEnded = moment(contract.endContractDate).isBefore(moment(), 'day');
   const canEdit = contract.isActive === 0 || contract.isActive === 1;
 
   return (
@@ -186,7 +200,7 @@ const ContractDetails = () => {
                 {contract.contractFileName ? contract.contractFileName : contract.contractUrl}
               </a>
             </Form.Item>
-            <Form.Item label="Trạng thái hợp đồng:" name="status">
+            <Form.Item label="Hiệu lực hợp đồng:" name="status">
               <Select disabled={!editMode}>
                 <Option value={1}>Đang hoạt động</Option>
                 <Option value={2}>Hết hạn hợp đồng</Option>
@@ -197,9 +211,11 @@ const ContractDetails = () => {
                 <>
                   {isContractEndingToday ? (
                     <>
-                      <Button type="default" style={{ backgroundColor: 'yellow', marginRight: '10px' }} onClick={handleRenewal}>Gia hạn</Button>
+                      <Button type="default" style={{ backgroundColor: 'yellow', marginRight: '10px' }} onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
                       <Button type="default" danger onClick={handleExpireContract}>Hết hạn hợp đồng</Button>
                     </>
+                  ) : isContractEnded ? (
+                    <Button type="default" danger onClick={handleExpireContract}>Hết hạn hợp đồng</Button>
                   ) : (
                     <>
                       {editMode ? (
@@ -209,16 +225,8 @@ const ContractDetails = () => {
                         </>
                       ) : (
                         <>
-                          {contract.isActive === 0 && (
-                            <Button type="primary" onClick={handleEditClick}>Cập nhật</Button>
-                          )}
-                          {contract.isActive === 1 && (
-                            <>
-                              <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
-                              <Button type="default" onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
-  
-                            </>
-                          )}
+                          <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
+                          <Button type="default" onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
                         </>
                       )}
                     </>
@@ -318,7 +326,6 @@ const ContractDetails = () => {
     </div>
   );
 };
-
 
 const styles = {
   table: {

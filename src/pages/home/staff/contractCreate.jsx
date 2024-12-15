@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, Typography, Card, DatePicker, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { getPlants } from '../../../api/plantsManagement';
+import { getPlants, getPlantDetails } from '../../../api/plantsManagement';
 import { createContract } from '../../../api/contractManagement';
 import { getOrders, getOrderDetails } from '../../../api/orderManagement';
+import { getAccountDetails } from '../../../api/accountManagement';
 import moment from 'moment';
 
 const { Title } = Typography;
@@ -16,7 +17,6 @@ const CreateContract = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [plantDetails, setPlantDetails] = useState(null);
   const [fullName, setFullName] = useState('');
-
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
@@ -66,26 +66,9 @@ const CreateContract = () => {
       creationContractDate: moment(),
     });
   }, [form]);
-  
-
-  // const handleOrderChange = async (orderId) => {
-  //   try {
-  //     const response = await getOrderDetails(orderId);
-  //     const { data } = response;
-  //     if (data) {
-  //       const plantId = data.orderDetails[0]?.plantId;
-  //       form.setFieldsValue({
-  //         totalAmount: data.finalPrice,
-  //         plantId: plantId,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching order details:', error);
-  //     message.error('Không có dữ liệu đơn hàng chi tiết.');
-  //   }
-  // };
 
   const handleOrderChange = async (orderId) => {
+    setLoading(true);
     try {
       const response = await getOrderDetails(orderId);
       const { data: orderData } = response;
@@ -93,6 +76,7 @@ const CreateContract = () => {
         const plantId = orderData.orderDetails[0]?.plantId;
         setOrderDetails(orderData);
         form.setFieldsValue({
+          contractNumber: orderId,
           totalAmount: orderData.finalPrice,
           plantId: plantId,
         });
@@ -107,11 +91,16 @@ const CreateContract = () => {
           const plantResponse = await getPlantDetails(plantId);
           const { data: plantData } = plantResponse;
           setPlantDetails(plantData);
+          form.setFieldsValue({
+            totalPrice: plantData.finalPrice,
+          });
         }
       }
     } catch (error) {
       console.error('Error fetching order details:', error);
       message.error('Không có dữ liệu đơn hàng chi tiết.');
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -129,9 +118,10 @@ const CreateContract = () => {
   };  
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
-      const creationContractDate = values.creationContractDate.add(7, 'hours').toISOString();
-      const endContractDate = values.endContractDate.add(7, 'hours').toISOString();
+      const creationContractDate = values.creationContractDate.startOf('day').add(7, 'hours').toISOString();
+      const endContractDate = values.endContractDate.startOf('day').add(7, 'hours').toISOString();
 
       const newContract = {
         contractNumber: values.contractNumber,
@@ -142,7 +132,7 @@ const CreateContract = () => {
         contractUrl: null,
         contractDetails: [{
           plantId: values.plantId,
-          totalPrice: values.totalAmount,
+          totalPrice: values.totalPrice,
         }],
       };
 
@@ -154,6 +144,8 @@ const CreateContract = () => {
     } catch (error) {
       console.error('Error creating contract:', error);
       message.error('Có lỗi xảy ra khi tạo hợp đồng.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -161,7 +153,6 @@ const CreateContract = () => {
     <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto', display: 'flex' }}>
       <div style={{ flex: 2 }}>
         <Title level={3} style={{ textAlign: 'center' }}>TẠO HỢP ĐỒNG MỚI</Title>
-        <Spin spinning={loading} tip="Loading...">
           <Card>
             <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} labelAlign="left" onFinish={handleSubmit}>
               <Form.Item name="contractNumber" label="Mã đơn hàng" rules={[{ required: true, message: 'Vui lòng chọn mã đơn hàng' }]}>
@@ -195,22 +186,22 @@ const CreateContract = () => {
                 />
               </Form.Item>
               <Form.Item name="totalAmount" label="Tổng số tiền" rules={[{ required: true, message: 'Vui lòng nhập tổng số tiền' }]}>
-                <Input readOnly />
+                <Input placeholder='Giá trị hợp đồng' readOnly />
               </Form.Item>
               <Form.Item name="plantId" label="Plant ID" hidden>
                 <Input type="hidden" />
               </Form.Item>
               <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
-                <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+                <Button type="primary" htmlType="submit" loading={loading} style={{ width: '100%' }}>
                   Tạo Hợp Đồng
                 </Button>
               </Form.Item>
             </Form>
           </Card>
-        </Spin>
       </div>
       <div style={{ flex: 1, marginLeft: '20px' }}>
-        <Card title="Chi tiết Đơn hàng">
+      <Spin spinning={loading} tip="Loading...">
+          <Card title="Chi tiết Đơn hàng">
           <p><strong>Khách hàng:</strong> {orderDetails ? fullName : '-'}</p>
           <p><strong>Địa chỉ giao hàng:</strong> {orderDetails ? orderDetails.deliveryAddress : '-'}</p>
           <p><strong>Tổng giá:</strong> {orderDetails ? orderDetails.finalPrice : '-'}</p>
@@ -218,16 +209,17 @@ const CreateContract = () => {
           <p><strong>Trạng thái thanh toán:</strong> {orderDetails ? orderDetails.paymentStatus : '-'}</p>
           <p><strong>Ngày tạo:</strong> {orderDetails ? moment(orderDetails.creationDate).format('DD-MM-YYYY') : '-'}</p>
         </Card>
+      </Spin>
+      <Spin spinning={loading} tip="Loading...">
         <Card title="Chi tiết Cây" style={{ marginTop: '16px' }}>
           <p><strong>Tên cây:</strong> {plantDetails ? plantDetails.plantName : '-'}</p>
           <p><strong>Mô tả:</strong> {plantDetails ? plantDetails.description : '-'}</p>
-          <p><strong>Giá cuối:</strong> {plantDetails ? plantDetails.finalPrice : '-'}</p>
+          <p><strong>Giá:</strong> {plantDetails ? plantDetails.finalPrice : '-'}</p>
         </Card>
+      </Spin>
       </div>
     </div>
   );
-  
-  
 };
 
 export default CreateContract;

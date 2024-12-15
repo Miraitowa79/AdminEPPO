@@ -4,7 +4,6 @@ import { Form, Input, Button, Typography, Card, Spin, message, Select, Row, Col,
 import { getOrderDetails, updateOrderDetails } from '../../../api/orderManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import { getTypeEcommerceById } from '../../../api/typeEcommerceApi';
-import { getPlantDetails } from '../../../api/plantsManagement';
 import moment from 'moment';
 import './orderDetailStaff.scss';
 
@@ -19,6 +18,7 @@ const OrderDetails = () => {
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
   const [typeEcommerceTitle, setTypeEcommerceTitle] = useState('');
+  const [selectedDetailId, setSelectedDetailId] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -34,11 +34,6 @@ const OrderDetails = () => {
         if (order.typeEcommerceId) {
           const { data: typeEcommerce } = await getTypeEcommerceById(order.typeEcommerceId);
           setTypeEcommerceTitle(typeEcommerce);
-        }
-
-        if (order.orderDetails.plantId) {
-          const { data: plant } = await getPlantDetails(order.orderDetails.plantId);
-          setUserData(plant);
         }
 
         form.setFieldsValue({
@@ -70,8 +65,20 @@ const OrderDetails = () => {
 
   const handleFinish = async (updatedData) => {
     try {
+      const currentStatus = orderData.status;
+      const newStatus = updatedData.status;
+
+      if (newStatus <= currentStatus) {
+        message.error('Không thể quay lại trạng thái trước đó.');
+        return;
+      }
+
       const newModificationDate = moment().format('YYYY-MM-DD');
-      const updatedOrderData = { ...orderData, ...updatedData, modificationDate: newModificationDate };
+      const updatedOrderData = {
+        ...orderData,
+        status: updatedData.status,
+        modificationDate: newModificationDate,
+      };
       await updateOrderDetails(updatedOrderData);
       setOrderData(updatedOrderData);
       setEditMode(false);
@@ -79,6 +86,10 @@ const OrderDetails = () => {
     } catch (error) {
       message.error('Error updating order details');
     }
+  };
+
+  const handleReclaimClick = (orderDetailId) => {
+    setSelectedDetailId(orderDetailId);
   };
 
   const getStatusText = (status) => {
@@ -93,6 +104,8 @@ const OrderDetails = () => {
         return 'Đã giao';
       case 5:
         return 'Đã hủy';
+      case 6:
+        return 'Thu hồi';
       default:
         return 'Không xác định';
     }
@@ -143,9 +156,6 @@ const OrderDetails = () => {
               <Form.Item label="Ngày mua" name="creationDate" className={editMode ? 'blurred-field' : ''}>
                 <Input value={moment(orderData.creationDate).format('DD-MM-YYYY')} readOnly />
               </Form.Item>
-              {/* <Form.Item label="Ngày cập nhật" name="modificationDate" className={editMode ? 'blurred-field' : ''}>
-                <Input readOnly />
-              </Form.Item> */}
               <Form.Item label="Trạng thái thanh toán" name="paymentStatus" className={editMode ? 'blurred-field' : ''}>
                 <Input readOnly />
               </Form.Item>
@@ -167,6 +177,7 @@ const OrderDetails = () => {
                     <Option value={3}>Đang giao</Option>
                     <Option value={4}>Đã giao</Option>
                     <Option value={5}>Đã hủy</Option>
+                    <Option value={6}>Thu hồi</Option>
                   </Select>
                 )}
               </Form.Item>
@@ -177,9 +188,11 @@ const OrderDetails = () => {
                     <Button type="primary" htmlType="submit">Lưu</Button>
                   </>
                 ) : (
-                  orderData.status !== 4 && orderData.status !== 5 && (
-                    <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
-                  )
+                  <>
+                    {orderData.status !== 4 && orderData.status !== 5 && orderData.status !== 6 && (
+                      <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
+                    )}
+                  </>
                 )}
               </Form.Item>
             </Form>
@@ -190,43 +203,51 @@ const OrderDetails = () => {
             {orderData.orderDetails && orderData.orderDetails.map(detail => (
               <div key={detail.orderDetailId} style={{ marginBottom: '10px' }}>
                 <p><strong>Plant ID:</strong> {detail.plantId}</p>
-                <p><strong>Ngày bắt đầu thuê:</strong> {moment(detail.rentalStartDate).format('DD-MM-YYYY')}</p>
-                <p><strong>Ngày kết thúc thuê:</strong> {moment(detail.rentalEndDate).format('DD-MM-YYYY')}</p>
-                <p><strong>Số tháng thuê:</strong> {detail.numberMonth}</p>
+                <p><strong>Ngày bắt đầu thuê:</strong> {detail.rentalStartDate ? moment(detail.rentalStartDate).format('DD-MM-YYYY') : 'N/A'}</p>
+                <p><strong>Ngày kết thúc thuê:</strong> {detail.rentalEndDate ? moment(detail.rentalEndDate).format('DD-MM-YYYY') : 'N/A'}</p>
+                <p><strong>Số tháng thuê:</strong> {detail.numberMonth || 'N/A'}</p>
+                
+                {/* Reclaim button for each detail */}
+                {orderData.status === 4 && (
+                  <Button type="primary" danger onClick={() => handleReclaimClick(detail.orderDetailId)}>
+                    Thu hồi sản phẩm
+                  </Button>
+                )}
+
+                {/* Conditionally display deposit information */}
+                {selectedDetailId === detail.orderDetailId && (
+                  <div style={{ marginTop: '10px' }}>
+                    <p><strong>Tiền đặt cọc:</strong> {detail.deposit || 'N/A'}</p>
+                    <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || 'N/A'}</p>
+                    <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || 'N/A'}</p>
+                    <p><strong>Tiền trả lại chủ sở hữu:</strong> {detail.depositReturnOwner || 'N/A'}</p>
+                  </div>
+                )}
               </div>
             ))}
           </Card>
-          {/* <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
-            {orderData.imageDeliveryOrders.length > 0 ? (
-              orderData.imageDeliveryOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
-              ))
-            ) : (
-              <p>Không có hình ảnh</p>
-            )}
-          </Card>
-          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
-            {orderData.imageReturnOrders.length > 0 ? (
-              orderData.imageReturnOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
-              ))
-            ) : (
-              <p>Không có hình ảnh</p>
-            )}
-          </Card> */}
-          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
+
+          {/* Scrollable Image Delivery Orders */}
+          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>
             {orderData.imageDeliveryOrders && orderData.imageDeliveryOrders.length > 0 ? (
-              orderData.imageDeliveryOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Delivery ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+              orderData.imageDeliveryOrders.map((imageOrder) => (
+                <Image
+                  key={imageOrder.imageDeliveryOrderId}
+                  src={imageOrder.imageUrl}
+                  alt={`Delivery ${imageOrder.imageDeliveryOrderId}`}
+                  style={{ width: '100%', marginBottom: '10px' }}
+                />
               ))
             ) : (
               <p>Không có hình ảnh</p>
             )}
           </Card>
-          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
+
+          {/* Scrollable Image Return Orders */}
+          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>
             {orderData.imageReturnOrders && orderData.imageReturnOrders.length > 0 ? (
               orderData.imageReturnOrders.map((image, index) => (
-                <Image key={index} src={image} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+                <Image key={index} src={image.imageUrl} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
               ))
             ) : (
               <p>Không có hình ảnh</p>
