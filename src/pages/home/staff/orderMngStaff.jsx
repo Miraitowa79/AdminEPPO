@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Pagination, message, Tag, Select, DatePicker, Button } from 'antd';
-import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
+import { SearchOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { getOrders, getFilteredOrders } from '../../../api/orderManagement'; // Import cả hai hàm API
 import { getAccounts } from '../../../api/accountManagement';
 import { getTypeEcommerce } from '../../../api/typeEcommerceApi';
@@ -22,14 +22,13 @@ const OrdersMng = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedTypeEcommerce, setSelectedTypeEcommerce] = useState(null);
   const [dateRange, setDateRange] = useState([]);
-  const pageSize = 10;
+  const pageSize = 1000;
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
         const response = await getAccounts({});
-        const { data } = response;
-        setAccounts(data);
+        setAccounts(response.data);
       } catch (error) {
         console.error('Error fetching accounts:', error);
         message.error('Không có dữ liệu tài khoản!');
@@ -158,9 +157,31 @@ const OrdersMng = () => {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Mã đơn hàng',
+      title: 'Mã ĐH',
       dataIndex: 'orderId',
       key: 'orderId',
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Tìm kiếm mã đơn hàng"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+          </Button>
+          <Button onClick={() => clearFilters()} icon={<ReloadOutlined />} size="small" style={{ width: 90 }}>
+          </Button>
+        </div>
+      ),
+      onFilter: (value, record) => record.orderId.toString().toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: 'Khách hàng',
@@ -172,11 +193,28 @@ const OrdersMng = () => {
       title: 'Tổng giá',
       dataIndex: 'finalPrice',
       key: 'finalPrice',
+      filters: [
+        { text: '< 1,000,000', value: 'low' },
+        { text: '1,000,000 - 5,000,000', value: 'medium' },
+        { text: '> 5,000,000', value: 'high' },
+      ],
+      onFilter: (value, record) => {
+        if (value === 'low') return record.finalPrice < 1000000;
+        if (value === 'medium') return record.finalPrice >= 1000000 && record.finalPrice <= 5000000;
+        if (value === 'high') return record.finalPrice > 5000000;
+        return true;
+      },
     },
     {
       title: 'Hình thức',
       dataIndex: 'typeEcommerceId',
       key: 'typeEcommerceId',
+      filters: [
+        { text: 'Mua bán', value: 1 },
+        { text: 'Cho thuê', value: 2 },
+        { text: 'Đấu giá', value: 3 },
+      ],
+      onFilter: (value, record) => record.typeEcommerceId === value,
       render: (typeEcommerceId) => {
         switch (typeEcommerceId) {
           case 1:
@@ -195,11 +233,43 @@ const OrdersMng = () => {
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (text) => moment(text).format('DD-MM-YYYY'),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <RangePicker
+            onChange={(dates) => {
+              setSelectedKeys(dates ? [dates] : []);
+            }}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+        </div>
+      ),
+      onFilter: (value, record) => {
+        const [start, end] = value;
+        const creationDate = moment(record.creationDate);
+        return creationDate.isBetween(start, end, 'days', '[]');
+      },
     },
     {
       title: 'Trạng thái thanh toán',
       dataIndex: 'paymentStatus',
       key: 'paymentStatus',
+      filters: [
+        { text: 'Đã thanh toán', value: 'Đã thanh toán' },
+        { text: 'Chưa thanh toán', value: 'Chưa thanh toán' },
+      ],
+      onFilter: (value, record) => record.paymentStatus.includes(value),
     },
     {
       title: 'Tình trạng vận chuyển',
@@ -210,6 +280,15 @@ const OrdersMng = () => {
       title: 'Trạng thái đơn hàng',
       dataIndex: 'status',
       key: 'status',
+      filters: [
+        { text: 'Chờ xác nhận', value: 1 },
+        { text: 'Đang chuẩn bị hàng', value: 2 },
+        { text: 'Đang giao', value: 3 },
+        { text: 'Đã giao', value: 4 },
+        { text: 'Đã hủy', value: 5 },
+        { text: 'Thu hồi', value: 6 },
+      ],
+      onFilter: (value, record) => record.status === value,
       render: (status) => {
         let statusText = '';
         let color = '';
@@ -235,6 +314,10 @@ const OrdersMng = () => {
             statusText = 'Đã hủy';
             color = 'grey';
             break;  
+          case 6:
+            statusText = 'Thu hồi';
+            color = 'purple';
+            break;  
           default:
             statusText = 'Không xác định';
             color = 'black';
@@ -255,23 +338,10 @@ const OrdersMng = () => {
       ),
     },
   ];
-
+  
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'end', marginBottom: '20px' }}>
-        {/* <Input
-          placeholder="Tìm kiếm theo mã đơn hàng/ địa chỉ giao hàng"
-          suffix={
-            <SearchOutlined
-              onClick={() => setCurrentPage(1)}
-              style={{ cursor: 'pointer' }}
-            />
-          }
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onPressEnter={() => setCurrentPage(1)}
-          style={{ width: '30%' }}
-        /> */}
         <Select
           placeholder="Chọn hình thức"
           onChange={handleTypeEcommerceChange}
@@ -282,30 +352,17 @@ const OrdersMng = () => {
           <Option value={2}>Cho thuê</Option>
           <Option value={3}>Đấu giá</Option>
         </Select>
-        {/* <RangePicker
-          onChange={handleDateRangeChange}
-          style={{ width: '30%' }}
-          disabledDate={disabledDate}
-        /> */}
       </div>
       <Table
         columns={columns}
         dataSource={data}
-        pagination={false}
+        pagination={{ pageSize: 10, onChange: handlePageChange }}
         rowKey="orderId"
         loading={loading}
         className="orders-table"
       />
-      <Pagination
-        current={currentPage}
-        total={totalItems}
-        pageSize={pageSize}
-        onChange={handlePageChange}
-        showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
-      />
     </div>
-  );
+  );  
 };
 
 export default OrdersMng;
