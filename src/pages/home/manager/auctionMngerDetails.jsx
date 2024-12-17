@@ -230,7 +230,7 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
               value={registrationOpenDate} 
             />
           </Form.Item>
@@ -245,7 +245,7 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
               value={registrationEndDate} 
             />
           </Form.Item>
@@ -321,7 +321,7 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+              disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
               value={activedDate} 
             />
           </Form.Item>
@@ -335,7 +335,7 @@ const AuctionDetails = () => {
             showTime
             disabled={!isEditing}
             readOnly
-            disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+            disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
             value={enddDate} 
           />
         </Form.Item>
