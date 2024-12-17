@@ -175,7 +175,8 @@ const AuctionDetails = () => {
     return 0;
   };
 
-  return (
+  return ( 
+    <ConfigProvider locale={viVN}>
     <div style={{ padding: '20px', maxWidth: '1800px', margin: 'auto', display: 'flex', gap: '20px' }}>
       <div style={{ flex: 2 }}>
         <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT CUỘC ĐẤU GIÁ</Title>
@@ -439,6 +440,7 @@ const AuctionDetails = () => {
 
 
     </div>
+    </ConfigProvider>
   );
 };
 const styles = {
