@@ -84,6 +84,7 @@ const AuctionDetails = () => {
       }
     };
 
+
     const fetchAccounts = async () => {
       try {
         const { data } = await getAccounts({});
