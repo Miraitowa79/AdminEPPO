@@ -72,7 +72,7 @@ const AuctionDetails = () => {
           priceStep: data.room.priceStep,
           registrationFee: data.room.registrationFee,
           activeDate: moment.utc(data.room.activeDate),
-          endDate: moment(data.room.endDate),
+          endDate: moment.utc(data.room.endDate),
           status: data.room.status,
           modificationBy: data.room.modificationBy,
         });
@@ -149,17 +149,12 @@ const AuctionDetails = () => {
       const values = await form.validateFields();
       const updatedData = {
         ...data.room,
-        registrationOpenDate: values.registrationOpenDate
-
-          .subtract(0, "hours")
-          .toISOString(),
-        registrationEndDate: values.registrationEndDate
-          .subtract(0, "hours")
-          .toISOString(),
+        registrationOpenDate: values.registrationOpenDate.toISOString(),
+        registrationEndDate: values.registrationEndDate.toISOString(),
         priceStep: values.priceStep,
         registrationFee: values.registrationFee,
-        activeDate: values.activeDate.subtract(0, "hours").toISOString(),
-        endDate: values.endDate.subtract(0, "hours").toISOString(),
+        activeDate: values.activeDate.toISOString(),
+        endDate: values.endDate.toISOString(),
 
         status: values.status,
         // modificationBy: values.modificationBy,
@@ -191,7 +186,7 @@ const AuctionDetails = () => {
       priceStep: data.room.priceStep,
       registrationFee: data.room.registrationFee,
       activeDate: moment.utc(data.room.activeDate),
-      endDate: moment(data.room.endDate),
+      endDate: moment.utc(data.room.endDate),
       status: data.room.status,
       modificationBy: data.room.modificationBy,
     });
