@@ -14,23 +14,50 @@ const PlantsRenting = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [data, setData] = useState([]); 
-
   const [loading, setLoading] = useState(false); 
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalItems, setTotalItems] = useState(0); 
   const pageSize = 10;
+  const [plantsData, setPlantsData] = useState([]);
+
+  // const fetchData = async (page = 1, search = '') => {
+  //   setLoading(true);
+  //   try {
+      
+  //     const response = await getListPlantSale({ pageIndex: page, pageSize, search: search || '' });
+  //     const items = response;
+  //     setData(items.data);
+      
+  //     if (items.length < pageSize) {
+  //       setTotalItems((page - 1) * pageSize + items.length);
+  //     } else {
+  //       setTotalItems((page + 1) * pageSize);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to fetch data:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchData = async (page = 1, search = '') => {
     setLoading(true);
     try {
-      const response = await getListPlantRenting({ pageIndex: page, pageSize, search });
-      const items = response;
-      setData(items.data);
-      console.log("date plant renting:",items)
-      if (items.length < pageSize) {
-        setTotalItems((page - 1) * pageSize + items.length);
+      if (search) {
+        // Nếu có từ khóa tìm kiếm, gọi API tìm kiếm
+        const response = await SearchPlant(search, page);
+        setData(response.data);  // Cập nhật dữ liệu tìm được
       } else {
-        setTotalItems((page + 1) * pageSize);
+        // Nếu không có từ khóa tìm kiếm, gọi API lấy tất cả dữ liệu
+        const response = await getListPlantRenting({ pageIndex: page, pageSize, search: search || '' });
+        setData(response.data);
+      }
+  
+      // Cập nhật totalItems cho pagination
+      if (response.data.length < pageSize) {
+        setTotalItems((page - 1) * pageSize + response.data.length);
+      } else {
+        setTotalItems(page * pageSize);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -38,19 +65,56 @@ const PlantsRenting = () => {
       setLoading(false);
     }
   };
+  
+  const SearchPlant = async (keyword, page = 1) => {
+    try {
+      const response = await axios.get(
+        'https://sep490ne-001-site1.atempurl.com/api/v1/GetList/Plants/Search/PlantID',
+        {
+          params: {
+            pageIndex: page,
+            pageSize: 100,  // Bạn có thể điều chỉnh pageSize ở đây nếu cần
+            typeEcommerceId: 2,
+            keyWord: keyword,
+          }
+        }
+      );
+  
+      if (response.data?.data) {
+        return response.data;  // Trả về dữ liệu tìm kiếm
+      } else {
+        return { data: [] };  // Nếu không có dữ liệu, trả về mảng trống
+      }
+    } catch (error) {
+      console.error('Error fetching plants data:', error);
+      return { data: [] };  // Nếu có lỗi, trả về mảng trống
+    }
+  };
+  
+  useEffect(() => {
+    fetchData(currentPage, searchText);
+  }, [currentPage, searchText]);
+  
 
   useEffect(() => {
     fetchData(currentPage, searchText);
   }, [currentPage, searchText]);
 
 
+  useEffect(() => {
+    if (searchText) {
+      SearchPlant(searchText); // Call SearchPlant when the searchText changes
+    }
+  }, [searchText]); // Dependency array, triggers whenever searchText changes
+
   const handleSearch = () => {
-    setCurrentPage(1); 
-    fetchData(1, searchText); 
+    SearchPlant(searchText); // Trigger the search when the user clicks the search icon
   };
+
+  
   
   const handleViewDetails = (record) => {
-    navigate(`/manager/products/plants/renting/${record.plantId}`);
+    navigate(`/manager/products/plants/sale/${record.plantId}`);
   };
 
   const handlePageChange = (page) => {
@@ -154,6 +218,7 @@ const PlantsRenting = () => {
       },
     },
     
+    
   
     // {
     //   title: 'Trạng Thái',
@@ -203,7 +268,7 @@ const PlantsRenting = () => {
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <Input
-          placeholder="Tìm kiếm theo mã sản phẩm/ tên sản phẩm"
+          placeholder="Tìm kiếm theo tên sản phẩm"
           suffix={
             <SearchOutlined
               onClick={handleSearch}
