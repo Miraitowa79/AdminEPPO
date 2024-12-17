@@ -20,18 +20,13 @@ const AuctionDetails = () => {
   const [form] = Form.useForm();
   const [isEditing, setIsEditing] = useState(false);
   const [prevStatus, setPrevStatus] = useState(1);
-  const [activeDate, setActiveDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [status, setStatus] = useState(1);
   const [account, setAccount] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleStatusChange = (value) => {
     setStatus(value);
   };
-  const registrationOpenDate = data?.room?.registrationOpenDate ? moment(data.room.registrationOpenDate) : null;
-  const registrationEndDate = data?.room?.registrationEndDate ? moment(data.room.registrationEndDate) : null;
-  const activedDate = data?.room?.activeDate ? moment(data.room.activeDate) : null;
-  const enddDate = data?.room?.endDate ? moment(data.room.endDate) : null;
+
 
   useEffect(() => {
     const fetchAccountDetails = async (modificationById) => {
@@ -59,16 +54,6 @@ const AuctionDetails = () => {
       try {
         const { data } = await getAuctionDetails(id);
         setData(data);
-        // form.setFieldsValue({
-        //   registrationOpenDate: data.room.registrationOpenDate ? moment(data.room.registrationOpenDate).local() : null,
-        //   registrationEndDate: data.room.registrationEndDate ? moment(data.room.registrationEndDate).local() : null,
-        //   priceStep: data.room.priceStep || 0,
-        //   registrationFee: data.room.registrationFee || 0,
-        //   activeDate: data.room.activeDate ? moment(data.room.activeDate).local() : null,
-        //   endDate: data.room.endDate ? moment(data.room.endDate).local() : null,
-        //   status: data.room.status || 0,
-        //   modificationBy: data.room.modificationBy || null,
-        // });
         form.setFieldsValue({
           registrationOpenDate: moment.utc(data.room.registrationOpenDate),
           registrationEndDate: moment.utc(data.room.registrationEndDate),
@@ -79,24 +64,13 @@ const AuctionDetails = () => {
           status: data.room.status || 0,
           modificationBy: data.room.modificationBy || null,
         });
-        // form.setFieldsValue({
-        //   registrationOpenDate: moment(data.room.registrationOpenDate).local(),
-        //   registrationEndDate: moment(data.room.registrationEndDate).local(),
-        //   priceStep: data.room.priceStep,
-        //   registrationFee: data.room.registrationFee,
-        //   activeDate: moment(data.room.activeDate).local(),
-        //   endDate: moment(data.room.endDate).local(),
-        //   status: data.room.status,
-        //   modificationBy: data.room.modificationBy,
-        // });
-
         const accountDetails = await getAccountDetails(data.room.modificationBy);
         setAccount(accountDetails);
         console.log('data-auction:', data)
         console.log('log time registrationOpenDate:', registrationOpenDate)
         console.log('log time registrationEndDate:', registrationEndDate)
-        console.log('log time activeDate:', activedDate)
-        console.log('log time endDate:', enddDate)
+        console.log('log time activeDate:', activeDate)
+        console.log('log time endDate:', endDate)
       } catch (error) {
         console.error('Error fetching auction details:', error);
         message.error('Error fetching auction details');
@@ -154,18 +128,6 @@ const AuctionDetails = () => {
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
       };
-
-      // const updatedData = {
-      //   ...data.room,
-      //   registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
-      //   registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
-      //   priceStep: values.priceStep,
-      //   registrationFee: values.registrationFee,
-      //   activeDate: values.activeDate.add(7, 'hours').toISOString(),
-      //   endDate: values.endDate.add(7, 'hours').toISOString(),
-      //   status: values.status,
-      //   modificationDate: new Date().toISOString(),
-      // };
 
       await updateAuctionRoom(id, updatedData);
       message.success('Cập nhật thành công !');
@@ -230,8 +192,8 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
-              value={registrationOpenDate} 
+              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+        
             />
           </Form.Item>
 
@@ -245,8 +207,8 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
-              value={registrationEndDate} 
+              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+         
             />
           </Form.Item>
             <Form.Item
@@ -321,8 +283,8 @@ const AuctionDetails = () => {
               showTime
               disabled={!isEditing}
               readOnly
-              disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
-              value={activedDate} 
+              disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+     
             />
           </Form.Item>
 
@@ -335,8 +297,8 @@ const AuctionDetails = () => {
             showTime
             disabled={!isEditing}
             readOnly
-            disabledDate={(current) => current && current < moment()} // Không cho chọn ngày quá khứ
-            value={enddDate} 
+            disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
+
           />
         </Form.Item>
 
