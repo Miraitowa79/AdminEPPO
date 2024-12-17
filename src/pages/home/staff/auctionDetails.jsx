@@ -54,10 +54,12 @@ const AuctionDetails = () => {
               <Input value={data.room.roomId || ''} readOnly />
             </Form.Item>
             <Form.Item label="Ngày mở đăng ký">
-              <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.registrationOpenDate)} disabled />
+              {/* <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.registrationOpenDate)} disabled /> */}
+              <Input value={moment(data.room.registrationOpenDate).format('DD-MM-YYYY HH:mm:ss') || ''} readOnly />
             </Form.Item>
             <Form.Item label="Ngày đóng đăng ký">
-              <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.registrationEndDate)} disabled />
+              {/* <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.registrationEndDate)} disabled /> */}
+              <Input value={moment(data.room.registrationEndDate).format('DD-MM-YYYY HH:mm:ss') || ''} readOnly />
             </Form.Item>
             <Form.Item label="Phí đăng ký">
               <Input value={data.room.registrationFee || ''} readOnly />
@@ -66,10 +68,12 @@ const AuctionDetails = () => {
               <Input value={data.room.priceStep || ''} readOnly />
             </Form.Item>
             <Form.Item label="Thời gian diễn ra">
-              <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.activeDate)} disabled />
+              {/* <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.activeDate)} disabled /> */}
+              <Input value={moment(data.room.activeDate).format('DD-MM-YYYY HH:mm:ss') || ''} readOnly />
             </Form.Item>
             <Form.Item label="Thời gian kết thúc">
-              <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.endDate)} disabled />
+              {/* <DatePicker format="DD-MM-YYYY HH:mm:ss" showTime value={moment(data.room.endDate)} disabled /> */}
+              <Input value={moment(data.room.endDate).format('DD-MM-YYYY HH:mm:ss') || ''} readOnly />
             </Form.Item>
             <Form.Item label="Ngày tạo cuộc đấu giá">
               <Input value={moment(data.room.creationDate).format('DD-MM-YYYY HH:mm:ss') || ''} readOnly />
