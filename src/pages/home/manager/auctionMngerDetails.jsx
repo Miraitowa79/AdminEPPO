@@ -56,17 +56,26 @@ const AuctionDetails = () => {
       try {
         const { data } = await getAuctionDetails(id);
         setData(data);
-
         form.setFieldsValue({
-          registrationOpenDate: moment(data.room.registrationOpenDate).local(),
-          registrationEndDate: moment(data.room.registrationEndDate).local(),
-          priceStep: data.room.priceStep,
-          registrationFee: data.room.registrationFee,
-          activeDate: moment(data.room.activeDate).local(),
-          endDate: moment(data.room.endDate).local(),
-          status: data.room.status,
-          modificationBy: data.room.modificationBy,
+          registrationOpenDate: data.room.registrationOpenDate ? moment(data.room.registrationOpenDate).local() : null,
+          registrationEndDate: data.room.registrationEndDate ? moment(data.room.registrationEndDate).local() : null,
+          priceStep: data.room.priceStep || 0,
+          registrationFee: data.room.registrationFee || 0,
+          activeDate: data.room.activeDate ? moment(data.room.activeDate).local() : null,
+          endDate: data.room.endDate ? moment(data.room.endDate).local() : null,
+          status: data.room.status || 0,
+          modificationBy: data.room.modificationBy || null,
         });
+        // form.setFieldsValue({
+        //   registrationOpenDate: moment(data.room.registrationOpenDate).local(),
+        //   registrationEndDate: moment(data.room.registrationEndDate).local(),
+        //   priceStep: data.room.priceStep,
+        //   registrationFee: data.room.registrationFee,
+        //   activeDate: moment(data.room.activeDate).local(),
+        //   endDate: moment(data.room.endDate).local(),
+        //   status: data.room.status,
+        //   modificationBy: data.room.modificationBy,
+        // });
 
         const accountDetails = await getAccountDetails(data.room.modificationBy);
         setAccount(accountDetails);
