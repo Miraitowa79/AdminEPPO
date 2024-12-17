@@ -7,6 +7,7 @@ import { getTypeEcommerce } from '../../../api/typeEcommerceApi';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import './ordersMng.scss';
+import { render } from 'react-dom';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -29,6 +30,7 @@ const OrdersMng = () => {
       try {
         const response = await getAccounts({});
         setAccounts(response.data);
+        console.log("acc list:", accounts)
       } catch (error) {
         console.error('Error fetching accounts:', error);
         message.error('Không có dữ liệu tài khoản!');
@@ -65,7 +67,7 @@ const OrdersMng = () => {
       const orders = response.data;
 
       const ordersWithDetails = orders.map(order => {
-        const user = accounts.find(account => account.userId === order.userId);
+        const user = accounts.find(account => account.userId == order.userId);
         const ecommerceType = typeEcommerce.find(type => type.typeEcommerceId === order.typeEcommerceId);
         return { 
           ...order, 
@@ -183,12 +185,17 @@ const OrdersMng = () => {
       ),
       onFilter: (value, record) => record.orderId.toString().toLowerCase().includes(value.toLowerCase()),
     },
-    {
-      title: 'Khách hàng',
-      dataIndex: 'fullName',
-      key: 'fullName',
-      className: 'wrap-text',
-    },
+    // {
+    //   title: 'Khách hàng',
+    //   dataIndex: 'fullName',
+    //   key: 'fullName',
+    //   className: 'wrap-text',
+    //   render: (fullName, record) => {
+    //     console.log("fullname:", fullName)
+    //     console.log("rec: ", record)
+    //     return (<>{fullName}</>)
+    //   }
+    // },
     {
       title: 'Tổng giá',
       dataIndex: 'finalPrice',
@@ -233,33 +240,33 @@ const OrdersMng = () => {
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (text) => moment(text).format('DD-MM-YYYY'),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <RangePicker
-            onChange={(dates) => {
-              setSelectedKeys(dates ? [dates] : []);
-            }}
-            style={{ marginBottom: 8, display: 'block' }}
-          />
-          <Button
-            type="primary"
-            onClick={() => confirm()}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-        </div>
-      ),
-      onFilter: (value, record) => {
-        const [start, end] = value;
-        const creationDate = moment(record.creationDate);
-        return creationDate.isBetween(start, end, 'days', '[]');
-      },
+      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      //   <div style={{ padding: 8 }}>
+      //     <RangePicker
+      //       onChange={(dates) => {
+      //         setSelectedKeys(dates ? [dates] : []);
+      //       }}
+      //       style={{ marginBottom: 8, display: 'block' }}
+      //     />
+      //     <Button
+      //       type="primary"
+      //       onClick={() => confirm()}
+      //       icon={<SearchOutlined />}
+      //       size="small"
+      //       style={{ width: 90, marginRight: 8 }}
+      //     >
+      //       Search
+      //     </Button>
+      //     <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+      //       Reset
+      //     </Button>
+      //   </div>
+      // ),
+      // onFilter: (value, record) => {
+      //   const [start, end] = value;
+      //   const creationDate = moment(record.creationDate);
+      //   return creationDate.isBetween(start, end, 'days', '[]');
+      // },
     },
     {
       title: 'Trạng thái thanh toán',

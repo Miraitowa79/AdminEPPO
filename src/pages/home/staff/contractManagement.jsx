@@ -34,7 +34,7 @@ const ContractMng = () => {
       setData(items.filter(item => item.isAddendum === (activeTab === 'addendum')).map((item, index) => ({
         ...item,
         key: item.contractId,
-        userId: item.user.userName,
+        userId: item.user.fullName,
         totalAmount: item.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
         creationContractDate: moment(item.creationContractDate).format('DD-MM-YYYY'),
         endContractDate: moment(item.endContractDate).format('DD-MM-YYYY'),

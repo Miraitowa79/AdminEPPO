@@ -111,176 +111,176 @@ const AuctionMng = () => {
       dataIndex: 'registrationFee',
       key: 'registrationFee',
       render: (fee) => fee.toLocaleString(),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Space>
-            <InputNumber
-              placeholder="Min"
-              value={selectedKeys[0]?.[0] || minFee}
-              onChange={(value) => {
-                const max = selectedKeys[0]?.[1];
-                setSelectedKeys(value !== null ? [[value, max]] : []);
-                setMinFee(value);
-              }}
-              style={{ marginBottom: 8, width: 100 }}
-            />
-            <InputNumber
-              placeholder="Max"
-              value={selectedKeys[0]?.[1] || maxFee}
-              onChange={(value) => {
-                const min = selectedKeys[0]?.[0];
-                setSelectedKeys(value !== null ? [[min, value]] : []);
-                setMaxFee(value);
-              }}
-              style={{ marginBottom: 8, width: 100 }}
-            />
-          </Space>
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Lọc
-            </Button>
-            <Button
-              onClick={() => {
-                clearFilters();
-                setMinFee(null);
-                setMaxFee(null);
-              }}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Xóa
-            </Button>
-          </Space>
-        </div>
-      ),
-      onFilter: (value, record) => {
-        const [min, max] = value;
-        if (min !== null && record.registrationFee < min) return false;
-        if (max !== null && record.registrationFee > max) return false;
-        return true;
-      },
+      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      //   <div style={{ padding: 8 }}>
+      //     <Space>
+      //       <InputNumber
+      //         placeholder="Min"
+      //         value={selectedKeys[0]?.[0] || minFee}
+      //         onChange={(value) => {
+      //           const max = selectedKeys[0]?.[1];
+      //           setSelectedKeys(value !== null ? [[value, max]] : []);
+      //           setMinFee(value);
+      //         }}
+      //         style={{ marginBottom: 8, width: 100 }}
+      //       />
+      //       <InputNumber
+      //         placeholder="Max"
+      //         value={selectedKeys[0]?.[1] || maxFee}
+      //         onChange={(value) => {
+      //           const min = selectedKeys[0]?.[0];
+      //           setSelectedKeys(value !== null ? [[min, value]] : []);
+      //           setMaxFee(value);
+      //         }}
+      //         style={{ marginBottom: 8, width: 100 }}
+      //       />
+      //     </Space>
+      //     <Space>
+      //       <Button
+      //         type="primary"
+      //         onClick={() => confirm()}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Lọc
+      //       </Button>
+      //       <Button
+      //         onClick={() => {
+      //           clearFilters();
+      //           setMinFee(null);
+      //           setMaxFee(null);
+      //         }}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Xóa
+      //       </Button>
+      //     </Space>
+      //   </div>
+      // ),
+      // onFilter: (value, record) => {
+      //   const [min, max] = value;
+      //   if (min !== null && record.registrationFee < min) return false;
+      //   if (max !== null && record.registrationFee > max) return false;
+      //   return true;
+      // },
     },
     {
       title: 'Ngày tạo',
       dataIndex: 'creationDate',
       key: 'creationDate',
       render: (date) => new Date(date).toLocaleDateString(),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <DatePicker.RangePicker
-            value={selectedKeys[0] || creationDateRange}
-            onChange={(dates) => {
-              setSelectedKeys(dates ? [dates] : []);
-              setCreationDateRange(dates);
-            }}
-            format="DD/MM/YYYY"
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Lọc
-            </Button>
-            <Button
-              onClick={() => {
-                clearFilters();
-                setCreationDateRange([null, null]);
-              }}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Xóa
-            </Button>
-          </Space>
-        </div>
-      ),
-      onFilter: (value, record) => isDateInRange(record.creationDate, creationDateRange),
+      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      //   <div style={{ padding: 8 }}>
+      //     <DatePicker.RangePicker
+      //       value={selectedKeys[0] || creationDateRange}
+      //       onChange={(dates) => {
+      //         setSelectedKeys(dates ? [dates] : []);
+      //         setCreationDateRange(dates);
+      //       }}
+      //       format="DD/MM/YYYY"
+      //     />
+      //     <Space>
+      //       <Button
+      //         type="primary"
+      //         onClick={() => confirm()}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Lọc
+      //       </Button>
+      //       <Button
+      //         onClick={() => {
+      //           clearFilters();
+      //           setCreationDateRange([null, null]);
+      //         }}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Xóa
+      //       </Button>
+      //     </Space>
+      //   </div>
+      // ),
+      // onFilter: (value, record) => isDateInRange(record.creationDate, creationDateRange),
     },
     {
       title: 'Ngày bắt đầu',
       dataIndex: 'activeDate',
       key: 'activeDate',
       render: (date) => new Date(date).toLocaleDateString(),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <DatePicker.RangePicker
-            value={selectedKeys[0] || activeDateRange}
-            onChange={(dates) => {
-              setSelectedKeys(dates ? [dates] : []);
-              setActiveDateRange(dates);
-            }}
-            format="DD/MM/YYYY"
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Lọc
-            </Button>
-            <Button
-              onClick={() => {
-                clearFilters();
-                setActiveDateRange([null, null]);
-              }}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Xóa
-            </Button>
-          </Space>
-        </div>
-      ),
-      onFilter: (value, record) => isDateInRange(record.activeDate, activeDateRange),
+      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      //   <div style={{ padding: 8 }}>
+      //     <DatePicker.RangePicker
+      //       value={selectedKeys[0] || activeDateRange}
+      //       onChange={(dates) => {
+      //         setSelectedKeys(dates ? [dates] : []);
+      //         setActiveDateRange(dates);
+      //       }}
+      //       format="DD/MM/YYYY"
+      //     />
+      //     <Space>
+      //       <Button
+      //         type="primary"
+      //         onClick={() => confirm()}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Lọc
+      //       </Button>
+      //       <Button
+      //         onClick={() => {
+      //           clearFilters();
+      //           setActiveDateRange([null, null]);
+      //         }}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Xóa
+      //       </Button>
+      //     </Space>
+      //   </div>
+      // ),
+      // onFilter: (value, record) => isDateInRange(record.activeDate, activeDateRange),
     },
     {
       title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <DatePicker.RangePicker
-            value={selectedKeys[0] || endDateRange}
-            onChange={(dates) => {
-              setSelectedKeys(dates ? [dates] : []);
-              setEndDateRange(dates);
-            }}
-            format="DD/MM/YYYY"
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Lọc
-            </Button>
-            <Button
-              onClick={() => {
-                clearFilters();
-                setEndDateRange([null, null]);
-              }}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Xóa
-            </Button>
-          </Space>
-        </div>
-      ),
-      onFilter: (value, record) => isDateInRange(record.endDate, endDateRange),
+      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      //   <div style={{ padding: 8 }}>
+      //     <DatePicker.RangePicker
+      //       value={selectedKeys[0] || endDateRange}
+      //       onChange={(dates) => {
+      //         setSelectedKeys(dates ? [dates] : []);
+      //         setEndDateRange(dates);
+      //       }}
+      //       format="DD/MM/YYYY"
+      //     />
+      //     <Space>
+      //       <Button
+      //         type="primary"
+      //         onClick={() => confirm()}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Lọc
+      //       </Button>
+      //       <Button
+      //         onClick={() => {
+      //           clearFilters();
+      //           setEndDateRange([null, null]);
+      //         }}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Xóa
+      //       </Button>
+      //     </Space>
+      //   </div>
+      // ),
+      // onFilter: (value, record) => isDateInRange(record.endDate, endDateRange),
     },
     {
       title: 'Trạng thái đấu giá',
