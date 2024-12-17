@@ -56,13 +56,23 @@ const AuctionDetails = () => {
       try {
         const { data } = await getAuctionDetails(id);
         setData(data);
+        // form.setFieldsValue({
+        //   registrationOpenDate: data.room.registrationOpenDate ? moment(data.room.registrationOpenDate).local() : null,
+        //   registrationEndDate: data.room.registrationEndDate ? moment(data.room.registrationEndDate).local() : null,
+        //   priceStep: data.room.priceStep || 0,
+        //   registrationFee: data.room.registrationFee || 0,
+        //   activeDate: data.room.activeDate ? moment(data.room.activeDate).local() : null,
+        //   endDate: data.room.endDate ? moment(data.room.endDate).local() : null,
+        //   status: data.room.status || 0,
+        //   modificationBy: data.room.modificationBy || null,
+        // });
         form.setFieldsValue({
-          registrationOpenDate: data.room.registrationOpenDate ? moment(data.room.registrationOpenDate).local() : null,
-          registrationEndDate: data.room.registrationEndDate ? moment(data.room.registrationEndDate).local() : null,
+          registrationOpenDate: moment.utc(data.room.registrationOpenDate).local(),
+          registrationEndDate: moment.utc(data.room.registrationEndDate).local(),
           priceStep: data.room.priceStep || 0,
           registrationFee: data.room.registrationFee || 0,
-          activeDate: data.room.activeDate ? moment(data.room.activeDate).local() : null,
-          endDate: data.room.endDate ? moment(data.room.endDate).local() : null,
+          activeDate: moment.utc(data.room.activeDate).local(),
+          endDate: moment.utc(data.room.endDate).local(),
           status: data.room.status || 0,
           modificationBy: data.room.modificationBy || null,
         });
@@ -141,6 +151,19 @@ const AuctionDetails = () => {
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
       };
+
+      // const updatedData = {
+      //   ...data.room,
+      //   registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
+      //   registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
+      //   priceStep: values.priceStep,
+      //   registrationFee: values.registrationFee,
+      //   activeDate: values.activeDate.add(7, 'hours').toISOString(),
+      //   endDate: values.endDate.add(7, 'hours').toISOString(),
+      //   status: values.status,
+      //   modificationDate: new Date().toISOString(),
+      // };
+
       await updateAuctionRoom(id, updatedData);
       message.success('Cập nhật thành công !');
       setIsEditing(false);
@@ -303,6 +326,7 @@ const AuctionDetails = () => {
             label="Thời gian diễn ra"
             rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
           >
+
             <DatePicker
               showTime
               disabled={!isEditing}
