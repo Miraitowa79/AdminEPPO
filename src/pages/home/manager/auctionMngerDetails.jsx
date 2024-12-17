@@ -28,7 +28,10 @@ const AuctionDetails = () => {
   const handleStatusChange = (value) => {
     setStatus(value);
   };
-
+  const registrationOpenDate = data?.room?.registrationOpenDate ? moment(data.room.registrationOpenDate) : null;
+  const registrationEndDate = data?.room?.registrationEndDate ? moment(data.room.registrationEndDate) : null;
+  const activedDate = data?.room?.activeDate ? moment(data.room.activeDate) : null;
+  const enddDate = data?.room?.endDate ? moment(data.room.endDate) : null;
 
   useEffect(() => {
     const fetchAccountDetails = async (modificationById) => {
@@ -67,12 +70,12 @@ const AuctionDetails = () => {
         //   modificationBy: data.room.modificationBy || null,
         // });
         form.setFieldsValue({
-          registrationOpenDate: moment.utc(data.room.registrationOpenDate).local(),
-          registrationEndDate: moment.utc(data.room.registrationEndDate).local(),
+          registrationOpenDate: moment.utc(data.room.registrationOpenDate),
+          registrationEndDate: moment.utc(data.room.registrationEndDate),
           priceStep: data.room.priceStep || 0,
           registrationFee: data.room.registrationFee || 0,
-          activeDate: moment.utc(data.room.activeDate).local(),
-          endDate: moment.utc(data.room.endDate).local(),
+          activeDate: moment.utc(data.room.activeDate),
+          endDate: moment.utc(data.room.endDate),
           status: data.room.status || 0,
           modificationBy: data.room.modificationBy || null,
         });
@@ -90,10 +93,10 @@ const AuctionDetails = () => {
         const accountDetails = await getAccountDetails(data.room.modificationBy);
         setAccount(accountDetails);
         console.log('data-auction:', data)
-        console.log('log time:', registrationOpenDate)
-        console.log('log time:', registrationEndDate)
-        console.log('log time:', activeDate)
-        console.log('log time:', endDate)
+        console.log('log time registrationOpenDate:', registrationOpenDate)
+        console.log('log time registrationEndDate:', registrationEndDate)
+        console.log('log time activeDate:', activedDate)
+        console.log('log time endDate:', enddDate)
       } catch (error) {
         console.error('Error fetching auction details:', error);
         message.error('Error fetching auction details');
@@ -196,20 +199,7 @@ const AuctionDetails = () => {
   if (loading) {
     return <Spin tip="Loading..." style={{ display: 'block', margin: 'auto' }} />;
   }
-  const handleActiveDateChange = (date) => {
-    setActiveDate(date);
-  };
 
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-  };
-  const calculateDuration = () => {
-    if (activeDate && endDate) {
-      const duration = endDate.diff(activeDate, 'days'); 
-      return duration;
-    }
-    return 0;
-  };
 
   return ( 
     <ConfigProvider locale={viVN}>
@@ -241,7 +231,7 @@ const AuctionDetails = () => {
               disabled={!isEditing}
               readOnly
               disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
-              value={moment()} 
+              value={registrationOpenDate} 
             />
           </Form.Item>
 
@@ -256,7 +246,7 @@ const AuctionDetails = () => {
               disabled={!isEditing}
               readOnly
               disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
-              value={moment()} 
+              value={registrationEndDate} 
             />
           </Form.Item>
             <Form.Item
@@ -332,14 +322,7 @@ const AuctionDetails = () => {
               disabled={!isEditing}
               readOnly
               disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
-              value={moment()} 
-              onChange={(date) => {
-                if (date) {
-                  setActiveDate(date);
-                } else {
-                  message.error('Thời gian không hợp lệ!');
-                }
-              }}
+              value={activedDate} 
             />
           </Form.Item>
 
@@ -353,7 +336,7 @@ const AuctionDetails = () => {
             disabled={!isEditing}
             readOnly
             disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
-            value={moment()} 
+            value={enddDate} 
           />
         </Form.Item>
 
