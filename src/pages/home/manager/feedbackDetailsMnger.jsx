@@ -11,9 +11,14 @@ import {
   Button,
   Input,
 } from "antd";
-import { getFeedbackDetails } from "../../../api/feedbackManagement";
+import {
+  getFeedbackDetails,
+  updateFeedbackDetails,
+} from "../../../api/feedbackManagement";
 import { getAuthUser } from "@src/utils";
+
 const { Title } = Typography;
+const { Option } = Select;
 
 const FeedbackDetails = () => {
   const { id } = useParams();
@@ -43,11 +48,6 @@ const FeedbackDetails = () => {
     }
   }, [id, form]);
 
-  if (loading) {
-    return (
-      <Spin tip="Loading..." style={{ display: "block", margin: "auto" }} />
-    );
-  }
   const handleEditClick = () => {
     setEditMode(true);
   };
@@ -56,6 +56,7 @@ const FeedbackDetails = () => {
     setEditMode(false);
     form.setFieldsValue(data);
   };
+
   const handleFinish = async (updatedData) => {
     try {
       const updatedFeedback = {
@@ -85,6 +86,13 @@ const FeedbackDetails = () => {
         return "Không xác định";
     }
   };
+
+  if (loading) {
+    return (
+      <Spin tip="Loading..." style={{ display: "block", margin: "auto" }} />
+    );
+  }
+
   const renderRatingStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
