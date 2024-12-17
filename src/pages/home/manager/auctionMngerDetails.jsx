@@ -56,21 +56,34 @@ const AuctionDetails = () => {
       try {
         const { data } = await getAuctionDetails(id);
         setData(data);
-
         form.setFieldsValue({
-          registrationOpenDate: moment(data.room.registrationOpenDate).local(),
-          registrationEndDate: moment(data.room.registrationEndDate).local(),
-          priceStep: data.room.priceStep,
-          registrationFee: data.room.registrationFee,
-          activeDate: moment(data.room.activeDate).local(),
-          endDate: moment(data.room.endDate).local(),
-          status: data.room.status,
-          modificationBy: data.room.modificationBy,
+          registrationOpenDate: data.room.registrationOpenDate ? moment(data.room.registrationOpenDate).local() : null,
+          registrationEndDate: data.room.registrationEndDate ? moment(data.room.registrationEndDate).local() : null,
+          priceStep: data.room.priceStep || 0,
+          registrationFee: data.room.registrationFee || 0,
+          activeDate: data.room.activeDate ? moment(data.room.activeDate).local() : null,
+          endDate: data.room.endDate ? moment(data.room.endDate).local() : null,
+          status: data.room.status || 0,
+          modificationBy: data.room.modificationBy || null,
         });
+        // form.setFieldsValue({
+        //   registrationOpenDate: moment(data.room.registrationOpenDate).local(),
+        //   registrationEndDate: moment(data.room.registrationEndDate).local(),
+        //   priceStep: data.room.priceStep,
+        //   registrationFee: data.room.registrationFee,
+        //   activeDate: moment(data.room.activeDate).local(),
+        //   endDate: moment(data.room.endDate).local(),
+        //   status: data.room.status,
+        //   modificationBy: data.room.modificationBy,
+        // });
 
         const accountDetails = await getAccountDetails(data.room.modificationBy);
         setAccount(accountDetails);
-
+        console.log('data-auction:', data)
+        console.log('log time:', registrationOpenDate)
+        console.log('log time:', registrationEndDate)
+        console.log('log time:', activeDate)
+        console.log('log time:', endDate)
       } catch (error) {
         console.error('Error fetching auction details:', error);
         message.error('Error fetching auction details');
@@ -118,12 +131,12 @@ const AuctionDetails = () => {
       const values = await form.validateFields();
       const updatedData = {
         ...data.room,
-        // registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString().local(),
-        // registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString().local(),
+        registrationOpenDate: values.registrationOpenDate.add(7, 'hours').toISOString(),
+        registrationEndDate: values.registrationEndDate.add(7, 'hours').toISOString(),
         priceStep: values.priceStep,
         registrationFee: values.registrationFee,
-        // activeDate: values.activeDate.add(7, 'hours').toISOString().local(),
-        // endDate: values.endDate.add(7, 'hours').toISOString().local(),
+        activeDate: values.activeDate.add(7, 'hours').toISOString(),
+        endDate: values.endDate.add(7, 'hours').toISOString(),
         status: values.status,
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
@@ -208,6 +221,8 @@ const AuctionDetails = () => {
               value={moment()} 
             />
           </Form.Item>
+
+
           <Form.Item
             name="registrationEndDate"
             label="Ngày đóng đăng ký"
