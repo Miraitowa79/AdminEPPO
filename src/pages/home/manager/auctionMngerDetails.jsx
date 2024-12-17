@@ -150,15 +150,15 @@ const AuctionDetails = () => {
       const updatedData = {
         ...data.room,
         registrationOpenDate: values.registrationOpenDate
-          .subtract(7, "hours")
+          .subtract(0, "hours")
           .toISOString(),
         registrationEndDate: values.registrationEndDate
-          .subtract(7, "hours")
+          .subtract(0, "hours")
           .toISOString(),
         priceStep: values.priceStep,
         registrationFee: values.registrationFee,
-        activeDate: values.activeDate.subtract(7, "hours").toISOString(),
-        endDate: values.endDate.subtract(7, "hours").toISOString(),
+        activeDate: values.activeDate.subtract(0, "hours").toISOString(),
+        endDate: values.endDate.subtract(0, "hours").toISOString(),
         status: values.status,
         // modificationBy: values.modificationBy,
         modificationDate: new Date().toISOString(),
