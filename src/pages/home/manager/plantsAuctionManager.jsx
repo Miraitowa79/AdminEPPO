@@ -29,7 +29,7 @@ const PlantsAuction = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 10;
+  const pageSize = 100;
   const [plantsData, setPlantsData] = useState([]);
 
   // const fetchData = async (page = 1, search = '') => {

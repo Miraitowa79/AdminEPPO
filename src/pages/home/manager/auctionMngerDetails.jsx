@@ -76,6 +76,7 @@ const AuctionDetails = () => {
           status: data.room.status,
           modificationBy: data.room.modificationBy,
         });
+        setIsEditing(false);
         const accountDetails = await getAccountDetails(
           data.room.modificationBy
         );

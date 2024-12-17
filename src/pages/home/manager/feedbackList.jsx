@@ -13,7 +13,7 @@ const FeedbackMng = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [ratingFilter, setRatingFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const pageSize = 10;
+  const pageSize = 100;
 
   const fetchData = async (page = 1, search = "", rating = "", status = "") => {
     setLoading(true);

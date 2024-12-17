@@ -4,6 +4,7 @@ import { SearchOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import avatar from "../../../assets/images/team-2.jpg";
 import { useNavigate } from "react-router-dom";
 import { getAccounts, getAccountsStatus } from "../../../api/accountManagement";
+import axios from "axios";
 
 const AccountMng = () => {
   const navigate = useNavigate();
@@ -13,26 +14,30 @@ const AccountMng = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [selectedType, setSelectedType] = useState("");
-  const pageSize = 10;
+  const pageSize = 100;
   const { Option } = Select;
 
-  const fetchData = async (page = 1, search = "", roleId = "") => {
+  const fetchData = async (
+    page = 1,
+    search = "",
+    roleId = "",
+    pageSize = 50
+  ) => {
     setLoading(true);
     try {
-      const response = roleId
-        ? await getAccountsStatus({ page, size: pageSize, search, roleId }) // Corrected roleId mapping
-        : await getAccounts({ page, size: pageSize, search });
+      let response;
 
-      const { data: items } = response;
-
-      setData(items);
-
-      if (items.length < pageSize) {
-        setTotalItems((page - 1) * pageSize + items.length);
+      if (search) {
+        response = await SearchAccount(search, page);
       } else {
-        setTotalItems((page + 1) * pageSize);
+        response = roleId
+          ? await getAccountsStatus({ page, size: pageSize, search, roleId })
+          : await getAccounts({ page, size: pageSize, search });
       }
-      // setTotalItems(response.total || items.length); // Adjusted totalItems logic
+
+      const { data: items, total } = response;
+      setTotalItems((page - 1) * pageSize + items.length);
+      setData(items);
     } catch (error) {
       console.error(
         "Failed to fetch data:",
@@ -43,30 +48,48 @@ const AccountMng = () => {
     }
   };
 
+  const SearchAccount = async (keyword, page = 1) => {
+    try {
+      const response = await axios.get(
+        "https://sep490ne-001-site1.atempurl.com/api/v1/GetUser/Users/Search/AccountID",
+        {
+          params: {
+            pageIndex: page,
+            pageSize: 1000,
+            keyWord: keyword,
+          },
+        }
+      );
+      return response.data?.data ? response.data : { data: [] };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return { data: [] };
+    }
+  };
+
   useEffect(() => {
     fetchData(currentPage, searchText, selectedType);
   }, [currentPage, searchText, selectedType]);
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchData(1, searchText, selectedType);
+  const handleSearch = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    setCurrentPage(1); // Reset page when type changes
   };
 
   const handleViewDetails = (record) => {
     navigate(`/list/users/${record.userId}`);
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleTypeChange = (value) => {
-    setSelectedType(value);
-    setCurrentPage(1);
-  };
-
   const handleAddAccount = () => {
     navigate("/manager/create/account");
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const columns = [
@@ -102,7 +125,7 @@ const AccountMng = () => {
       dataIndex: "creationDate",
       key: "creationDate",
       render: (date) => {
-        const formattedDate = new Date(date).toLocaleDateString("vi-VN"); // Định dạng theo chuẩn Việt Nam
+        const formattedDate = new Date(date).toLocaleDateString("vi-VN");
         return formattedDate;
       },
     },
@@ -117,15 +140,15 @@ const AccountMng = () => {
         switch (status) {
           case 1:
             statusText = "Đang hoạt động";
-            color = "green"; // Màu xanh cho "Đang hoạt động"
+            color = "green";
             break;
           case 2:
             statusText = "Ngừng hoạt động";
-            color = "red"; // Màu đỏ cho "Ngừng hoạt động"
+            color = "red";
             break;
           default:
             statusText = "Không rõ";
-            color = "gray"; // Màu xám cho "Không rõ"
+            color = "gray";
             break;
         }
 
@@ -156,7 +179,7 @@ const AccountMng = () => {
         }}
       >
         <Input
-          placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
+          placeholder="Tìm kiếm theo mã tài khoản"
           suffix={
             <SearchOutlined
               onClick={handleSearch}

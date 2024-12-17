@@ -19,22 +19,73 @@ const ContractMng = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedType, setSelectedType] = useState("");
   const [activeTab, setActiveTab] = useState("main");
-  const pageSize = 10;
+  const pageSize = 100;
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
+
+  // const fetchData = async (page = 1, status = "") => {
+  //   setLoading(true);
+  //   try {
+  //     const response = status
+  //       ? await getContractStatus({ page, size: pageSize, status })
+  //       : await getContracts({ page, size: pageSize });
+
+  //     const { data: items } = response;
+
+  //     setData(
+  //       items
+  //         .filter((item) => item.isAddendum === (activeTab === "addendum"))
+  //         .map((item, index) => ({
+  //           ...item,
+  //           key: item.contractId,
+  //           userId: item.user.userName,
+  //           totalAmount: item.totalAmount.toLocaleString("vi-VN", {
+  //             style: "currency",
+  //             currency: "VND",
+  //           }),
+  //           creationContractDate: moment(item.creationContractDate).format(
+  //             "DD-MM-YYYY"
+  //           ),
+  //           endContractDate: moment(item.endContractDate).format("DD-MM-YYYY"),
+  //           status: item.status === 1 ? "Đang hoạt động" : "Hết hạn",
+  //         }))
+  //     );
+
+  //     if (items.length < pageSize) {
+  //       setTotalItems((page - 1) * pageSize + items.length);
+  //     } else {
+  //       setTotalItems((page + 1) * pageSize + items.length);
+  //     }
+  //     console.log("API Response:", response.data);
+  //     console.log("Items length:", response.data.length);
+  //   } catch (error) {
+  //     console.error("Failed to fetch data:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchData = async (page = 1, status = "") => {
     setLoading(true);
     try {
-      const response = status
-        ? await getContractStatus({ page, size: pageSize, status })
-        : await getContracts({ page, size: pageSize });
+      let response;
+      if (search) {
+        // Use the SearchContract function if there's a search term
+        response = await SearchContract(search, page);
+      } else {
+        // Fetch contracts or contract status based on status filter
+        response = status
+          ? await getContractStatus({ page, size: pageSize, status })
+          : await getContracts({ page, size: pageSize });
+      }
 
       const { data: items } = response;
 
       setData(
         items
           .filter((item) => item.isAddendum === (activeTab === "addendum"))
-          .map((item, index) => ({
+          .map((item) => ({
             ...item,
             key: item.contractId,
             userId: item.user.userName,
@@ -50,18 +101,52 @@ const ContractMng = () => {
           }))
       );
 
+      // Set total items based on the response length
       if (items.length < pageSize) {
         setTotalItems((page - 1) * pageSize + items.length);
       } else {
-        setTotalItems((page + 1) * pageSize + items.length);
+        setTotalItems(page * pageSize + items.length);
       }
+
       console.log("API Response:", response.data);
-      console.log("Items length:", response.data.length);
+      console.log("Items length:", items.length);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const SearchContract = async (keyword, page = 1) => {
+    try {
+      const response = await axios.get(
+        "https://sep490ne-001-site1.atempurl.com/api/v1/Search/Contract",
+        {
+          params: {
+            pageIndex: page,
+            pageSize: 100, // Adjust pageSize as necessary
+            keyWord: keyword,
+          },
+        }
+      );
+
+      // Ensure the response has data and return it, else return empty data
+      return response.data?.data ? response.data : { data: [] };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return { data: [] };
+    }
+  };
+  useEffect(() => {
+    fetchData(currentPage, searchText, selectedType);
+  }, [currentPage, searchText, selectedType]);
+
+  const handleSearch = () => {
+    fetchData(1, searchText, selectedType);
+  };
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -74,11 +159,6 @@ const ContractMng = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-  };
-
-  const handleTypeChange = (value) => {
-    setSelectedType(value);
-    setCurrentPage(1);
   };
 
   const handleTabChange = (key) => {
@@ -186,8 +266,16 @@ const ContractMng = () => {
         }}
       >
         <Input
-          placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
-          suffix={<SearchOutlined style={{ cursor: "pointer" }} />}
+          placeholder="Tìm kiếm theo  mã hợp đồng"
+          suffix={
+            <SearchOutlined
+              onClick={handleSearch}
+              style={{ cursor: "pointer" }}
+            />
+          }
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onPressEnter={handleSearch}
           style={{ width: "50%" }}
         />
         <Select
