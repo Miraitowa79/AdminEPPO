@@ -66,11 +66,16 @@ const AuctionDetails = () => {
         });
         const accountDetails = await getAccountDetails(data.room.modificationBy);
         setAccount(accountDetails);
-        console.log('data-auction:', data)
-        console.log('log time registrationOpenDate:', registrationOpenDate)
-        console.log('log time registrationEndDate:', registrationEndDate)
-        console.log('log time activeDate:', activeDate)
-        console.log('log time endDate:', endDate)
+        console.log('data-auction:', data);
+        console.log('log time registrationOpenDate:', data.room.registrationOpenDate);
+        console.log('log time registrationEndDate:', data.room.registrationEndDate);
+        console.log('log time activeDate:', data.room.activeDate);
+        console.log('log time endDate:', data.room.endDate);
+
+        console.log('Raw registrationOpenDate:', data.room.registrationOpenDate);
+        console.log('Formatted registrationOpenDate:', moment.utc(data.room.registrationOpenDate).toISOString());
+        console.log('Form Values:', form.getFieldsValue());
+
       } catch (error) {
         console.error('Error fetching auction details:', error);
         message.error('Error fetching auction details');
@@ -144,7 +149,7 @@ const AuctionDetails = () => {
   };
 
   const handleCancelEdit = () => {
-    form.resetFields();
+    // Set lại giá trị của các trường trong form về giá trị ban đầu mà không reset toàn bộ form
     form.setFieldsValue({
       registrationOpenDate: moment.utc(data.room.registrationOpenDate).local(),
       registrationEndDate: moment.utc(data.room.registrationEndDate).local(),
@@ -155,8 +160,11 @@ const AuctionDetails = () => {
       status: data.room.status,
       modificationBy: data.room.modificationBy,
     });
+    
+    // Đặt lại trạng thái chỉnh sửa
     setIsEditing(false);
   };
+  
 
   if (loading) {
     return <Spin tip="Loading..." style={{ display: 'block', margin: 'auto' }} />;
@@ -191,7 +199,7 @@ const AuctionDetails = () => {
             <DatePicker
               showTime
               disabled={!isEditing}
-              readOnly
+           
               disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
         
             />
@@ -206,7 +214,7 @@ const AuctionDetails = () => {
             <DatePicker
               showTime
               disabled={!isEditing}
-              readOnly
+     
               disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
          
             />
@@ -282,7 +290,7 @@ const AuctionDetails = () => {
             <DatePicker
               showTime
               disabled={!isEditing}
-              readOnly
+       
               disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
      
             />
@@ -296,7 +304,7 @@ const AuctionDetails = () => {
           <DatePicker
             showTime
             disabled={!isEditing}
-            readOnly
+ 
             disabledDate={(current) => current && current < moment().startOf('day')} // Không cho chọn ngày quá khứ
 
           />
@@ -350,9 +358,6 @@ const AuctionDetails = () => {
                   <Button type="primary" onClick={handleUpdate} loading={isSubmitting} style={{ marginRight: '10px' }}>
                     Cập nhật
                   </Button>
-                  {/* <Button onClick={handleCancelEdit}>
-                    Hủy
-                  </Button> */}
                 </>
               ) : (
                 <Button type="primary" onClick={() => setIsEditing(true)} style={{ width: '90px' }}>
