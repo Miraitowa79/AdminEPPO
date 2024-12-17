@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Form, Input, Button, DatePicker, Typography, Card, Spin, message, Select, Modal } from 'antd';
+import { Form, Input, Button, DatePicker, Typography, Card, Spin, message, Modal, Select } from 'antd'; // Ensure Select is imported
 import { getContractDetails, updateContractDetails, createContractWithUserId } from '../../../api/contractManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import moment from 'moment';
@@ -15,7 +15,7 @@ const ContractDetails = () => {
   const [contract, setContract] = useState({});
   const [user, setUser] = useState({});
   const [editMode, setEditMode] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm(); // Ensure form is created
   const [supplementaryContract, setSupplementaryContract] = useState(null);
 
   useEffect(() => {
@@ -95,10 +95,7 @@ const ContractDetails = () => {
             contractDetails: contract.contractDetails,
           };
 
-          console.log('check', newContract)
-  
           const { contractId } = await createContractWithUserId(userId, newContract);
-          console.log("userId", user.userId)
           const { data: supplementaryContractData } = await getContractDetails(contractId);
           setSupplementaryContract(supplementaryContractData);
           message.success('Gia hạn hợp đồng thành công!');
@@ -109,34 +106,6 @@ const ContractDetails = () => {
       },
     });
   };
-  
-
-  const handleExpireContract = async () => {
-    try {
-      const expiredContract = {
-        contractId: contract.contractId,
-        userId: contract.userId,
-        contractNumber: contract.contractNumber,
-        description: contract.description,
-        creationContractDate: new Date(contract.creationContractDate).toISOString(),
-        endContractDate: new Date(contract.endContractDate).toISOString(),
-        totalAmount: contract.totalAmount,
-        createdAt: new Date(contract.createdAt).toISOString(),
-        updatedAt: new Date().toISOString(),
-        typeContract: contract.typeContract,
-        contractUrl: contract.contractUrl,
-        isActive: 2,
-        status: 2
-      };
-      console.log('check send exp', expiredContract)
-      await updateContractDetails(id, expiredContract);
-      setContract(expiredContract);
-      message.success('Hợp đồng đã được đánh dấu là hết hạn!');
-    } catch (error) {
-      console.error('Error expiring contract:', error);
-      message.error('Có lỗi xảy ra khi đánh dấu hợp đồng là hết hạn.');
-    }
-  };
 
   if (loading) {
     return <Spin tip="Loading..." style={{ display: 'block', margin: 'auto' }} />;
@@ -144,7 +113,22 @@ const ContractDetails = () => {
 
   const isContractEndingToday = moment(contract.endContractDate).isSame(moment(), 'day');
   const isContractEnded = moment(contract.endContractDate).isBefore(moment(), 'day');
-  const canEdit = contract.isActive === 0 || contract.isActive === 1;
+
+  const getIsActiveText = (isActive) => {
+    switch (isActive) {
+      case 0:
+        return 'Chưa ký hợp đồng';
+      case 1:
+        return 'Đã ký hợp đồng';
+      case 2:
+        return 'Hết hạn hợp đồng';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const isContractExpired = contract.status === 2;
+
 
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: 'auto', display: 'flex', gap: '20px' }}>
@@ -162,16 +146,17 @@ const ContractDetails = () => {
               <Input value={user.fullName || 'N/A'} readOnly />
             </Form.Item>
             <Form.Item label="Mô tả:" name="description">
-              <Input readOnly={!canEdit || (contract.isActive === 1 && !editMode)} />
+              <Input readOnly={!editMode} />
             </Form.Item>
             <Form.Item label="Ngày tạo hợp đồng:" name="creationContractDate">
-              <DatePicker value={moment(contract?.creationContractDate)} disabled />
+              <DatePicker value={moment(contract?.creationContractDate)} disabled format="DD/MM/YYYY" />
             </Form.Item>
             {contract.isActive === 1 && (
               <Form.Item label="Ngày kết thúc hợp đồng:" name="endContractDate">
                 <DatePicker 
                   value={moment(contract?.endContractDate)} 
                   disabled={!editMode} 
+                  format="DD/MM/YYYY"
                   disabledDate={(current) => current && current < moment().endOf('day')}
                 />
               </Form.Item>
@@ -185,12 +170,8 @@ const ContractDetails = () => {
                 readOnly
               />
             </Form.Item>
-            <Form.Item label="Trạng thái hợp đồng:" name="isActive">
-              <Select disabled={!editMode || contract.isActive === 1}>
-                <Option value={1}>Đã ký hợp đồng</Option>
-                <Option value={0}>Chưa ký hợp đồng</Option>
-                <Option value={2}>Hết hạn hợp đồng</Option>
-              </Select>
+            <Form.Item label="Trạng thái hợp đồng:">
+              <Input value={getIsActiveText(contract.isActive)} readOnly />
             </Form.Item>
             <Form.Item label="Loại hợp đồng:" name="typeContract">
               <Input readOnly />
@@ -207,31 +188,35 @@ const ContractDetails = () => {
               </Select>
             </Form.Item>
             <Form.Item style={{ textAlign: 'center' }}>
-              {contract.status !== 2 && (
+              {!isContractExpired && (
+                isContractEndingToday || !isContractEnded ? (
                 <>
-                  {isContractEndingToday ? (
+                  {editMode ? (
                     <>
-                      <Button type="default" style={{ backgroundColor: 'yellow', marginRight: '10px' }} onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
-                      <Button type="default" danger onClick={handleExpireContract}>Hết hạn hợp đồng</Button>
+                      <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
+                      <Button type="primary" htmlType="submit">Lưu</Button>
                     </>
-                  ) : isContractEnded ? (
-                    <Button type="default" danger onClick={handleExpireContract}>Hết hạn hợp đồng</Button>
                   ) : (
                     <>
-                      {editMode ? (
-                        <>
-                          <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
-                          <Button type="primary" htmlType="submit">Lưu</Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
-                          <Button type="default" onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
-                        </>
-                      )}
+                      <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
+                      <Button type="default" onClick={() => handleRenewal(contract?.userId)}>Gia hạn</Button>
                     </>
                   )}
                 </>
+              ) : (
+                <>
+                  {editMode ? (
+                    <>
+                    <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelClick}>Hủy</Button>
+                      <Button type="primary" htmlType="submit">Lưu</Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button type="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>Chỉnh sửa</Button>
+                    </>
+                  )}
+                </>
+              )
               )}
             </Form.Item>
           </Form>

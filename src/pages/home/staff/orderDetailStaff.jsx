@@ -18,7 +18,6 @@ const OrderDetails = () => {
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
   const [typeEcommerceTitle, setTypeEcommerceTitle] = useState('');
-  const [selectedDetailId, setSelectedDetailId] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -88,10 +87,6 @@ const OrderDetails = () => {
     }
   };
 
-  const handleReclaimClick = (orderDetailId) => {
-    setSelectedDetailId(orderDetailId);
-  };
-
   const getStatusText = (status) => {
     switch (status) {
       case 1:
@@ -132,34 +127,34 @@ const OrderDetails = () => {
               labelAlign="left"
               onFinish={handleFinish}
             >
-              <Form.Item label="Khách hàng" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Khách hàng">
                 <Input value={userData.fullName || 'N/A'} readOnly />
               </Form.Item>
-              <Form.Item label="Số điện thoại" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Số điện thoại">
                 <Input value={userData.phoneNumber || 'N/A'} readOnly />
               </Form.Item>
-              <Form.Item label="Địa chỉ giao hàng" name="deliveryAddress" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Địa chỉ giao hàng" name="deliveryAddress">
                 <Input readOnly />
               </Form.Item>
-              <Form.Item label="Giá cây" name="totalPrice" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Giá cây" name="totalPrice">
                 <Input readOnly />
               </Form.Item>
-              <Form.Item label="Phí giao hàng" name="deliveryFee" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Phí giao hàng" name="deliveryFee">
                 <Input readOnly />
               </Form.Item>
-              <Form.Item label="Tổng đơn hàng" name="finalPrice" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Tổng đơn hàng" name="finalPrice">
                 <Input readOnly />
               </Form.Item>
-              <Form.Item label="Loại hình thức" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Loại hình thức">
                 <Input value={typeEcommerceTitle.title} readOnly />
               </Form.Item>
-              <Form.Item label="Ngày mua" name="creationDate" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Ngày mua" name="creationDate">
                 <Input value={moment(orderData.creationDate).format('DD-MM-YYYY')} readOnly />
               </Form.Item>
-              <Form.Item label="Trạng thái thanh toán" name="paymentStatus" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Trạng thái thanh toán" name="paymentStatus">
                 <Input readOnly />
               </Form.Item>
-              <Form.Item label="Tình trạng giao hàng" name="deliveryDescription" className={editMode ? 'blurred-field' : ''}>
+              <Form.Item label="Tình trạng giao hàng" name="deliveryDescription">
                 <Input value={orderData.deliveryDescription} readOnly />
               </Form.Item>
               <Form.Item label="Trạng thái đơn hàng" name="status">
@@ -168,7 +163,8 @@ const OrderDetails = () => {
                     {orderData.status < 2 && <Option value={2}>Đang chuẩn bị hàng</Option>}
                     {orderData.status < 3 && <Option value={3}>Đang giao</Option>}
                     {orderData.status < 4 && <Option value={4}>Đã giao</Option>}
-                    {orderData.status < 5 && <Option value={5}>Đã hủy</Option>}
+                    {orderData.status < 4 && <Option value={5}>Đã hủy</Option>}
+                    {orderData.status == 4 && <Option value={6}>Thu hồi</Option>}
                   </Select>
                 ) : (
                   <Select value={orderData.status} disabled style={{ width: '100%' }}>
@@ -189,7 +185,7 @@ const OrderDetails = () => {
                   </>
                 ) : (
                   <>
-                    {orderData.status !== 4 && orderData.status !== 5 && orderData.status !== 6 && (
+                    {orderData.status !== 5 && orderData.status !== 6 && (
                       <Button type="primary" onClick={handleUpdateClick}>Cập nhật</Button>
                     )}
                   </>
@@ -199,33 +195,24 @@ const OrderDetails = () => {
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="Chi tiết đơn hàng">
-            {orderData.orderDetails && orderData.orderDetails.map(detail => (
-              <div key={detail.orderDetailId} style={{ marginBottom: '10px' }}>
-                <p><strong>Plant ID:</strong> {detail.plantId}</p>
-                <p><strong>Ngày bắt đầu thuê:</strong> {detail.rentalStartDate ? moment(detail.rentalStartDate).format('DD-MM-YYYY') : 'N/A'}</p>
-                <p><strong>Ngày kết thúc thuê:</strong> {detail.rentalEndDate ? moment(detail.rentalEndDate).format('DD-MM-YYYY') : 'N/A'}</p>
-                <p><strong>Số tháng thuê:</strong> {detail.numberMonth || 'N/A'}</p>
-                
-                {/* Reclaim button for each detail */}
-                {orderData.status === 4 && (
-                  <Button type="primary" danger onClick={() => handleReclaimClick(detail.orderDetailId)}>
-                    Thu hồi sản phẩm
-                  </Button>
-                )}
-
-                {/* Conditionally display deposit information */}
-                {selectedDetailId === detail.orderDetailId && (
+          {orderData.typeEcommerceId === 2 && ( // Assuming 2 is the ID for rental
+            <Card title="Chi tiết đơn hàng">
+              {orderData.orderDetails && orderData.orderDetails.map(detail => (
+                <div key={detail.orderDetailId} style={{ marginBottom: '10px' }}>
+                  <p><strong>Mã cây:</strong> {detail.plantId}</p>
+                  <p><strong>Ngày bắt đầu thuê:</strong> {detail.rentalStartDate ? moment(detail.rentalStartDate).format('DD-MM-YYYY') : 'N/A'}</p>
+                  <p><strong>Ngày kết thúc thuê:</strong> {detail.rentalEndDate ? moment(detail.rentalEndDate).format('DD-MM-YYYY') : 'N/A'}</p>
+                  <p><strong>Số tháng thuê:</strong> {detail.numberMonth || '0'}</p>
                   <div style={{ marginTop: '10px' }}>
-                    <p><strong>Tiền đặt cọc:</strong> {detail.deposit || 'N/A'}</p>
-                    <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || 'N/A'}</p>
-                    <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || 'N/A'}</p>
-                    <p><strong>Tiền trả lại chủ sở hữu:</strong> {detail.depositReturnOwner || 'N/A'}</p>
+                    <p><strong>Tiền đặt cọc:</strong> {detail.deposit || '0'}</p>
+                    <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || '-'}</p>
+                    <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || '0'}</p>
+                    <p><strong>Tiền trả lại chủ sở hữu:</strong> {detail.depositReturnOwner || '0'}</p>
                   </div>
-                )}
-              </div>
-            ))}
-          </Card>
+                </div>
+              ))}
+            </Card>
+          )}
 
           {/* Scrollable Image Delivery Orders */}
           <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>

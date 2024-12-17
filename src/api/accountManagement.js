@@ -1,6 +1,6 @@
 import { baseApi } from "./baseClient";
 
-export const getAccounts = ({ page = 1, size = 100, search = "" }) => {
+export const getAccounts = ({ page = 1, size = 1000, search = "" }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await baseApi().get("/GetList/Users", {
@@ -10,6 +10,7 @@ export const getAccounts = ({ page = 1, size = 100, search = "" }) => {
           search,
         },
       });
+      console.log("check acc", data)
       return resolve(data);
     } catch (error) {
       console.log("Error fetching accounts:", error);

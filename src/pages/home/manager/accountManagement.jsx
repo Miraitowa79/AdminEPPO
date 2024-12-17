@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Input, Avatar, Button, Pagination, Select, Tag } from 'antd';
-import { SearchOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import { Table, Input, Avatar, Button, Pagination, Select, Tag } from "antd";
+import { SearchOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import avatar from "../../../assets/images/team-2.jpg";
-import { useNavigate } from 'react-router-dom';
-import { getAccounts, getAccountsStatus } from '../../../api/accountManagement';
+import { useNavigate } from "react-router-dom";
+import { getAccounts, getAccountsStatus } from "../../../api/accountManagement";
 
 const AccountMng = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState("");
   const pageSize = 10;
   const { Option } = Select;
 
-  const fetchData = async (page = 1, search = '', roleId = '') => {
+  const fetchData = async (page = 1, search = "", roleId = "") => {
     setLoading(true);
     try {
       const response = roleId
@@ -34,7 +34,10 @@ const AccountMng = () => {
       }
       // setTotalItems(response.total || items.length); // Adjusted totalItems logic
     } catch (error) {
-      console.error('Failed to fetch data:', error.response?.data || error.message);
+      console.error(
+        "Failed to fetch data:",
+        error.response?.data || error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -63,75 +66,75 @@ const AccountMng = () => {
   };
 
   const handleAddAccount = () => {
-    navigate('/manager/create/account');
+    navigate("/manager/create/account");
   };
 
   const columns = [
     {
-      title: 'STT',
-      dataIndex: 'key',
-      key: 'key',
+      title: "STT",
+      dataIndex: "key",
+      key: "key",
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Avatar',
-      dataIndex: 'imageUrl',
-      key: 'imageUrl',
+      title: "Avatar",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
       render: (imageUrl) => <Avatar src={imageUrl || avatar} />,
     },
     {
-      title: 'Họ Và Tên',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      title: "Họ Và Tên",
+      dataIndex: "fullName",
+      key: "fullName",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Số Điện Thoại',
-      dataIndex: 'phoneNumber',
-      key: 'phoneNumber',
+      title: "Số Điện Thoại",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
     },
     {
-      title: 'Ngày Tạo',
-      dataIndex: 'creationDate',
-      key: 'creationDate',
+      title: "Ngày Tạo",
+      dataIndex: "creationDate",
+      key: "creationDate",
       render: (date) => {
-        const formattedDate = new Date(date).toLocaleDateString('vi-VN');  // Định dạng theo chuẩn Việt Nam
+        const formattedDate = new Date(date).toLocaleDateString("vi-VN"); // Định dạng theo chuẩn Việt Nam
         return formattedDate;
       },
     },
     {
-      title: 'Trạng Thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng Thái",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
-        let statusText = '';
-        let color = '';
-  
+        let statusText = "";
+        let color = "";
+
         switch (status) {
           case 1:
-            statusText = 'Đang hoạt động';
-            color = 'green';  // Màu xanh cho "Đang hoạt động"
+            statusText = "Đang hoạt động";
+            color = "green"; // Màu xanh cho "Đang hoạt động"
             break;
           case 2:
-            statusText = 'Ngừng hoạt động';
-            color = 'red';    // Màu đỏ cho "Ngừng hoạt động"
+            statusText = "Ngừng hoạt động";
+            color = "red"; // Màu đỏ cho "Ngừng hoạt động"
             break;
           default:
-            statusText = 'Không rõ';
-            color = 'gray';   // Màu xám cho "Không rõ"
+            statusText = "Không rõ";
+            color = "gray"; // Màu xám cho "Không rõ"
             break;
         }
-  
+
         return <Tag color={color}>{statusText}</Tag>;
       },
     },
     {
-      title: 'Xem chi tiết',
-      key: 'action',
+      title: "Xem chi tiết",
+      key: "action",
       render: (text, record) => (
         <Button
           type="link"
@@ -143,32 +146,45 @@ const AccountMng = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+    <div style={{ padding: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
         <Input
           placeholder="Tìm kiếm theo họ và tên/ mã hợp đồng"
           suffix={
             <SearchOutlined
               onClick={handleSearch}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
             />
           }
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           onPressEnter={handleSearch}
-          style={{ width: '50%' }}
+          style={{ width: "50%" }}
         />
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleAddAccount}
-          style={{ marginLeft: '10px' }}
+          style={{ marginLeft: "10px" }}
         >
           Thêm Tài Khoản
         </Button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
         <Select
           placeholder="Chọn loại tài khoản"
           value={selectedType}
@@ -195,7 +211,11 @@ const AccountMng = () => {
         pageSize={pageSize}
         onChange={handlePageChange}
         showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
+        style={{
+          textAlign: "center",
+          marginTop: "20px",
+          justifyContent: "right",
+        }}
       />
     </div>
   );

@@ -1,9 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Form, Input, Typography, Card, Spin, message, Button, DatePicker, Select } from 'antd';
-import moment from 'moment';
-import { getAuctionDetails, updateAuctionRoom } from '../../../api/auctionManagement';
-import { getAccounts } from '../../../api/accountManagement';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {
+  Form,
+  Input,
+  Typography,
+  Card,
+  Spin,
+  message,
+  Button,
+  DatePicker,
+  Select,
+} from "antd";
+import moment from "moment";
+import {
+  getAuctionDetails,
+  updateAuctionRoom,
+} from "../../../api/auctionManagement";
+import { getAccounts } from "../../../api/accountManagement";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -31,8 +44,8 @@ const AuctionDetails = () => {
           modificationBy: data.room.modificationBy,
         });
       } catch (error) {
-        console.error('Error fetching auction details:', error);
-        message.error('Error fetching auction details');
+        console.error("Error fetching auction details:", error);
+        message.error("Error fetching auction details");
       } finally {
         setLoading(false);
       }
@@ -43,8 +56,8 @@ const AuctionDetails = () => {
         const { data } = await getAccounts({});
         setAccounts(data);
       } catch (error) {
-        console.error('Error fetching accounts:', error);
-        message.error('Error fetching accounts');
+        console.error("Error fetching accounts:", error);
+        message.error("Error fetching accounts");
       }
     };
 
@@ -57,17 +70,17 @@ const AuctionDetails = () => {
   const getStatusText = (status) => {
     switch (status) {
       case 1:
-        return 'Chờ xác nhận';
+        return "Chờ xác nhận";
       case 2:
-        return 'Đang hoạt động';
+        return "Đang hoạt động";
       case 3:
-        return 'Đấu giá thành công';
+        return "Đấu giá thành công";
       case 4:
-        return 'Đấu giá thất bại';
+        return "Đấu giá thất bại";
       case 5:
-        return 'Đã hủy';
+        return "Đã hủy";
       default:
-        return 'Không xác định';
+        return "Không xác định";
     }
   };
 
@@ -86,10 +99,13 @@ const AuctionDetails = () => {
         modificationDate: new Date().toISOString(),
       };
       await updateAuctionRoom(id, updatedData);
-      message.success('Cập nhật thành công !');
+      message.success("Cập nhật thành công !");
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to fetch data:', error.response?.data || error.message);
+      console.error(
+        "Failed to fetch data:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -113,41 +129,93 @@ const AuctionDetails = () => {
   };
 
   if (loading) {
-    return <Spin tip="Loading..." style={{ display: 'block', margin: 'auto' }} />;
+    return (
+      <Spin tip="Loading..." style={{ display: "block", margin: "auto" }} />
+    );
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto', display: 'flex', gap: '20px' }}>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1200px",
+        margin: "auto",
+        display: "flex",
+        gap: "20px",
+      }}
+    >
       <div style={{ flex: 1 }}>
-        <Title level={3} style={{ textAlign: 'center' }}>CHI TIẾT CUỘC ĐẤU GIÁ</Title>
+        <Title level={3} style={{ textAlign: "center" }}>
+          CHI TIẾT CUỘC ĐẤU GIÁ
+        </Title>
         <Card>
-          <Form form={form} layout="horizontal" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
+          <Form
+            form={form}
+            layout="horizontal"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            labelAlign="left"
+          >
             <Form.Item label="Id Phòng đấu giá" className="blurred-field">
-              <Input value={data.room.roomId || ''} readOnly />
+              <Input value={data.room.roomId || ""} readOnly />
             </Form.Item>
-            <Form.Item name="registrationOpenDate" label="Ngày mở đăng ký" rules={[{ required: true, message: 'Please select a date' }]}>
+            <Form.Item
+              name="registrationOpenDate"
+              label="Ngày mở đăng ký"
+              rules={[{ required: true, message: "Please select a date" }]}
+            >
               <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
             </Form.Item>
-            <Form.Item name="registrationEndDate" label="Ngày đóng đăng ký" rules={[{ required: true, message: 'Please select a date' }]}>
+            <Form.Item
+              name="registrationEndDate"
+              label="Ngày đóng đăng ký"
+              rules={[{ required: true, message: "Please select a date" }]}
+            >
               <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
             </Form.Item>
             <Form.Item label="Phí đăng ký" className="blurred-field">
-              <Input value={data.room.registrationFee || ''} readOnly />
+              <Input value={data.room.registrationFee || ""} readOnly />
             </Form.Item>
-            <Form.Item name="priceStep" label="Mức đấu giá" rules={[{ required: true, message: 'Please enter a price step' }]}>
+            <Form.Item
+              name="priceStep"
+              label="Mức đấu giá"
+              rules={[{ required: true, message: "Please enter a price step" }]}
+            >
               <Input disabled={!isEditing} />
             </Form.Item>
             <Form.Item label="Ngày tạo cuộc đấu giá" className="blurred-field">
-              <Input value={new Date(data.room.creationDate).toLocaleDateString() || ''} readOnly />
+              <Input
+                value={
+                  new Date(data.room.creationDate).toLocaleDateString() || ""
+                }
+                readOnly
+              />
             </Form.Item>
-            <Form.Item name="activeDate" label="Thời gian diễn ra" rules={[{ required: true, message: 'Please select a date' }]}>
+            <Form.Item
+              name="activeDate"
+              label="Thời gian diễn ra"
+              rules={[{ required: true, message: "Please select a date" }]}
+            >
               <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
             </Form.Item>
-            <Form.Item name="endDate" label="Thời gian kết thúc" rules={[{ required: true, message: 'Please select a date' }]}>
+            <Form.Item
+              name="endDate"
+              label="Thời gian kết thúc"
+              rules={[{ required: true, message: "Please select a date" }]}
+            >
               <DatePicker format="YYYY-MM-DD" disabled={!isEditing} />
             </Form.Item>
-            <Form.Item label="Thời gian sửa đổi lần cuối" className="blurred-field">
-              <Input value={new Date(data.room.modificationDate).toLocaleDateString() || ''} readOnly />
+            <Form.Item
+              label="Thời gian sửa đổi lần cuối"
+              className="blurred-field"
+            >
+              <Input
+                value={
+                  new Date(data.room.modificationDate).toLocaleDateString() ||
+                  ""
+                }
+                readOnly
+              />
             </Form.Item>
             {/* <Form.Item name="modificationBy" label="Modification By" rules={[{ required: true, message: 'Please select a user' }]}>
               <Select placeholder="Select a modifier" disabled={!isEditing}>
@@ -158,7 +226,11 @@ const AuctionDetails = () => {
                 ))}
               </Select>
             </Form.Item> */}
-            <Form.Item name="status" label="Trạng thái cuộc đấu giá" rules={[{ required: true, message: 'Please select a status' }]}>
+            <Form.Item
+              name="status"
+              label="Trạng thái cuộc đấu giá"
+              rules={[{ required: true, message: "Please select a status" }]}
+            >
               <Select placeholder="Select status" disabled={!isEditing}>
                 <Option value={1}>Chờ xác nhận</Option>
                 <Option value={2}>Đang hoạt động</Option>
@@ -170,16 +242,29 @@ const AuctionDetails = () => {
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               {isEditing ? (
                 <>
-                 <Button type="default" danger style={{ marginRight: '10px' }} onClick={handleCancelEdit}>Hủy</Button>
-                  <Button type="primary" onClick={handleUpdate} style={{ marginRight: '10px' }}>
-                    Cập nhật
-                  </Button>
-                  <Button onClick={handleCancelEdit}>
+                  <Button
+                    type="default"
+                    danger
+                    style={{ marginRight: "10px" }}
+                    onClick={handleCancelEdit}
+                  >
                     Hủy
                   </Button>
+                  <Button
+                    type="primary"
+                    onClick={handleUpdate}
+                    style={{ marginRight: "10px" }}
+                  >
+                    Cập nhật
+                  </Button>
+                  <Button onClick={handleCancelEdit}>Hủy</Button>
                 </>
               ) : (
-                <Button type="primary" onClick={toggleEdit} style={{ width: '100%' }}>
+                <Button
+                  type="primary"
+                  onClick={toggleEdit}
+                  style={{ width: "100%" }}
+                >
                   Chỉnh sửa
                 </Button>
               )}
@@ -188,43 +273,73 @@ const AuctionDetails = () => {
         </Card>
       </div>
       <div style={{ flex: 1 }}>
-        <Title level={3} style={{ textAlign: 'center' }}>THÔNG TIN CÂY ĐẤU GIÁ</Title>
+        <Title level={3} style={{ textAlign: "center" }}>
+          THÔNG TIN CÂY ĐẤU GIÁ
+        </Title>
         <Card>
-          <Form layout="horizontal" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
+          <Form
+            layout="horizontal"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            labelAlign="left"
+          >
             <Form.Item label="Tên cây">
-              <Input value={data.room.plant.plantName || ''} readOnly />
+              <Input value={data.room.plant.plantName || ""} readOnly />
             </Form.Item>
             <Form.Item label="Tiêu đề">
-              <Input value={data.room.plant.title || ''} readOnly />
+              <Input value={data.room.plant.title || ""} readOnly />
             </Form.Item>
             <Form.Item label="Mô tả">
-              <Input.TextArea value={data.room.plant.description || ''} readOnly />
+              <Input.TextArea
+                value={data.room.plant.description || ""}
+                readOnly
+              />
             </Form.Item>
             <Form.Item label="Hình ảnh: ">
-              <a href={data.room.plant.mainImage} target="_blank" rel="noopener noreferrer">
+              <a
+                href={data.room.plant.mainImage}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Xem ảnh
               </a>
             </Form.Item>
             <Form.Item label="Giá">
-              <Input value={data.room.plant.finalPrice || ''} readOnly />
+              <Input value={data.room.plant.finalPrice || ""} readOnly />
             </Form.Item>
             <Form.Item label="Loại cây">
-              <Input value={data.room.plant.categoryId || ''} readOnly />
+              <Input value={data.room.plant.categoryId || ""} readOnly />
             </Form.Item>
             <Form.Item label="Hình thức">
-              <Input value={data.room.plant.typeEcommerceId || ''} readOnly />
+              <Input value={data.room.plant.typeEcommerceId || ""} readOnly />
             </Form.Item>
             <Form.Item label="Trạng thái hoạt động">
-              <Input value={data.room.plant.isActive === true ? 'Có thể đặt mua / thuê / mang vào đấu giá.' : 'Không thể thuê, mua, đấu giá.'} readOnly />
+              <Input
+                value={
+                  data.room.plant.isActive === true
+                    ? "Có thể đặt mua / thuê / mang vào đấu giá."
+                    : "Không thể thuê, mua, đấu giá."
+                }
+                readOnly
+              />
             </Form.Item>
             <Form.Item label="Trạng thái của cây">
-              <Input value={data.room.plant.status === 1 ? 'Đã tạo.' : 'Đã hủy.'} readOnly />
+              <Input
+                value={data.room.plant.status === 1 ? "Đã tạo." : "Đã hủy."}
+                readOnly
+              />
             </Form.Item>
             <Form.Item label="Ngày tạo cây">
-              <Input value={new Date(data.room.plant.creationDate).toLocaleDateString() || ''} readOnly />
+              <Input
+                value={
+                  new Date(data.room.plant.creationDate).toLocaleDateString() ||
+                  ""
+                }
+                readOnly
+              />
             </Form.Item>
             <Form.Item label="Mã cây">
-              <Input value={data.room.plant.code || ''} readOnly />
+              <Input value={data.room.plant.code || ""} readOnly />
             </Form.Item>
           </Form>
         </Card>

@@ -1,26 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Pagination, Tag, Rate, Select } from 'antd';
-import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { getFeedbacks } from '../../../api/feedbackManagement';
+import React, { useState, useEffect } from "react";
+import { Table, Input, Button, Pagination, Tag, Rate, Select } from "antd";
+import { SearchOutlined, EyeOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { getFeedbacks } from "../../../api/feedbackManagement";
 
 const FeedbackMng = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [ratingFilter, setRatingFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [ratingFilter, setRatingFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const pageSize = 10;
 
-  const fetchData = async (page = 1, search = '', rating = '', status = '') => {
+  const fetchData = async (page = 1, search = "", rating = "", status = "") => {
     setLoading(true);
     try {
-      const response = await getFeedbacks({ page, size: pageSize, search, rating, status });
+      const response = await getFeedbacks({
+        page,
+        size: pageSize,
+        search,
+        rating,
+        status,
+      });
       const items = response.data;
-      
+
       setData(items);
 
       if (items.length < pageSize) {
@@ -29,7 +35,7 @@ const FeedbackMng = () => {
         setTotalItems((page + 1) * pageSize);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -63,44 +69,43 @@ const FeedbackMng = () => {
   };
 
   const getStarColor = (rating) => {
-    if (rating === 1) return 'red';
-    if (rating === 2 || rating === 3) return 'orange';
-    return 'gold';
+    if (rating === 1) return "red";
+    if (rating === 2 || rating === 3) return "orange";
+    return "gold";
   };
-
 
   const columns = [
     {
-      title: 'STT',
-      dataIndex: 'key',
-      key: 'key',
+      title: "STT",
+      dataIndex: "key",
+      key: "key",
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: 'Tiêu đề',
-      dataIndex: 'title',
-      key: 'title',
+      title: "Tiêu đề",
+      dataIndex: "title",
+      key: "title",
     },
     {
-      title: 'Khách hàng',
-      dataIndex: ['user', 'fullName'],
-      key: 'fullName',
+      title: "Khách hàng",
+      dataIndex: ["user", "fullName"],
+      key: "fullName",
     },
     {
-      title: 'Tên cây',
-      dataIndex: ['plant', 'plantName'],
-      key: 'plantName',
+      title: "Tên cây",
+      dataIndex: ["plant", "plantName"],
+      key: "plantName",
     },
     {
-      title: 'Ngày gửi',
-      dataIndex: 'creationDate',
-      key: 'creationDate',
+      title: "Ngày gửi",
+      dataIndex: "creationDate",
+      key: "creationDate",
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Đánh giá',
-      dataIndex: 'rating',
-      key: 'rating',
+      title: "Đánh giá",
+      dataIndex: "rating",
+      key: "rating",
       render: (rating) => (
         <Rate
           disabled
@@ -111,33 +116,33 @@ const FeedbackMng = () => {
       ),
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
-        let statusText = '';
-        let color = '';
-  
+        let statusText = "";
+        let color = "";
+
         switch (status) {
           case 1:
-            statusText = 'Đang xử lý';
-            color = 'yellow';
+            statusText = "Đang xử lý";
+            color = "yellow";
             break;
           case 2:
-            statusText = 'Đã phản hồi';
-            color = 'green';
+            statusText = "Đã phản hồi";
+            color = "green";
             break;
           default:
-            statusText = 'Không xác định';
-            color = 'black';
+            statusText = "Không xác định";
+            color = "black";
         }
-  
+
         return <Tag color={color}>{statusText}</Tag>;
       },
     },
     {
-      title: 'Xem',
-      key: 'action',
+      title: "Xem",
+      key: "action",
       render: (text, record) => (
         <Button
           type="link"
@@ -148,9 +153,15 @@ const FeedbackMng = () => {
     },
   ];
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '20px' }}>
-      </div>
+    <div style={{ padding: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      ></div>
       <Table
         columns={columns}
         dataSource={data}
@@ -164,7 +175,11 @@ const FeedbackMng = () => {
         pageSize={pageSize}
         onChange={handlePageChange}
         showSizeChanger={false}
-        style={{ textAlign: 'center', marginTop: '20px', justifyContent: 'right' }}
+        style={{
+          textAlign: "center",
+          marginTop: "20px",
+          justifyContent: "right",
+        }}
       />
     </div>
   );
