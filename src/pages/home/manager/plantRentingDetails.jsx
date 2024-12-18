@@ -375,7 +375,7 @@ const PlantRentingDetails = () => {
                   </td>
                   <td style={styles.value}>{accountDetails.email || "N/A"}</td>
                 </tr>
-                <tr>
+                {/* <tr>
                   <td style={styles.label}>
                     <strong>Địa chỉ:</strong>
                   </td>
@@ -391,8 +391,31 @@ const PlantRentingDetails = () => {
                       "N/A"
                     )}
                   </td>
+                </tr> */}
+                <tr>
+                  <td style={styles.label}>
+                    <strong>Địa chỉ:</strong>
+                  </td>
+                  <td style={styles.value}>
+                    {accountDetails &&
+                    accountDetails.addresses &&
+                    accountDetails.addresses.length > 0 ? (
+                      accountDetails.addresses.length === 1 ? (
+                        <span>
+                          {accountDetails.addresses[0].description || "N/A"}
+                        </span> // Nếu chỉ có một địa chỉ
+                      ) : (
+                        <ul>
+                          {accountDetails.addresses.map((address, index) => (
+                            <li key={index}>{address.description || "N/A"}</li> // Hiển thị địa chỉ từ description
+                          ))}
+                        </ul>
+                      )
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
                 </tr>
-
                 <tr>
                   <td style={styles.label}>
                     <strong>Hình ảnh:</strong>

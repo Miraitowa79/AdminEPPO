@@ -36,7 +36,7 @@ const AccountDetails = () => {
       try {
         const response = await getAccountDetails(id);
         setData(response.data);
-        console.log("data:", response.data);
+        console.log("data-account:", response.data);
       } catch (error) {
         console.error("Error fetching account details:", error);
         message.error("Lỗi khi tải thông tin tài khoản");
@@ -108,7 +108,7 @@ const AccountDetails = () => {
             labelAlign="left"
             initialValues={data}
           >
-            <Form.Item label="Hình ảnh">
+            {/* <Form.Item label="Hình ảnh">
               <Avatar
                 style={{
                   width: "100px",
@@ -118,7 +118,19 @@ const AccountDetails = () => {
                 }}
                 src={avatar}
               />
+            </Form.Item> */}
+            <Form.Item label="Hình ảnh">
+              <Avatar
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "50%",
+                }}
+                src={data.imageUrl || avatar} // Nếu không có imageUrl, sử dụng avatar mặc định
+              />
             </Form.Item>
+
             <Form.Item label="Tên tài khoản">
               <Input value={data.userName || ""} readOnly />
             </Form.Item>
