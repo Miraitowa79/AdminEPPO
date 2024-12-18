@@ -10,7 +10,7 @@ export const getAccounts = ({ page = 1, size = 1000, search = "" }) => {
           search,
         },
       });
-      console.log("check acc", data)
+      console.log("check acc", data);
       return resolve(data);
     } catch (error) {
       console.log("Error fetching accounts:", error);
