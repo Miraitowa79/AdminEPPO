@@ -215,8 +215,9 @@ const OrderDetails = () => {
           )}
 
           {/* Scrollable Image Delivery Orders */}
-          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>
-            {orderData.imageDeliveryOrders && orderData.imageDeliveryOrders.length > 0 ? (
+          <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {orderData.imageDeliveryOrders && orderData.imageDeliveryOrders.length > 0 ? (
               orderData.imageDeliveryOrders.map((imageOrder) => (
                 <Image
                   key={imageOrder.imageDeliveryOrderId}
@@ -228,17 +229,21 @@ const OrderDetails = () => {
             ) : (
               <p>Không có hình ảnh</p>
             )}
+            </div>
+            
           </Card>
 
           {/* Scrollable Image Return Orders */}
-          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px', maxHeight: '400px', overflowY: 'auto' }}>
-            {orderData.imageReturnOrders && orderData.imageReturnOrders.length > 0 ? (
-              orderData.imageReturnOrders.map((image, index) => (
-                <Image key={index} src={image.imageUrl} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
-              ))
-            ) : (
-              <p>Không có hình ảnh</p>
-            )}
+          <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {orderData.imageReturnOrders && orderData.imageReturnOrders.length > 0 ? (
+                orderData.imageReturnOrders.map((image, index) => (
+                  <Image key={index} src={image.imageUrl} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+                ))
+              ) : (
+                <p>Không có hình ảnh</p>
+              )}
+            </div>
           </Card>
         </Col>
       </Row>
