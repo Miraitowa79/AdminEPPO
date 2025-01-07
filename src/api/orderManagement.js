@@ -30,6 +30,18 @@ export const getOrderDetails = (id) => {
     });
 };
 
+export const getPlantsBill = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { data } = await baseApi().get(`GetList/Order/By/OrderId?orderId=${id}`);
+            return resolve(data);
+        } catch (error) {
+            console.log('Error fetching order details:', error);
+            return reject(error);
+        }
+    });
+};
+
 export const updateOrderDetails = (updatedOrderData) => {
     return new Promise(async (resolve, reject) => {
         try {
