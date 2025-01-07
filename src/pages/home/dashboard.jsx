@@ -98,7 +98,7 @@ const Dashboard = () => {
   const fetchRevenueDataBar = async (year) => {
     try {
       const response = await axios.get(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Revenue/Month",
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/Count/Order/Revenue/Month",
         {
           params: { status: 4, year: year },
         }
@@ -124,7 +124,7 @@ const Dashboard = () => {
   const fetchRevenueDataPie = async () => {
     try {
       const response = await axios.get(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Revenue/TypeEcommerceId",
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/Count/Order/Revenue/TypeEcommerceId",
         {
           params: { status: 4, year: 2024 },
         }
@@ -152,7 +152,7 @@ const Dashboard = () => {
   const fetchCustomerCount = async () => {
     try {
       const response = await fetch(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/Count/Customer/Status"
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/Count/Customer/Status"
       );
       if (response.ok) {
         const data = await response.json();
@@ -170,7 +170,7 @@ const Dashboard = () => {
   const fetchOrders = async () => {
     try {
       const response = await fetch(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Status"
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/Count/Order/Status"
       );
       if (response.ok) {
         const data = await response.json();
@@ -188,7 +188,7 @@ const Dashboard = () => {
   const fetchOrdersRevenue = async () => {
     try {
       const response = await fetch(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Total/Revenue"
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/Count/Order/Total/Revenue"
       );
       if (response.ok) {
         const data = await response.json();
@@ -206,7 +206,7 @@ const Dashboard = () => {
   const fetchOrdersRevenueToday = async () => {
     try {
       const response = await fetch(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/Count/Order/Today/Revenue"
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/Count/Order/Today/Revenue"
       );
       if (response.ok) {
         const data = await response.json();
@@ -224,7 +224,7 @@ const Dashboard = () => {
   const fetchCustomerList = async () => {
     try {
       const response = await axios.get(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/GetUser/Users/TopCustomers?page=1&size=5"
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/GetUser/Users/TopCustomers?page=1&size=5"
       ); // Replace with your API URL
       if (response.data?.data) {
         setCustomerList(response.data.data); // Update state with the fetched data
@@ -237,7 +237,7 @@ const Dashboard = () => {
   const fetchFeedbackList = async () => {
     try {
       const response = await axios.get(
-        "https://sep490ne-001-site1.atempurl.com/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=5"
+        "https://sep490pass-001-site1.ptempurl.com/api/v1/GetList/Feedback/Order/Delivered/Plant/Renting?page=1&size=5"
       );
       if (response.data?.data) {
         setFeedbackList(response.data.data); // Update state with the fetched data
