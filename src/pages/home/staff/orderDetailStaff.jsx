@@ -153,7 +153,7 @@ const OrderDetails = () => {
               <Form.Item label="Giá cây" name="totalPrice">
                 <Input readOnly />
               </Form.Item>
-              <Form.Item label="Phí giao hàng" name="deliveryFee">
+              <Form.Item label="Phí vận chuyển" name="deliveryFee">
                 <Input readOnly />
               </Form.Item>
               <Form.Item label="Tổng giá trị đơn hàng" name="finalPrice">
@@ -247,20 +247,59 @@ const OrderDetails = () => {
           {orderData.typeEcommerceId === 2 && (
             <Card title="Chi tiết đơn hàng">
               {orderData.orderDetails && orderData.orderDetails.map(detail => (
-                <div key={detail.orderDetailId} style={{ marginBottom: '10px' }}>
-                  <p><strong>Tên cây:</strong> {detail.plant.plantName}</p>
-                  <p><strong>Ngày bắt đầu thuê:</strong> {detail.rentalStartDate ? moment(detail.rentalStartDate).format('DD-MM-YYYY') : 'N/A'}</p>
-                  <p><strong>Ngày kết thúc thuê:</strong> {detail.rentalEndDate ? moment(detail.rentalEndDate).format('DD-MM-YYYY') : 'N/A'}</p>
-                  <p><strong>Số tháng thuê:</strong> {detail.numberMonth || '0'}</p>
-                  <div style={{ marginTop: '10px' }}>
-                    <p><strong>Tiền đặt cọc:</strong> {detail.deposit || '0'}</p>
-                    <p><strong>Mô tả đặt cọc:</strong> {detail.depositDescription || '-'}</p>
-                    <p><strong>Tiền trả lại khách hàng:</strong> {detail.depositReturnCustomer || '0'}</p>
-                    <p><strong>Tiền trả lại chủ sở hữu:</strong> {detail.depositReturnOwner || '0'}</p>
-                  </div>
+                <div key={detail.orderDetailId} style={{ marginBottom: '20px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      <tr>
+                        <td style={styles.label}><strong>Tên cây:</strong></td>
+                        <td style={styles.value}>{detail.plant.plantName}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Giá cây thuê/tháng:</strong></td>
+                        <td style={styles.value}>{detail.plant.finalPrice}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Ngày bắt đầu thuê:</strong></td>
+                        <td style={styles.value}>{detail.rentalStartDate ? moment(detail.rentalStartDate).format('DD-MM-YYYY') : 'N/A'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Ngày kết thúc thuê đúng hẹn:</strong></td>
+                        <td style={styles.value}>{detail.rentalEndDate ? moment(detail.rentalEndDate).format('DD-MM-YYYY') : 'N/A'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Số tháng thuê:</strong></td>
+                        <td style={styles.value}>{detail.numberMonth || '0'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Phí đặt cọc cây:</strong></td>
+                        <td style={styles.value}>{detail.deposit || '0'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Tổng phí trả cây thuê trước hạn ước tính từ 3 ngày sau:</strong></td>
+                        <td style={styles.value}>{detail.depositDescription || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Phí tiền ước tính trả:</strong></td>
+                        <td style={styles.value}>{detail.priceRentalReturnObject || '0'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Phí chênh lệch khi thu hồi sớm:</strong></td>
+                        <td style={styles.value}>{detail.feeRecoveryObject || '0'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Yêu cầu trả hàng sớm:</strong></td>
+                        <td style={styles.value}>{detail.isReturnSoon ? 'Đã xác nhận' : 'Chưa xác nhận'}</td>
+                      </tr>
+                      <tr>
+                        <td style={styles.label}><strong>Mô tả trả hàng sớm:</strong></td>
+                        <td style={styles.value}>{detail.returnSoonDescription || '0'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               ))}
             </Card>
+
           )}
 
           <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
@@ -312,5 +351,22 @@ const OrderDetails = () => {
     </div>
   );
 };
+
+const styles = {
+  label: {
+    padding: '10px',
+    textAlign: 'left',
+    borderBottom: '1px solid #ddd',
+    width: '40%',
+    verticalAlign: 'top',
+  },
+  value: {
+    padding: '10px',
+    textAlign: 'left',
+    borderBottom: '1px solid #ddd',
+    width: '60%',
+  },
+};
+
 
 export default OrderDetails;
