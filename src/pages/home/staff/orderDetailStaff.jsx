@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Form, Input, Button, Typography, Card, Spin, message, Select, Row, Col, Image, List, Modal } from 'antd';
+import { Form, Input, Button, Typography, Card, Spin, message, Select, Row, Col, Image, List, Modal, Collapse } from 'antd';
 import { getPlantsBill, updateOrderDetails } from '../../../api/orderManagement';
 import { getAccountDetails } from '../../../api/accountManagement';
 import { getTypeEcommerceById } from '../../../api/typeEcommerceApi';
 import { getPlantDetails } from '../../../api/plantsManagement';
+import { getContractsByOrderId } from '../../../api/contractManagement';
 import moment from 'moment';
 import { ShopOutlined, DollarCircleOutlined } from '@ant-design/icons';
 import './orderDetailStaff.scss';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { Panel } = Collapse;
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -23,6 +25,7 @@ const OrderDetails = () => {
   const [plantOwners, setPlantOwners] = useState({});
   const [ownerModalVisible, setOwnerModalVisible] = useState(false);
   const [selectedOwner, setSelectedOwner] = useState(null);
+  const [contracts, setContracts] = useState([]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -61,6 +64,12 @@ const OrderDetails = () => {
           creationDate: moment(order.creationDate).format('DD-MM-YYYY'),
           modificationDate: moment(order.modificationDate).format('DD-MM-YYYY'),
         });
+
+        if (order.typeEcommerceId === 2) {
+          const { data: contractData } = await getContractsByOrderId(id);
+          setContracts(contractData);
+        }  
+
       } catch (error) {
         console.error('Error fetching order details:', error);
         message.error('Error fetching order details');
@@ -128,7 +137,7 @@ const OrderDetails = () => {
     <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto' }}>
       <Title level={3} style={{ textAlign: 'center' }}>THÔNG TIN ĐƠN HÀNG</Title>
       <Row gutter={16}>
-        <Col span={16}>
+        <Col span={14}>
           <Card>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <Button type="primary" shape="round">Mã đơn hàng: {orderData.orderId}</Button>
@@ -243,7 +252,7 @@ const OrderDetails = () => {
             </div>
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={10}>
           {orderData.typeEcommerceId === 2 && (
             <Card title="Chi tiết đơn hàng">
               {orderData.orderDetails && orderData.orderDetails.map(detail => (
@@ -296,39 +305,73 @@ const OrderDetails = () => {
                       </tr>
                     </tbody>
                   </table>
+
+                  {/* Danh sách hợp đồng */}
+                    <Collapse>
+                      <Panel header="Danh sách hợp đồng" key="1">
+                        {contracts.length > 0 ? (
+                          <List
+                            itemLayout="horizontal"
+                            dataSource={contracts}
+                            renderItem={contract => (
+                              <List.Item>
+                                <List.Item.Meta
+                                  title={
+                                    <a href={contract.contractUrl} target="_blank" rel="noopener noreferrer">
+                                      {contract.contractFileName}
+                                    </a>
+                                  }
+                                  description={contract.description}
+                                />
+                              </List.Item>
+                            )}
+                          />
+                        ) : (
+                          <p>Không có hợp đồng</p>
+                        )}
+                      </Panel>
+                    </Collapse>
                 </div>
               ))}
             </Card>
 
+
           )}
 
           <Card title="Hình ảnh giao hàng" style={{ marginTop: '16px' }}>
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <Row gutter={[16, 16]} style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {orderData.imageDeliveryOrders && orderData.imageDeliveryOrders.length > 0 ? (
                 orderData.imageDeliveryOrders.map((imageOrder) => (
-                  <Image
-                    key={imageOrder.imageDeliveryOrderId}
-                    src={imageOrder.imageUrl}
-                    alt={`Delivery ${imageOrder.imageDeliveryOrderId}`}
-                    style={{ width: '100%', marginBottom: '10px' }}
-                  />
+                  <Col key={imageOrder.imageDeliveryOrderId} span={12}>
+                    <Image
+                      src={imageOrder.imageUrl}
+                      alt={`Delivery ${imageOrder.imageDeliveryOrderId}`}
+                      style={{ width: '100%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
+                    />
+                  </Col>
                 ))
               ) : (
                 <p>Không có hình ảnh</p>
               )}
-            </div>
+            </Row>
           </Card>
 
           <Card title="Hình ảnh trả hàng" style={{ marginTop: '16px' }}>
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <Row gutter={[16, 16]} style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {orderData.imageReturnOrders && orderData.imageReturnOrders.length > 0 ? (
                 orderData.imageReturnOrders.map((image, index) => (
-                  <Image key={index} src={image.imageUrl} alt={`Return ${index}`} style={{ width: '100%', marginBottom: '10px' }} />
+                  <Col key={index} span={12}>
+                    <Image
+                      src={image.imageUrl}
+                      alt={`Return ${index}`}
+                      style={{ width: '100%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
+                    />
+                  </Col>
                 ))
               ) : (
                 <p>Không có hình ảnh</p>
               )}
-            </div>
+            </Row>
           </Card>
         </Col>
       </Row>

@@ -119,3 +119,29 @@ export const getContractStatus = ({
     }
   });
 };
+
+export const getContractsByOrderIdAndCode = (orderId, code) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const url = `/GetList/Contracts/Owner-Customer/Id?orderId=${orderId}&code=${code}`;
+      const { data } = await baseApi().get(url);
+      return resolve(data);
+    } catch (error) {
+      console.log("Error fetching contracts by orderId and code:", error);
+      return reject(error);
+    }
+  });
+};
+
+export const getContractsByOrderId = (orderId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const url = `/GetList/Contracts/OrderDetail/Contract-list/Id?orderId=${orderId}`;
+      const { data } = await baseApi().get(url);
+      resolve(data);
+    } catch (error) {
+      console.log("Error fetching contracts by orderId:", error);
+      reject(error);
+    }
+  });
+};
